@@ -6,9 +6,12 @@ import { LoadingState } from '@/components/configurator/LoadingState';
 import { SaveIndicator } from '@/components/configurator/SaveIndicator';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { useChecklistConfig } from '@/hooks/useChecklistConfig';
+import { useState } from 'react';
 
 const Checklist = () => {
   const { user } = useAuth();
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+  
   const {
     loading,
     saving,
@@ -31,19 +34,17 @@ const Checklist = () => {
   // Calculate progress based on the four steps
   // Each step contributes to the progress
   const completedSteps = [
+    isProfileComplete,                         // Profile step
     customerTypes.some(type => type.selected), // Customer types step
     assetTypes.some(type => type.selected),    // Assets step
     meterTypes.some(type => type.selected)     // Optimization step
   ];
   
-  // We'll count profile as a step that will be checked via the ProgressBar component
-  // This is the 4th step (totaling 4 steps)
   const completedCount = completedSteps.filter(Boolean).length;
   const totalSteps = 4; // Profile, Customer Types, Assets, Optimization
   
-  // Calculate progress as a percentage of completed steps (excluding profile for now)
-  // The profile completion status will be checked in the ProgressBar component
-  const progress = Math.round((completedCount / 3) * 100); // Calculate based on 3 steps that we're tracking here
+  // Calculate progress as a percentage of completed steps
+  const progress = Math.round((completedCount / totalSteps) * 100);
 
   return (
     <div className="flex flex-col gap-6">
@@ -54,6 +55,7 @@ const Checklist = () => {
         customerTypes={customerTypes}
         assetTypes={assetTypes}
         meterTypes={meterTypes}
+        onProfileStatusChange={setIsProfileComplete}
       />
       
       <div className="flex flex-col md:flex-row gap-6">

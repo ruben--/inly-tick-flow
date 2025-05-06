@@ -14,6 +14,7 @@ interface ProgressBarProps {
   customerTypes: { id: string; name: string; selected: boolean }[];
   assetTypes: { id: string; name: string; selected: boolean }[];
   meterTypes: { id: string; name: string; selected: boolean }[];
+  onProfileStatusChange?: (isComplete: boolean) => void;
 }
 
 export const ProgressBar = ({ 
@@ -22,7 +23,8 @@ export const ProgressBar = ({
   totalTasks,
   customerTypes,
   assetTypes,
-  meterTypes
+  meterTypes,
+  onProfileStatusChange
 }: ProgressBarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
@@ -63,13 +65,18 @@ export const ProgressBar = ({
           data.website;
         
         setIsProfileComplete(!!profileComplete);
+        
+        // Call the callback with the profile status
+        if (onProfileStatusChange) {
+          onProfileStatusChange(!!profileComplete);
+        }
       } catch (error) {
         console.error("Error checking profile status:", error);
       }
     };
     
     checkProfileStatus();
-  }, [user]);
+  }, [user, onProfileStatusChange]);
 
   // Function to permanently hide the progress bar
   const handlePermanentHide = () => {
