@@ -53,7 +53,7 @@ export const MainContent = ({
             <CompanyLogo
               website={selectedCustomer?.website || ''}
               companyName={selectedCustomer?.name || 'Company'}
-              className="h-10 w-10"
+              className="h-10 w-10 rounded-full"
             />
             <h2 className="text-xl font-medium">Products Preview</h2>
           </div>

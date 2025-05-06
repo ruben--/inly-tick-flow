@@ -72,11 +72,11 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
               className="object-contain p-1 w-full h-full"
             />
           ) : (
-            <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500 text-lg">
+            <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">
               {isLoading ? (
                 <div className="animate-pulse rounded-none bg-gray-300 h-full w-full" />
               ) : (
-                initials || <Building className="h-10 w-10" />
+                <span className="text-lg font-medium">{initials}</span>
               )}
             </div>
           )}
