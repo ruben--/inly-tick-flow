@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,22 +10,17 @@ import { Mail, Briefcase } from 'lucide-react';
 const Index = () => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const { loginWithSSO } = useAuth();
-  const navigate = useNavigate();
   
   const handleSSOLogin = async (provider: 'google' | 'azure') => {
     setIsLoading(provider);
     try {
       await loginWithSSO(provider);
-      // No need to navigate here as the OAuth flow will redirect
+      // Clerk will handle the redirect after successful authentication
     } catch (error: any) {
       console.error('SSO login error:', error);
       
-      // More specific error handling
-      if (error?.message?.includes('provider is not enabled')) {
-        toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login is not enabled. Please configure the provider in Supabase.`);
-      } else {
-        toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login failed: ${error?.message || 'Unknown error'}`);
-      }
+      // Display error message
+      toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login failed: ${error?.message || 'Unknown error'}`);
       setIsLoading(null);
     }
   };

@@ -1,7 +1,12 @@
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Provider } from '@supabase/supabase-js';
+import { createContext, useContext, ReactNode } from 'react';
+import { 
+  useUser, 
+  useAuth as useClerkAuth, 
+  useSignIn, 
+  useSignOut, 
+  SignInWithOAuthStrategy 
+} from '@clerk/clerk-react';
 
 interface User {
   id: string;
@@ -12,7 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  loginWithSSO: (provider: Provider) => Promise<void>;
+  loginWithSSO: (provider: 'google' | 'azure') => Promise<void>;
   logout: () => void;
 }
 
@@ -31,79 +36,39 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { isLoaded: clerkLoaded, user: clerkUser } = useUser();
+  const { signOut } = useSignOut();
+  const { signIn } = useSignIn();
+  const { isLoaded } = useClerkAuth();
 
-  useEffect(() => {
-    // Check if the user is already authenticated
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Error getting session:', error);
-        setLoading(false);
-        return;
-      }
-      
-      if (data.session?.user) {
-        const { id, email } = data.session.user;
-        const name = email?.split('@')[0] || 'User';
-        setUser({ id, email: email || '', name });
-      }
-      setLoading(false);
-    };
-
-    fetchUser();
-
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session?.user) {
-          const { id, email } = session.user;
-          const name = email?.split('@')[0] || 'User';
-          setUser({ id, email: email || '', name });
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  // Transform Clerk User to our User interface
+  const user: User | null = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.primaryEmailAddress?.emailAddress || '',
+    name: clerkUser.firstName || clerkUser.username || 'User',
+  } : null;
 
   // SSO login function
-  const loginWithSSO = async (provider: Provider) => {
-    setLoading(true);
+  const loginWithSSO = async (provider: 'google' | 'azure') => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`
-        }
+      // Map our provider names to Clerk's OAuth strategy names
+      const strategy: SignInWithOAuthStrategy = 
+        provider === 'azure' ? 'oauth_microsoft' : 'oauth_google';
+        
+      await signIn.authenticateWithStrategy({
+        strategy,
+        redirectUrl: `${window.location.origin}/dashboard`,
+        redirectUrlComplete: `${window.location.origin}/dashboard`,
       });
-      
-      if (error) {
-        console.error('SSO login error:', error);
-        setLoading(false);
-        throw error;
-      }
     } catch (error) {
       console.error('SSO login error:', error);
-      setLoading(false);
       throw error;
     }
   };
 
   const logout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Logout error:', error);
-        throw error;
-      }
-      setUser(null);
+      await signOut();
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -111,7 +76,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, loginWithSSO, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        loading: !isLoaded, 
+        loginWithSSO, 
+        logout 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
