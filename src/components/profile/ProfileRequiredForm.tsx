@@ -1,12 +1,24 @@
 
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
-import { UserProfileFormValues } from "./ProfileForm";
+
+// Create validation schema
+const profileSchema = z.object({
+  companyName: z.string().min(1, "Company name is required"),
+  website: z.string().min(1, "Website is required").url("Must be a valid URL"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  role: z.string().min(1, "Role is required")
+});
+
+export type UserProfileFormValues = z.infer<typeof profileSchema>;
 
 interface ProfileRequiredFormProps {
   userId: string;
@@ -18,13 +30,15 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<UserProfileFormValues>({
+    resolver: zodResolver(profileSchema),
     defaultValues: {
       companyName: "",
       website: "",
       firstName: "",
       lastName: "",
       role: ""
-    }
+    },
+    mode: "onChange" // Validate on change for better user experience
   });
 
   // Fetch existing profile data if available
