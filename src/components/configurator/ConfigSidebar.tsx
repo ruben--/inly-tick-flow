@@ -25,9 +25,9 @@ export const ConfigSidebar = ({
     <div className="md:w-1/3 lg:w-1/4 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Design your offering</CardTitle>
+          <CardTitle>Configure Your Offering</CardTitle>
           <CardDescription>
-            Choose your target customers and add products, assets, and more that suit your business needs.
+            Customize what products and services you'd like to offer to your customers.
           </CardDescription>
         </CardHeader>
       </Card>

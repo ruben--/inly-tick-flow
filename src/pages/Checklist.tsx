@@ -97,7 +97,7 @@ const Checklist = () => {
   const isAllCustomersSelected = customerTypes.every(type => type.selected);
 
   return (
-    <div className="flex flex-col md:flex-row gap-6">
+    <div className="flex flex-col md:flex-row gap-6 p-4">
       <ConfigSidebar 
         customerTypes={customerTypes}
         assetTypes={assetTypes}
