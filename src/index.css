@@ -94,32 +94,10 @@
   }
 }
 
-/* Page Transition Styles - Simplified for pure cross-fade */
-.transition-container {
-  position: relative;
+/* Simple page content styling with no transitions */
+.page-content {
   width: 100%;
-  min-height: 50vh; /* Ensure minimal height to prevent layout shifts */
-}
-
-.transition-wrapper {
-  width: 100%;
-  transition: opacity 300ms ease;
-  will-change: opacity;
-}
-
-.fadeIn {
-  opacity: 1;
-  z-index: 1;
-}
-
-.fadeOut {
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  pointer-events: none; /* Prevent interaction during fade out */
+  min-height: 50vh; /* Maintain minimal height to prevent layout shifts */
 }
 
 /* Remove unused keyframes */

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 
 interface PageTransitionProps {
@@ -8,29 +8,11 @@ interface PageTransitionProps {
 
 export const PageTransition = ({ children }: PageTransitionProps) => {
   const location = useLocation();
-  const [displayLocation, setDisplayLocation] = useState(location);
-  const [transitionStage, setTransitionStage] = useState('fadeIn');
-
-  useEffect(() => {
-    if (location.pathname !== displayLocation.pathname) {
-      // Start fade out
-      setTransitionStage('fadeOut');
-      
-      // After fade out completes, update location and fade in
-      const timeout = setTimeout(() => {
-        setDisplayLocation(location);
-        setTransitionStage('fadeIn');
-      }, 300); // Match this with the CSS transition duration
-      
-      return () => clearTimeout(timeout);
-    }
-  }, [location, displayLocation]);
-
+  
+  // Simple wrapper with no transition effects
   return (
-    <div className="transition-container">
-      <div className={`transition-wrapper ${transitionStage}`}>
-        {children}
-      </div>
+    <div className="page-content">
+      {children}
     </div>
   );
 };
