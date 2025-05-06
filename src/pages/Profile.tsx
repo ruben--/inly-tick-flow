@@ -43,7 +43,7 @@ export default function Profile() {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .maybeSingle();
           
         if (error) {
@@ -83,7 +83,7 @@ export default function Profile() {
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          user_id: user.id,
+          id: user.id,
           company_name: data.companyName,
           website: data.website,
           first_name: data.firstName,
