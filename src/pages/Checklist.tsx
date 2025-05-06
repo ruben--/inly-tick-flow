@@ -1,12 +1,13 @@
 
 import { useAuth } from '@/contexts/AuthContext';
-import { ConfigSidebar } from '@/components/configurator/ConfigSidebar';
-import { MainContent } from '@/components/configurator/MainContent';
 import { LoadingState } from '@/components/configurator/LoadingState';
 import { SaveIndicator } from '@/components/configurator/SaveIndicator';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { useChecklistConfig } from '@/hooks/useChecklistConfig';
 import { useState } from 'react';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { ConfigurationSidebar } from '@/components/configurator/ConfigurationSidebar';
+import { MainContent } from '@/components/configurator/MainContent';
 
 const Checklist = () => {
   const { user } = useAuth();
@@ -32,7 +33,6 @@ const Checklist = () => {
   }
 
   // Calculate progress based on the four steps
-  // Each step contributes to the progress
   const completedSteps = [
     isProfileComplete,                         // Profile step
     customerTypes.some(type => type.selected), // Customer types step
@@ -47,35 +47,39 @@ const Checklist = () => {
   const progress = Math.round((completedCount / totalSteps) * 100);
 
   return (
-    <div className="flex flex-col gap-6">
-      <ProgressBar 
-        progress={progress}
-        completedTasks={completedCount}
-        totalTasks={totalSteps}
-        customerTypes={customerTypes}
-        assetTypes={assetTypes}
-        meterTypes={meterTypes}
-        onProfileStatusChange={setIsProfileComplete}
-      />
-      
-      <div className="flex flex-col md:flex-row gap-6">
-        <ConfigSidebar 
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex min-h-svh w-full">
+        <ConfigurationSidebar 
           customerTypes={customerTypes}
           assetTypes={assetTypes}
           meterTypes={meterTypes}
           toggleCustomerType={toggleCustomerType}
           toggleAssetType={toggleAssetType}
           toggleMeterType={toggleMeterType}
+          completedSteps={completedSteps}
         />
-        <MainContent 
-          selectedCustomer={selectedCustomer}
-          selectedAssetTypes={selectedAssetTypes}
-          isAllCustomersSelected={isAllCustomersSelected}
-          meterTypes={meterTypes}
-        />
-        <SaveIndicator saving={saving} lastSaved={lastSaved} />
+        
+        <div className="flex flex-col w-full gap-6">
+          <ProgressBar 
+            progress={progress}
+            completedTasks={completedCount}
+            totalTasks={totalSteps}
+            customerTypes={customerTypes}
+            assetTypes={assetTypes}
+            meterTypes={meterTypes}
+            onProfileStatusChange={setIsProfileComplete}
+          />
+          
+          <MainContent 
+            selectedCustomer={selectedCustomer}
+            selectedAssetTypes={selectedAssetTypes}
+            isAllCustomersSelected={isAllCustomersSelected}
+            meterTypes={meterTypes}
+          />
+          <SaveIndicator saving={saving} lastSaved={lastSaved} />
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
