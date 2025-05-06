@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
@@ -17,6 +18,13 @@ export const MainContent = ({
   // Find the FTM and BTM meter types
   const ftmMeter = meterTypes.find(type => type.id === 'ftm');
   const btmMeter = meterTypes.find(type => type.id === 'btm');
+  
+  // Check if any assets are selected
+  const hasSelectedAssets = selectedAssetTypes.length > 0;
+  
+  // Check if any meter types are selected
+  const hasSelectedMeterTypes = meterTypes.some(type => type.selected);
+  
   return <div className="md:w-2/3 lg:w-3/4">
       {/* Browser Mockup */}
       <div className="border border-gray-200 rounded-lg overflow-hidden shadow-lg bg-white">
@@ -43,7 +51,7 @@ export const MainContent = ({
               <h1 className="text-4xl font-bold text-white mb-2">
                 {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : 'Choose customers'}
               </h1>
-              <p className="text-white/90 text-lg">This is your product offering towards customers. </p>
+              <p className="text-white/90 text-lg">This is your product offering towards customers. </p>
             </div>
           </div>
 
@@ -53,24 +61,30 @@ export const MainContent = ({
               <CardTitle>These are the assets you currently optimise:</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {selectedAssetTypes.map(type => <Card key={type.id} className="flex overflow-hidden">
-                    <div className="w-20 shrink-0">
-                      <img src={type.image} alt={type.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-medium">{type.name}</h3>
-                      <p className="text-sm text-muted-foreground">{type.description}</p>
-                    </div>
-                  </Card>)}
-              </div>
+              {hasSelectedAssets ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {selectedAssetTypes.map(type => <Card key={type.id} className="flex overflow-hidden">
+                      <div className="w-20 shrink-0">
+                        <img src={type.image} alt={type.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-medium">{type.name}</h3>
+                        <p className="text-sm text-muted-foreground">{type.description}</p>
+                      </div>
+                    </Card>)}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No assets are being optimised</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Savings Section */}
           <Card>
             <CardHeader>
-              <CardTitle>This is the type of optimisation that is activated: </CardTitle>
+              <CardTitle>This is the type of optimisation that is activated: </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -99,8 +113,8 @@ export const MainContent = ({
                   </Card>}
 
                 {/* Show message when no meter types are selected */}
-                {!ftmMeter?.selected && !btmMeter?.selected && <div className="col-span-2 text-center py-8">
-                    <p className="text-muted-foreground">Select asset types to see options</p>
+                {!hasSelectedMeterTypes && <div className="col-span-2 text-center py-8">
+                    <p className="text-muted-foreground">No optimisation is activated</p>
                   </div>}
               </div>
             </CardContent>
