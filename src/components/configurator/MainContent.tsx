@@ -6,9 +6,10 @@ import { AssetType } from './AssetTypeCard';
 interface MainContentProps {
   selectedCustomer: CustomerType | undefined;
   selectedAssetTypes: AssetType[];
+  isAllCustomersSelected: boolean;
 }
 
-export const MainContent = ({ selectedCustomer, selectedAssetTypes }: MainContentProps) => {
+export const MainContent = ({ selectedCustomer, selectedAssetTypes, isAllCustomersSelected }: MainContentProps) => {
   return (
     <div className="md:w-2/3 lg:w-3/4">
       {/* Hero Section */}
@@ -20,7 +21,11 @@ export const MainContent = ({ selectedCustomer, selectedAssetTypes }: MainConten
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            {selectedCustomer ? `Welcome ${selectedCustomer.name}` : 'Choose customers'}
+            {isAllCustomersSelected 
+              ? 'All customers' 
+              : selectedCustomer 
+                ? `Welcome ${selectedCustomer.name}` 
+                : 'Choose customers'}
           </h1>
           <p className="text-white/90 text-lg">
             We got you covered, whatever your needs

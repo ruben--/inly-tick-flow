@@ -94,6 +94,7 @@ const Checklist = () => {
 
   const selectedCustomer = customerTypes.find(type => type.selected);
   const selectedAssetTypes = assetTypes.filter(type => type.selected);
+  const isAllCustomersSelected = customerTypes.every(type => type.selected);
 
   return (
     <div className="flex flex-col md:flex-row gap-6">
@@ -108,6 +109,7 @@ const Checklist = () => {
       <MainContent 
         selectedCustomer={selectedCustomer}
         selectedAssetTypes={selectedAssetTypes}
+        isAllCustomersSelected={isAllCustomersSelected}
       />
     </div>
   );
