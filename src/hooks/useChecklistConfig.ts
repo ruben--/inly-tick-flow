@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
@@ -58,6 +57,7 @@ export const useChecklistConfig = (userId: string | undefined): UseChecklistConf
       description: 'Such as data centers, solar parks, wind farms.',
       image: '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png',
       selected: false,
+      website: 'https://commercial-industry.com',
     },
     {
       id: 'residential',
@@ -65,6 +65,7 @@ export const useChecklistConfig = (userId: string | undefined): UseChecklistConf
       description: 'Such as data centers, solar parks, wind farms.',
       image: '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png',
       selected: true,
+      website: 'https://residential-energy.com',
     },
   ]);
 

@@ -7,6 +7,7 @@ export interface CustomerType {
   description: string;
   image: string;
   selected: boolean;
+  website?: string; // Added website property as optional
 }
 
 interface CustomerTypeCardProps {
