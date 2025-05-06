@@ -11,7 +11,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
 import { UserProfileFormValues } from "./ProfileRequiredForm"; // Import the type
 
-export const ProfileForm: React.FC = () => {
+interface ProfileFormProps {
+  onProfileComplete?: () => void;
+}
+
+export const ProfileForm: React.FC<ProfileFormProps> = ({ onProfileComplete }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +78,11 @@ export const ProfileForm: React.FC = () => {
             lastName: data.last_name || "",
             role: data.role || ""
           });
+          
+          // Check if profile is complete
+          if (data.company_name && data.website && data.first_name && data.last_name && data.role) {
+            onProfileComplete?.();
+          }
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -88,7 +97,7 @@ export const ProfileForm: React.FC = () => {
     };
     
     fetchProfile();
-  }, [user, form, toast]);
+  }, [user, form, toast, onProfileComplete]);
 
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!user?.id) return;
@@ -119,6 +128,9 @@ export const ProfileForm: React.FC = () => {
         title: "Success!",
         description: "Your profile has been updated",
       });
+      
+      // Call onProfileComplete callback if provided
+      onProfileComplete?.();
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
