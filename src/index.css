@@ -99,25 +99,32 @@
   position: relative;
   width: 100%;
   min-height: 50vh; /* Ensure minimal height to prevent layout shifts */
-  overflow: hidden; /* Prevent any overflow during transitions */
+  overflow-x: hidden; /* Only hide horizontal overflow */
 }
 
 .transition-wrapper {
-  position: relative;
   width: 100%;
-  will-change: opacity, transform; /* Optimize for animations */
+  opacity: 1;
+  transform: translateY(0);
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+  will-change: opacity, transform;
 }
 
 .fadeIn {
-  animation: fadeIn 0.3s ease-out forwards;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .fadeOut {
-  animation: fadeOut 0.3s ease-out forwards;
+  opacity: 0;
+  transform: translateY(-8px);
   position: absolute;
   width: 100%;
   top: 0;
   left: 0;
+  pointer-events: none; /* Prevent interaction during fade out */
 }
 
 @keyframes fadeIn {
