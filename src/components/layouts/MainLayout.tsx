@@ -77,11 +77,8 @@ export function MainLayout() {
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/login">Login</Link>
-                  </Button>
                   <Button size="sm" asChild>
-                    <Link to="/signup">Sign Up</Link>
+                    <Link to="/">Sign In with SSO</Link>
                   </Button>
                 </>
               )}

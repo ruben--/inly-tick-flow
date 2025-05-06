@@ -1,5 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Provider } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -10,8 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
+  loginWithSSO: (provider: Provider) => Promise<void>;
   logout: () => void;
 }
 
@@ -34,60 +35,68 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check local storage for user data
-    const storedUser = localStorage.getItem('vpp_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    // Check if the user is already authenticated
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        const { id, email } = data.session.user;
+        const name = email?.split('@')[0] || 'User';
+        setUser({ id, email: email || '', name });
+      }
+      setLoading(false);
+    };
+
+    fetchUser();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          const { id, email } = session.user;
+          const name = email?.split('@')[0] || 'User';
+          setUser({ id, email: email || '', name });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  // Mock authentication functions
-  const login = async (email: string, password: string) => {
+  // SSO login function
+  const loginWithSSO = async (provider: Provider) => {
     setLoading(true);
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
       
-      // Mock validation
-      if (!email.includes('@') || password.length < 6) {
-        throw new Error('Invalid credentials');
-      }
-      
-      const user = { id: crypto.randomUUID(), email, name: email.split('@')[0] };
-      setUser(user);
-      localStorage.setItem('vpp_user', JSON.stringify(user));
-    } finally {
+      if (error) throw error;
+    } catch (error) {
+      console.error('SSO login error:', error);
       setLoading(false);
+      throw error;
     }
   };
 
-  const signup = async (email: string, password: string, name: string) => {
-    setLoading(true);
+  const logout = async () => {
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-      
-      // Mock validation
-      if (!email.includes('@') || password.length < 6) {
-        throw new Error('Invalid credentials');
-      }
-      
-      const user = { id: crypto.randomUUID(), email, name };
-      setUser(user);
-      localStorage.setItem('vpp_user', JSON.stringify(user));
-    } finally {
-      setLoading(false);
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
     }
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('vpp_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, loading, loginWithSSO, logout }}>
       {children}
     </AuthContext.Provider>
   );
