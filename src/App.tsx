@@ -8,7 +8,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { MainLayout } from "./components/layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
 import Checklist from "./pages/Checklist";
 import Configure from "./pages/Configure";
 import NotFound from "./pages/NotFound";
@@ -30,12 +29,10 @@ const App = () => (
               <Route path="/login" element={<Navigate to="/" replace />} />
               <Route path="/signup" element={<Navigate to="/" replace />} />
               
+              {/* Redirect dashboard to checklist */}
+              <Route path="/dashboard" element={<Navigate to="/checklist" replace />} />
+              
               {/* Protected Routes */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
               <Route path="/checklist" element={
                 <ProtectedRoute>
                   <Checklist />

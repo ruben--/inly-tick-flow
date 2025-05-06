@@ -3,7 +3,7 @@ import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Check, Cog, List, User } from 'lucide-react';
+import { Check, Cog, User } from 'lucide-react';
 
 export function MainLayout() {
   const { user, logout } = useAuth();
@@ -28,12 +28,6 @@ export function MainLayout() {
             <nav className="hidden md:flex items-center gap-6">
               {user ? (
                 <>
-                  <Link 
-                    to="/dashboard" 
-                    className={`font-medium ${isActive('/dashboard') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    Dashboard
-                  </Link>
                   <Link 
                     to="/checklist" 
                     className={`font-medium ${isActive('/checklist') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
@@ -90,13 +84,6 @@ export function MainLayout() {
       {user && !isIndexPage && (
         <div className="md:hidden bg-muted border-b">
           <div className="container flex justify-between py-2">
-            <Link 
-              to="/dashboard" 
-              className={`flex flex-col items-center p-1 ${isActive('/dashboard') ? 'text-primary' : 'text-muted-foreground'}`}
-            >
-              <List size={18} />
-              <span className="text-xs">Dashboard</span>
-            </Link>
             <Link 
               to="/checklist" 
               className={`flex flex-col items-center p-1 ${isActive('/checklist') ? 'text-primary' : 'text-muted-foreground'}`}
