@@ -15,6 +15,9 @@ const AnimatedBackground: React.FC = () => {
     phase: number;
     speed: number;
     color: string;
+    // Add movement properties
+    velocityX: number;
+    velocityY: number;
   }
 
   useEffect(() => {
@@ -48,7 +51,10 @@ const AnimatedBackground: React.FC = () => {
           frequency: Math.random() * 0.02 + 0.01,
           phase: Math.random() * Math.PI * 2,
           speed: (Math.random() * 0.01 + 0.005) * (Math.random() > 0.5 ? 1 : -1),
-          color: `rgba(${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, 0.3)`
+          color: `rgba(${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, 0.3)`,
+          // Add random velocities for movement
+          velocityX: (Math.random() - 0.5) * 0.5,
+          velocityY: (Math.random() - 0.5) * 0.5
         });
       }
     };
@@ -91,6 +97,46 @@ const AnimatedBackground: React.FC = () => {
       ctx.stroke();
     };
     
+    // Update frequency point positions
+    const updateFrequencyPoints = () => {
+      if (!canvas) return;
+      
+      const { width, height } = canvas;
+      const padding = 50; // Padding from edges
+      
+      frequencyPointsRef.current.forEach(point => {
+        // Update position with velocity
+        point.x += point.velocityX;
+        point.y += point.velocityY;
+        
+        // Bounce off edges with padding
+        if (point.x < padding || point.x > width - padding) {
+          point.velocityX *= -1;
+          point.x = Math.max(padding, Math.min(width - padding, point.x));
+        }
+        
+        if (point.y < padding || point.y > height - padding) {
+          point.velocityY *= -1;
+          point.y = Math.max(padding, Math.min(height - padding, point.y));
+        }
+        
+        // Occasionally change velocity slightly for more organic movement
+        if (Math.random() < 0.01) {
+          point.velocityX += (Math.random() - 0.5) * 0.1;
+          point.velocityY += (Math.random() - 0.5) * 0.1;
+          
+          // Limit velocity to prevent too fast movement
+          const maxVelocity = 0.8;
+          const velocityMagnitude = Math.sqrt(point.velocityX * point.velocityX + point.velocityY * point.velocityY);
+          
+          if (velocityMagnitude > maxVelocity) {
+            point.velocityX = (point.velocityX / velocityMagnitude) * maxVelocity;
+            point.velocityY = (point.velocityY / velocityMagnitude) * maxVelocity;
+          }
+        }
+      });
+    };
+    
     // Animation function
     const animate = () => {
       if (!contextRef.current || !canvas) return;
@@ -100,6 +146,9 @@ const AnimatedBackground: React.FC = () => {
       
       // Get current time for phase calculation
       const time = performance.now() * 0.001;
+      
+      // Update positions of frequency points
+      updateFrequencyPoints();
       
       // Draw each frequency wave
       frequencyPointsRef.current.forEach(point => {
