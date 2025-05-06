@@ -53,7 +53,7 @@
 /* Add backdrop blur for when the profile modal is active */
 .DialogOverlay {
   backdrop-filter: blur(1.5px);
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.1) !important; /* 10% dark background */
 }
 
 @layer base {
