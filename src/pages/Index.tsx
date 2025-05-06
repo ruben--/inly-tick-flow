@@ -14,6 +14,7 @@ const Index = () => {
   const handleSSOLogin = async (provider: 'google' | 'microsoft') => {
     setIsLoading(provider);
     try {
+      console.log(`Starting ${provider} SSO login process...`);
       await loginWithSSO(provider);
       // Clerk will handle the redirect after successful authentication
     } catch (error: any) {

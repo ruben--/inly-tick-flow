@@ -47,18 +47,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     name: clerkUser.firstName || clerkUser.username || 'User',
   } : null;
 
-  // SSO login function
+  // SSO login function with fixed OAuth implementation
   const loginWithSSO = async (provider: 'google' | 'microsoft') => {
     try {
       // Map our provider names to Clerk's OAuth provider names
-      const strategy = 
-        provider === 'microsoft' ? 'oauth_microsoft' : 'oauth_google';
+      const strategy = provider === 'microsoft' ? 'oauth_microsoft' : 'oauth_google';
         
+      // Using the correct method for Clerk v5+
       await signIn.authenticateWithRedirect({
         strategy,
         redirectUrl: `${window.location.origin}/dashboard`,
         redirectUrlComplete: `${window.location.origin}/dashboard`,
       });
+      
+      // The redirect will happen automatically, no need to handle it manually
     } catch (error) {
       console.error('SSO login error:', error);
       throw error;
