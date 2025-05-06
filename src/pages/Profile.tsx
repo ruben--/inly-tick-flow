@@ -5,15 +5,15 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 
 export default function Profile() {
   return (
-    <div className="container py-8 max-w-2xl mx-auto">
+    <div className="container py-8 max-w-3xl mx-auto">
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Your Profile</CardTitle>
+        <CardHeader className="border-b">
+          <CardTitle className="text-2xl font-medium">Your Profile</CardTitle>
           <CardDescription>
             Update your personal and company information
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <ProfileForm />
         </CardContent>
       </Card>

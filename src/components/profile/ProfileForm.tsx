@@ -9,7 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
-import { UserProfileFormValues } from "./ProfileRequiredForm"; // Import the type
+import { UserProfileFormValues } from "./ProfileRequiredForm";
+import { CompanyLogo } from "./CompanyLogo";
 
 export const ProfileForm: React.FC = () => {
   const { user } = useAuth();
@@ -131,10 +132,24 @@ export const ProfileForm: React.FC = () => {
     }
   };
 
+  // Get current website value for logo display
+  const websiteValue = form.watch("website");
+  const companyNameValue = form.watch("companyName");
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <ProfileFormFields form={form} />
+        <div className="flex flex-col md:flex-row gap-6 items-start">
+          <CompanyLogo 
+            website={websiteValue} 
+            companyName={companyNameValue}
+            className="h-24 w-24 border border-gray-200"
+          />
+          
+          <div className="flex-1 w-full">
+            <ProfileFormFields form={form} />
+          </div>
+        </div>
         
         <Button type="submit" disabled={isLoading}>
           {isLoading ? "Saving..." : "Save Profile"}

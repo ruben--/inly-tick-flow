@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
+import { CompanyLogo } from "./CompanyLogo";
 
 // Create validation schema
 const profileSchema = z.object({
@@ -136,9 +137,21 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     }
   };
 
+  // Get current website value for logo display
+  const websiteValue = form.watch("website");
+  const companyNameValue = form.watch("companyName");
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="flex flex-col items-center mb-4">
+          <CompanyLogo 
+            website={websiteValue} 
+            companyName={companyNameValue}
+            className="h-24 w-24 border border-gray-200"
+          />
+        </div>
+
         <ProfileFormFields form={form} />
         
         <Button type="submit" disabled={isLoading} className="w-full">
