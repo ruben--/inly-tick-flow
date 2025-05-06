@@ -51,7 +51,8 @@ const AnimatedBackground: React.FC = () => {
           frequency: Math.random() * 0.02 + 0.01,
           phase: Math.random() * Math.PI * 2,
           speed: (Math.random() * 0.01 + 0.005) * (Math.random() > 0.5 ? 1 : -1),
-          color: `rgba(${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, 0.3)`,
+          // Klein Blue (RGB approximation: 0, 47, 167) with varying opacity
+          color: `rgba(0, 47, 167, ${0.2 + Math.random() * 0.3})`,
           // Add random velocities for movement
           velocityX: (Math.random() - 0.5) * 0.5,
           velocityY: (Math.random() - 0.5) * 0.5
@@ -170,8 +171,9 @@ const AnimatedBackground: React.FC = () => {
             ctx.beginPath();
             ctx.moveTo(pointA.x, pointA.y);
             ctx.lineTo(pointB.x, pointB.y);
+            // Use Klein Blue for connection lines too with distance-based opacity
             const opacity = 0.15 - (distance / (canvas.width * 0.4)) * 0.15;
-            ctx.strokeStyle = `rgba(100, 100, 100, ${opacity})`;
+            ctx.strokeStyle = `rgba(0, 47, 167, ${opacity})`;
             ctx.stroke();
           }
         }
