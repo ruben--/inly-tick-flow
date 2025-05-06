@@ -1,15 +1,6 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@font-face {
-    font-family: 'Fever Display';
-    src: url(https://cdn.prod.website-files.com/67cdd304497393c705d6d8c3/67cdd304497393c705d6d8dc_PerfectlyNineties-Regular.woff) format('woff');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
 
 @font-face {
     font-family: 'Fever Type';
