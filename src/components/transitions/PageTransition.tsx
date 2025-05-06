@@ -25,8 +25,10 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
   }, [location, displayLocation]);
 
   return (
-    <div className={`transition-wrapper ${transitionStage}`}>
-      {children}
+    <div className="transition-container">
+      <div className={`transition-wrapper ${transitionStage}`}>
+        {children}
+      </div>
     </div>
   );
 };

@@ -95,17 +95,29 @@
 }
 
 /* Page Transition Styles */
+.transition-container {
+  position: relative;
+  width: 100%;
+  min-height: 50vh; /* Ensure minimal height to prevent layout shifts */
+  overflow: hidden; /* Prevent any overflow during transitions */
+}
+
 .transition-wrapper {
   position: relative;
   width: 100%;
+  will-change: opacity, transform; /* Optimize for animations */
 }
 
 .fadeIn {
-  animation: fadeIn 0.3s ease forwards;
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
 .fadeOut {
-  animation: fadeOut 0.3s ease forwards;
+  animation: fadeOut 0.3s ease-out forwards;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
 }
 
 @keyframes fadeIn {
