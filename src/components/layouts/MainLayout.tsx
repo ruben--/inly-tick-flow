@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Check, Cog, User } from 'lucide-react';
 import { ProfileRequiredModal } from '@/components/ProfileRequiredModal';
-
 export function MainLayout() {
   const {
     user,
@@ -28,12 +26,8 @@ export function MainLayout() {
             
             <nav className="hidden md:flex items-center gap-6">
               {user ? <>
-                  <Link to="/checklist" className={`font-medium ${isActive('/checklist') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
-                    Setup Checklist
-                  </Link>
-                  <Link to="/configure" className={`font-medium ${isActive('/configure') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
-                    Configure
-                  </Link>
+                  <Link to="/checklist" className={`font-medium ${isActive('/checklist') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Configurator</Link>
+                  <Link to="/configure" className={`font-medium ${isActive('/configure') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Settings</Link>
                   <Link to="/profile" className={`font-medium ${isActive('/profile') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
                     Profile
                   </Link>
