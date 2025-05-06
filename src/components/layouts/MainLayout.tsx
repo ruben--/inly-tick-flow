@@ -13,79 +13,84 @@ export function MainLayout() {
     return location.pathname === path;
   };
 
+  // Hide header and footer on index page
+  const isIndexPage = location.pathname === '/';
+
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="bg-white border-b sticky top-0 z-10">
-        <div className="container flex justify-between items-center h-16">
-          <Link to="/" className="text-xl font-bold gradient-text">
-            VPP Orchestration Hub
-          </Link>
-          
-          <nav className="hidden md:flex items-center gap-6">
-            {user ? (
-              <>
-                <Link 
-                  to="/dashboard" 
-                  className={`font-medium ${isActive('/dashboard') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  to="/checklist" 
-                  className={`font-medium ${isActive('/checklist') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  Setup Checklist
-                </Link>
-                <Link 
-                  to="/configure" 
-                  className={`font-medium ${isActive('/configure') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  Configure
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link 
-                  to="/about" 
-                  className={`font-medium ${isActive('/about') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  About
-                </Link>
-                <Link 
-                  to="/features" 
-                  className={`font-medium ${isActive('/features') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                >
-                  Features
-                </Link>
-              </>
-            )}
-          </nav>
-          
-          <div className="flex items-center gap-2">
-            {user ? (
-              <>
-                <span className="hidden md:inline text-sm text-muted-foreground">
-                  {user.name}
-                </span>
-                <Button variant="ghost" size="sm" onClick={logout}>
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/login">Login</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link to="/signup">Sign Up</Link>
-                </Button>
-              </>
-            )}
+      {!isIndexPage && (
+        <header className="bg-white border-b sticky top-0 z-10">
+          <div className="container flex justify-between items-center h-16">
+            <Link to="/" className="text-xl font-bold gradient-text">
+              VPP Orchestration Hub
+            </Link>
+            
+            <nav className="hidden md:flex items-center gap-6">
+              {user ? (
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className={`font-medium ${isActive('/dashboard') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link 
+                    to="/checklist" 
+                    className={`font-medium ${isActive('/checklist') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                  >
+                    Setup Checklist
+                  </Link>
+                  <Link 
+                    to="/configure" 
+                    className={`font-medium ${isActive('/configure') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                  >
+                    Configure
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/about" 
+                    className={`font-medium ${isActive('/about') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                  >
+                    About
+                  </Link>
+                  <Link 
+                    to="/features" 
+                    className={`font-medium ${isActive('/features') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                  >
+                    Features
+                  </Link>
+                </>
+              )}
+            </nav>
+            
+            <div className="flex items-center gap-2">
+              {user ? (
+                <>
+                  <span className="hidden md:inline text-sm text-muted-foreground">
+                    {user.name}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={logout}>
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/login">Login</Link>
+                  </Button>
+                  <Button size="sm" asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      {user && (
+      {user && !isIndexPage && (
         <div className="md:hidden bg-muted border-b">
           <div className="container flex justify-between py-2">
             <Link 
@@ -120,15 +125,17 @@ export function MainLayout() {
         </div>
       )}
 
-      <main className="flex-1 container py-8">
+      <main className={`flex-1 ${!isIndexPage ? 'container py-8' : ''}`}>
         <Outlet />
       </main>
 
-      <footer className="bg-muted py-6 border-t">
-        <div className="container text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} VPP Orchestration Hub. All rights reserved.</p>
-        </div>
-      </footer>
+      {!isIndexPage && (
+        <footer className="bg-muted py-6 border-t">
+          <div className="container text-center text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} VPP Orchestration Hub. All rights reserved.</p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

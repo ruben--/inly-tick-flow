@@ -8,8 +8,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { MainLayout } from "./components/layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Checklist from "./pages/Checklist";
 import Configure from "./pages/Configure";
@@ -27,8 +25,6 @@ const App = () => (
           <Routes>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
               
               {/* Protected Routes */}
               <Route path="/dashboard" element={
