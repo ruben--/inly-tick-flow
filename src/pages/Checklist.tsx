@@ -28,21 +28,26 @@ const Checklist = () => {
     return <LoadingState />;
   }
 
-  // Calculate progress for the progress bar
-  const totalItems = customerTypes.length + assetTypes.length + meterTypes.length;
-  const completedItems = 
-    customerTypes.filter(ct => ct.selected).length +
-    assetTypes.filter(at => at.selected).length +
-    meterTypes.filter(mt => mt.selected).length;
+  // Calculate progress based on the four main steps
+  const completedSteps = [
+    customerTypes.some(type => type.selected), // Customer types step
+    assetTypes.some(type => type.selected),    // Assets step
+    meterTypes.some(type => type.selected)     // Optimization step
+  ];
   
-  const progress = Math.round((completedItems / totalItems) * 100);
+  // We'll count profile as a step that will be checked via the ProgressBar component
+  // This is the 4th step (totaling 4 steps)
+  const completedCount = completedSteps.filter(Boolean).length;
+  const totalSteps = 4; // Profile, Customer Types, Assets, Optimization
+  
+  const progress = Math.round((completedCount / (totalSteps - 1)) * 100); // Exclude profile from calculation as it's checked separately
 
   return (
     <div className="flex flex-col gap-6">
       <ProgressBar 
         progress={progress}
-        completedTasks={completedItems}
-        totalTasks={totalItems}
+        completedTasks={completedCount}
+        totalTasks={totalSteps}
         customerTypes={customerTypes}
         assetTypes={assetTypes}
         meterTypes={meterTypes}

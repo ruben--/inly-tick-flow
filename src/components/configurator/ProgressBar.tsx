@@ -2,15 +2,10 @@
 import { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Check, Circle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check, Circle, UserRound, Briefcase, ChartBar, Settings } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-
-interface TaskItem {
-  id: string;
-  name: string;
-  completed: boolean;
-  type: 'customer' | 'asset' | 'meter';
-}
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProgressBarProps {
   progress: number;
@@ -30,27 +25,69 @@ export const ProgressBar = ({
   meterTypes
 }: ProgressBarProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
+  const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
 
-  // Create a unified list of all task items
-  const allTasks: TaskItem[] = [
-    ...customerTypes.map(type => ({
-      id: type.id,
-      name: `Select ${type.name} Customer Type`,
-      completed: type.selected,
-      type: 'customer' as const
-    })),
-    ...assetTypes.map(type => ({
-      id: type.id,
-      name: `Configure ${type.name} Asset`,
-      completed: type.selected,
-      type: 'asset' as const
-    })),
-    ...meterTypes.map(type => ({
-      id: type.id,
-      name: `Set up ${type.name} Meter Type`,
-      completed: type.selected,
-      type: 'meter' as const
-    }))
+  // Check if profile is complete
+  useState(() => {
+    const checkProfileStatus = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('company_name, first_name, last_name, role, website')
+          .eq('id', user.id)
+          .maybeSingle();
+          
+        if (error) {
+          console.error("Error checking profile:", error);
+          return;
+        }
+        
+        // Check if all required profile fields are filled
+        const profileComplete = data && 
+          data.company_name && 
+          data.first_name && 
+          data.last_name && 
+          data.role && 
+          data.website;
+        
+        setIsProfileComplete(!!profileComplete);
+      } catch (error) {
+        console.error("Error checking profile status:", error);
+      }
+    };
+    
+    checkProfileStatus();
+  }, [user]);
+
+  // Define the four main setup steps
+  const setupSteps = [
+    {
+      id: 'profile',
+      name: 'Setup Company Profile',
+      completed: isProfileComplete,
+      icon: <UserRound className="h-4 w-4" />
+    },
+    {
+      id: 'customer-types',
+      name: 'Choose Customer Types',
+      completed: customerTypes.some(type => type.selected),
+      icon: <Briefcase className="h-4 w-4" />
+    },
+    {
+      id: 'assets',
+      name: 'Choose Assets',
+      completed: assetTypes.some(type => type.selected),
+      icon: <Settings className="h-4 w-4" />
+    },
+    {
+      id: 'optimization',
+      name: 'Choose Optimisation Type',
+      completed: meterTypes.some(type => type.selected),
+      icon: <ChartBar className="h-4 w-4" />
+    }
   ];
 
   return (
@@ -81,21 +118,24 @@ export const ProgressBar = ({
           <Progress value={progress} className="h-2" />
           
           <div className="mt-4 space-y-3">
-            <div className="text-sm font-medium">Task Status</div>
+            <div className="text-sm font-medium">Setup Steps</div>
             <div className="grid gap-2">
-              {allTasks.map((task) => (
+              {setupSteps.map((step) => (
                 <div 
-                  key={`${task.type}-${task.id}`} 
+                  key={step.id} 
                   className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-secondary/50"
                 >
-                  {task.completed ? (
+                  {step.completed ? (
                     <Check className="h-4 w-4 text-green-500 shrink-0" />
                   ) : (
                     <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
                   )}
-                  <span className={task.completed ? "text-foreground" : "text-muted-foreground"}>
-                    {task.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {step.icon}
+                    <span className={step.completed ? "text-foreground" : "text-muted-foreground"}>
+                      {step.name}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -103,11 +143,11 @@ export const ProgressBar = ({
           
           {progress === 100 ? (
             <div className="mt-2 text-sm text-green-600">
-              All tasks completed! Your VPP is fully configured.
+              All steps completed! Your VPP is fully configured.
             </div>
           ) : (
             <div className="mt-2 text-sm text-muted-foreground">
-              Complete all tasks to finalize your VPP configuration.
+              Complete all steps to finalize your VPP configuration.
             </div>
           )}
         </div>
