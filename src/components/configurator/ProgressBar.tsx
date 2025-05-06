@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Check, Circle, UserRound, Briefcase, ChartBar, Settings } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check, Circle, UserRound, Briefcase, ChartBar, Settings, X } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +27,15 @@ export const ProgressBar = ({
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
   const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
+  const [isPermanentlyHidden, setIsPermanentlyHidden] = useState<boolean>(false);
+
+  // Check if progress bar should be hidden based on localStorage
+  useEffect(() => {
+    const hiddenState = localStorage.getItem('progressBarHidden');
+    if (hiddenState === 'true') {
+      setIsPermanentlyHidden(true);
+    }
+  }, []);
 
   // Check if profile is complete
   useEffect(() => {
@@ -62,6 +71,17 @@ export const ProgressBar = ({
     checkProfileStatus();
   }, [user]);
 
+  // Function to permanently hide the progress bar
+  const handlePermanentHide = () => {
+    localStorage.setItem('progressBarHidden', 'true');
+    setIsPermanentlyHidden(true);
+  };
+
+  // If permanently hidden, don't render anything
+  if (isPermanentlyHidden) {
+    return null;
+  }
+
   // Define the four main setup steps
   const setupSteps = [
     {
@@ -94,8 +114,19 @@ export const ProgressBar = ({
     <Collapsible 
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="w-full bg-white mb-6 rounded-lg p-4 border border-gray-200 text-gray-800 shadow-sm font-fever"
+      className="relative w-full bg-white mb-6 rounded-lg p-4 border border-gray-200 text-gray-800 shadow-sm font-fever"
     >
+      {/* Close button */}
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        className="absolute right-1 top-1 h-6 w-6 p-0 hover:bg-gray-100 rounded-full" 
+        onClick={handlePermanentHide}
+        title="Hide progress bar permanently"
+      >
+        <X className="h-3 w-3" />
+      </Button>
+      
       <div className="flex justify-between items-center mb-2">
         <div className="font-medium">
           Setup Progress ({completedTasks}/{totalTasks})

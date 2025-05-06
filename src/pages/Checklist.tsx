@@ -28,7 +28,8 @@ const Checklist = () => {
     return <LoadingState />;
   }
 
-  // Calculate progress based on the four main steps
+  // Calculate progress based on the four steps
+  // Each step contributes to the progress
   const completedSteps = [
     customerTypes.some(type => type.selected), // Customer types step
     assetTypes.some(type => type.selected),    // Assets step
@@ -40,7 +41,9 @@ const Checklist = () => {
   const completedCount = completedSteps.filter(Boolean).length;
   const totalSteps = 4; // Profile, Customer Types, Assets, Optimization
   
-  const progress = Math.round((completedCount / (totalSteps - 1)) * 100); // Exclude profile from calculation as it's checked separately
+  // Calculate progress as a percentage of completed steps (excluding profile for now)
+  // The profile completion status will be checked in the ProgressBar component
+  const progress = Math.round((completedCount / 3) * 100); // Calculate based on 3 steps that we're tracking here
 
   return (
     <div className="flex flex-col gap-6">
