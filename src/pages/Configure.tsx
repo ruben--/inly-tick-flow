@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
+import { CheckCircle2, RefreshCcw } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ConfigState {
   vppName: string;
@@ -33,6 +35,20 @@ interface ConfigState {
   };
 }
 
+// Helper function to get stored config from local storage
+const getStoredConfig = (): ConfigState | null => {
+  const storedConfig = localStorage.getItem('vppConfig');
+  if (storedConfig) {
+    try {
+      return JSON.parse(storedConfig);
+    } catch (e) {
+      console.error('Error parsing stored config:', e);
+      return null;
+    }
+  }
+  return null;
+};
+
 const Configure = () => {
   const [config, setConfig] = useState<ConfigState>({
     vppName: 'My Virtual Power Plant',
@@ -57,6 +73,33 @@ const Configure = () => {
       dispatchMethod: 'automatic'
     }
   });
+  const [saving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
+
+  // Load stored configuration on initial load
+  useEffect(() => {
+    const storedConfig = getStoredConfig();
+    if (storedConfig) {
+      setConfig(storedConfig);
+      setLastSaved(new Date().toLocaleTimeString());
+    }
+  }, []);
+
+  // Save configuration when it changes with debounce
+  useEffect(() => {
+    setSaving(true);
+    const timer = setTimeout(() => {
+      localStorage.setItem('vppConfig', JSON.stringify(config));
+      setSaving(false);
+      setLastSaved(new Date().toLocaleTimeString());
+      toast({
+        title: "Configuration saved",
+        description: `Your changes have been saved automatically at ${new Date().toLocaleTimeString()}`,
+      });
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [config]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -103,20 +146,67 @@ const Configure = () => {
     }));
   };
 
-  const handleSave = () => {
-    // In a real app, this would save to the backend
-    // For demo purposes, we'll just show a success toast
-    toast.success('Configuration saved successfully');
+  const handleResetToDefaults = () => {
+    const defaultConfig = {
+      vppName: 'My Virtual Power Plant',
+      capacityMW: '10',
+      location: 'Western Grid',
+      gridConnectionType: 'distribution',
+      responseModes: {
+        demandResponse: true,
+        frequencyRegulation: false,
+        peakShaving: true,
+        loadFollowing: false
+      },
+      energySources: {
+        solar: true,
+        wind: true,
+        batteries: true,
+        generators: false
+      },
+      controlSettings: {
+        responseTime: '30',
+        autonomyLevel: 'medium',
+        dispatchMethod: 'automatic'
+      }
+    };
+    
+    setConfig(defaultConfig);
+    toast({
+      title: "Reset to defaults",
+      description: "Configuration has been reset to default values",
+    });
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold gradient-text">Configure Your VPP</h1>
-        <p className="text-muted-foreground mt-1">
-          Customize your virtual power plant settings
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">Configure Your VPP</h1>
+          <p className="text-muted-foreground mt-1">
+            Customize your virtual power plant settings
+          </p>
+        </div>
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+          {saving ? (
+            <div className="flex items-center">
+              <RefreshCcw className="h-4 w-4 mr-1 animate-spin" />
+              <span>Saving changes...</span>
+            </div>
+          ) : lastSaved ? (
+            <div className="flex items-center">
+              <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
+              <span>Saved at {lastSaved}</span>
+            </div>
+          ) : null}
+        </div>
       </div>
+
+      <Alert className="bg-muted/50">
+        <AlertDescription>
+          Your configuration is automatically saved as you make changes.
+        </AlertDescription>
+      </Alert>
 
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid grid-cols-4 mb-8">
@@ -378,8 +468,20 @@ const Configure = () => {
       </Tabs>
 
       <div className="flex justify-end gap-4">
-        <Button variant="outline">Reset to Defaults</Button>
-        <Button onClick={handleSave}>Save Configuration</Button>
+        <Button variant="outline" onClick={handleResetToDefaults}>Reset to Defaults</Button>
+        <Button disabled={saving}>
+          {saving ? (
+            <>
+              <RefreshCcw className="h-4 w-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Saved
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
