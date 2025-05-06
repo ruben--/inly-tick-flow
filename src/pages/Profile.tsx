@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -128,9 +127,9 @@ export default function Profile() {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} />
+                        <Input placeholder="John" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -142,9 +141,9 @@ export default function Profile() {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel>Last Name <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} />
+                        <Input placeholder="Doe" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -156,9 +155,9 @@ export default function Profile() {
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Role</FormLabel>
+                      <FormLabel>Role <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="Energy Manager" {...field} />
+                        <Input placeholder="Energy Manager" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -170,9 +169,9 @@ export default function Profile() {
                   name="companyName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company Name</FormLabel>
+                      <FormLabel>Company Name <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="Acme Inc." {...field} />
+                        <Input placeholder="Acme Inc." {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -4,6 +4,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Check, Cog, User } from 'lucide-react';
+import { ProfileRequiredModal } from '@/components/ProfileRequiredModal';
 
 export function MainLayout() {
   const {
@@ -18,6 +19,8 @@ export function MainLayout() {
   // Hide header and footer on index page
   const isIndexPage = location.pathname === '/';
   return <div className="min-h-screen flex flex-col">
+      {user && !isIndexPage && <ProfileRequiredModal />}
+      
       {!isIndexPage && <header className="bg-white border-b sticky top-0 z-10">
           <div className="container flex justify-between items-center h-16">
             <Link to="/" className="text-xl font-bold gradient-text">Growth Portal
