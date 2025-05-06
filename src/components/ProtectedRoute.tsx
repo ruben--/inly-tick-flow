@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse-slow">Loading...</div>
+        <div className="animate-pulse text-lg">Loading...</div>
       </div>
     );
   }

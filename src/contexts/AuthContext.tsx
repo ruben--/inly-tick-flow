@@ -1,7 +1,7 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Session, Provider, User } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 
 interface AuthUser {
   id: string;
@@ -13,7 +13,8 @@ interface AuthContextType {
   user: AuthUser | null;
   session: Session | null;
   loading: boolean;
-  loginWithSSO: (provider: 'google' | 'microsoft') => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -82,26 +83,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, []);
 
-  const loginWithSSO = async (provider: 'google' | 'microsoft') => {
+  const login = async (email: string, password: string) => {
     try {
-      // Map our provider names to Supabase OAuth provider names
-      const supabaseProvider: Provider = provider === 'microsoft' ? 'azure' : 'google';
-      console.log(`Starting ${provider} SSO login process...`);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: supabaseProvider,
+      if (error) {
+        throw error;
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const signup = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
       
       if (error) {
         throw error;
       }
-      
-      // Supabase handles the redirect automatically
-    } catch (error) {
-      console.error('SSO login error:', error);
+    } catch (error: any) {
+      console.error('Signup error:', error);
       throw error;
     }
   };
@@ -124,7 +136,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user, 
         session,
         loading, 
-        loginWithSSO, 
+        login, 
+        signup, 
         logout 
       }}
     >

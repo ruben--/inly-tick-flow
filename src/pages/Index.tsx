@@ -1,28 +1,82 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import AnimatedBackground from '@/components/AnimatedBackground';
-import { Mail, Briefcase } from 'lucide-react';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+const loginSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email address' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+});
+
+const signupSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email address' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 const Index = () => {
-  const [isLoading, setIsLoading] = useState<string | null>(null);
-  const { loginWithSSO } = useAuth();
-  
-  const handleSSOLogin = async (provider: 'google' | 'microsoft') => {
-    setIsLoading(provider);
+  const navigate = useNavigate();
+  const { login, signup } = useAuth();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+
+  const loginForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const signupForm = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
+
+  const handleLogin = async (values: LoginFormValues) => {
+    setIsLoggingIn(true);
     try {
-      console.log(`Starting ${provider} SSO login process...`);
-      await loginWithSSO(provider);
-      // Supabase will handle the redirect after successful authentication
+      await login(values.email, values.password);
+      toast.success('Successfully logged in');
+      navigate('/dashboard');
     } catch (error: any) {
-      console.error('SSO login error:', error);
-      
-      // Display error message
-      toast.error(`${provider === 'microsoft' ? 'Microsoft' : 'Google'} login failed: ${error?.message || 'Unknown error'}`);
-      setIsLoading(null);
+      console.error('Login error:', error);
+      toast.error(`Login failed: ${error?.message || 'Unknown error'}`);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleSignup = async (values: SignupFormValues) => {
+    setIsSigningUp(true);
+    try {
+      await signup(values.email, values.password);
+      toast.success('Account created. Please check your email to verify your account.');
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      toast.error(`Signup failed: ${error?.message || 'Unknown error'}`);
+    } finally {
+      setIsSigningUp(false);
     }
   };
 
@@ -38,32 +92,116 @@ const Index = () => {
           
           <Card className="w-full backdrop-blur-sm bg-card/80">
             <CardHeader>
-              <CardTitle className="text-center">Sign in with SSO</CardTitle>
+              <CardTitle className="text-center">Welcome</CardTitle>
               <CardDescription className="text-center">
-                Continue with your preferred authentication provider
+                Sign in to your account or create a new one
               </CardDescription>
             </CardHeader>
             
-            <CardContent className="space-y-4">
-              <Button 
-                className="w-full flex items-center justify-center gap-2"
-                variant="outline" 
-                onClick={() => handleSSOLogin('google')}
-                disabled={isLoading !== null}
-              >
-                <Mail size={18} />
-                {isLoading === 'google' ? 'Connecting...' : 'Continue with Google'}
-              </Button>
+            <Tabs defaultValue="login" className="w-full">
+              <TabsList className="grid grid-cols-2 mx-6">
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
               
-              <Button 
-                className="w-full flex items-center justify-center gap-2" 
-                onClick={() => handleSSOLogin('microsoft')}
-                disabled={isLoading !== null}
-              >
-                <Briefcase size={18} />
-                {isLoading === 'microsoft' ? 'Connecting...' : 'Continue with Microsoft'}
-              </Button>
-            </CardContent>
+              <TabsContent value="login">
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4 px-6 pb-6">
+                    <FormField
+                      control={loginForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="your@email.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={loginForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isLoggingIn}
+                    >
+                      {isLoggingIn ? 'Logging in...' : 'Log in'}
+                    </Button>
+                  </form>
+                </Form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <Form {...signupForm}>
+                  <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4 px-6 pb-6">
+                    <FormField
+                      control={signupForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="your@email.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={signupForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={signupForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Confirm password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isSigningUp}
+                    >
+                      {isSigningUp ? 'Creating account...' : 'Create account'}
+                    </Button>
+                  </form>
+                </Form>
+              </TabsContent>
+            </Tabs>
             
             <CardFooter className="flex justify-center">
               <p className="text-sm text-muted-foreground">
