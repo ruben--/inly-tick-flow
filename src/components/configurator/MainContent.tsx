@@ -21,7 +21,7 @@ export const MainContent = ({
   meterTypes
 }: MainContentProps) => {
   const { user } = useAuth();
-  const [profileData, setProfileData] = useState<{ logo_url: string | null, company_name: string | null } | null>(null);
+  const [profileData, setProfileData] = useState<{ logo_url: string | null, company_name: string | null, website: string | null } | null>(null);
 
   // Find the FTM and BTM meter types
   const ftmMeter = meterTypes.find(type => type.id === 'ftm');
@@ -33,12 +33,12 @@ export const MainContent = ({
   // Check if any meter types are selected
   const hasSelectedMeterTypes = meterTypes.some(type => type.selected);
   
-  // Get company domain from customer's website or use default
-  const companyDomain = selectedCustomer?.website 
-    ? selectedCustomer.website.replace(/^https?:\/\//, '').split('/')[0] 
+  // Extract domain from profile website or use default
+  const companyDomain = profileData?.website 
+    ? new URL(!/^https?:\/\//i.test(profileData.website) ? `https://${profileData.website}` : profileData.website).hostname
     : 'yourcompany.com';
   
-  // Fetch user profile data including logo_url
+  // Fetch user profile data including logo_url and website
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!user?.id) return;
@@ -46,7 +46,7 @@ export const MainContent = ({
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('logo_url, company_name')
+          .select('logo_url, company_name, website')
           .eq('id', user.id)
           .maybeSingle();
 
