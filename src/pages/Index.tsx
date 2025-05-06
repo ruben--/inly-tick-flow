@@ -11,7 +11,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const { loginWithSSO } = useAuth();
   
-  const handleSSOLogin = async (provider: 'google' | 'azure') => {
+  const handleSSOLogin = async (provider: 'google' | 'microsoft') => {
     setIsLoading(provider);
     try {
       await loginWithSSO(provider);
@@ -20,7 +20,7 @@ const Index = () => {
       console.error('SSO login error:', error);
       
       // Display error message
-      toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login failed: ${error?.message || 'Unknown error'}`);
+      toast.error(`${provider === 'microsoft' ? 'Microsoft' : 'Google'} login failed: ${error?.message || 'Unknown error'}`);
       setIsLoading(null);
     }
   };
@@ -56,11 +56,11 @@ const Index = () => {
               
               <Button 
                 className="w-full flex items-center justify-center gap-2" 
-                onClick={() => handleSSOLogin('azure')}
+                onClick={() => handleSSOLogin('microsoft')}
                 disabled={isLoading !== null}
               >
                 <Briefcase size={18} />
-                {isLoading === 'azure' ? 'Connecting...' : 'Continue with Microsoft'}
+                {isLoading === 'microsoft' ? 'Connecting...' : 'Continue with Microsoft'}
               </Button>
             </CardContent>
             

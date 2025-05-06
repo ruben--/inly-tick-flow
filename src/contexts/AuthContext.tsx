@@ -1,11 +1,10 @@
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { 
   useUser, 
   useAuth as useClerkAuth, 
-  useSignIn, 
-  useSignOut, 
-  SignInWithOAuthStrategy 
+  useSignIn,
+  useClerk
 } from '@clerk/clerk-react';
 
 interface User {
@@ -17,7 +16,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  loginWithSSO: (provider: 'google' | 'azure') => Promise<void>;
+  loginWithSSO: (provider: 'google' | 'microsoft') => Promise<void>;
   logout: () => void;
 }
 
@@ -37,9 +36,9 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const { isLoaded: clerkLoaded, user: clerkUser } = useUser();
-  const { signOut } = useSignOut();
   const { signIn } = useSignIn();
   const { isLoaded } = useClerkAuth();
+  const clerk = useClerk();
 
   // Transform Clerk User to our User interface
   const user: User | null = clerkUser ? {
@@ -49,13 +48,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   } : null;
 
   // SSO login function
-  const loginWithSSO = async (provider: 'google' | 'azure') => {
+  const loginWithSSO = async (provider: 'google' | 'microsoft') => {
     try {
-      // Map our provider names to Clerk's OAuth strategy names
-      const strategy: SignInWithOAuthStrategy = 
-        provider === 'azure' ? 'oauth_microsoft' : 'oauth_google';
+      // Map our provider names to Clerk's OAuth provider names
+      const strategy = 
+        provider === 'microsoft' ? 'oauth_microsoft' : 'oauth_google';
         
-      await signIn.authenticateWithStrategy({
+      await signIn.authenticateWithRedirect({
         strategy,
         redirectUrl: `${window.location.origin}/dashboard`,
         redirectUrlComplete: `${window.location.origin}/dashboard`,
@@ -68,7 +67,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      await signOut();
+      await clerk.signOut();
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
