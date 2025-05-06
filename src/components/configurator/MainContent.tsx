@@ -95,41 +95,48 @@ export const MainContent = ({
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className={`overflow-hidden ${!ftmMeter?.selected ? 'opacity-50' : ''}`}>
-                  <div className="h-40 bg-muted">
-                    <img 
-                      src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png"
-                      alt="Front of the Meter" 
-                      className="w-full h-full object-cover opacity-50"
-                    />
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-medium">Front of the Meter</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {ftmMeter?.selected 
-                        ? ftmMeter.description 
-                        : "Select Front of the Meter to see details"}
-                    </p>
-                  </CardContent>
-                </Card>
+                {ftmMeter?.selected && (
+                  <Card className="overflow-hidden">
+                    <div className="h-40 bg-muted">
+                      <img 
+                        src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png"
+                        alt="Front of the Meter" 
+                        className="w-full h-full object-cover opacity-50"
+                      />
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-medium">Front of the Meter</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {ftmMeter.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
                 
-                <Card className={`overflow-hidden ${!btmMeter?.selected ? 'opacity-50' : ''}`}>
-                  <div className="h-40 bg-muted">
-                    <img 
-                      src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png"
-                      alt="Behind the Meter" 
-                      className="w-full h-full object-cover opacity-50"
-                    />
+                {btmMeter?.selected && (
+                  <Card className="overflow-hidden">
+                    <div className="h-40 bg-muted">
+                      <img 
+                        src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png"
+                        alt="Behind the Meter" 
+                        className="w-full h-full object-cover opacity-50"
+                      />
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-medium">Behind the Meter</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {btmMeter.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Show message when no meter types are selected */}
+                {!ftmMeter?.selected && !btmMeter?.selected && (
+                  <div className="col-span-2 text-center py-8">
+                    <p className="text-muted-foreground">Select meter types to see options</p>
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-medium">Behind the Meter</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {btmMeter?.selected 
-                        ? btmMeter.description 
-                        : "Select Behind the Meter to see details"}
-                    </p>
-                  </CardContent>
-                </Card>
+                )}
               </div>
             </CardContent>
           </Card>
