@@ -4,7 +4,7 @@ import { LoadingState } from '@/components/configurator/LoadingState';
 import { SaveIndicator } from '@/components/configurator/SaveIndicator';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { useChecklistConfig } from '@/hooks/useChecklistConfig';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ConfigurationSidebar } from '@/components/configurator/ConfigurationSidebar';
 import { MainContent } from '@/components/configurator/MainContent';
@@ -12,6 +12,7 @@ import { MainContent } from '@/components/configurator/MainContent';
 const Checklist = () => {
   const { user } = useAuth();
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   
   const {
     loading,
@@ -27,6 +28,15 @@ const Checklist = () => {
     selectedAssetTypes,
     isAllCustomersSelected
   } = useChecklistConfig(user?.id);
+
+  // Ensure sidebar is open on component mount
+  useEffect(() => {
+    // Short delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      setSidebarOpen(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading) {
     return <LoadingState />;
@@ -47,7 +57,7 @@ const Checklist = () => {
   const progress = Math.round((completedCount / totalSteps) * 100);
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={sidebarOpen}>
       <div className="flex min-h-svh w-full">
         <ConfigurationSidebar 
           customerTypes={customerTypes}
@@ -59,7 +69,7 @@ const Checklist = () => {
           completedSteps={completedSteps}
         />
         
-        <div className="flex flex-col w-full gap-6">
+        <div className="flex flex-col w-full gap-6 p-6">
           <ProgressBar 
             progress={progress}
             completedTasks={completedCount}

@@ -42,14 +42,14 @@
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
     
-    /* Sidebar Apple-style theme variables */
-    --sidebar-background: 0 0% 97%;
+    /* Sidebar Apple-style theme variables - updated for more contrast */
+    --sidebar-background: 0 0% 96%;
     --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-accent: 0 0% 93%;
-    --sidebar-accent-foreground: 240 10% 3.9%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-accent: 0 0% 92%;
+    --sidebar-accent-foreground: 240 5% 15%;
+    --sidebar-primary: 210 100% 50%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 88%;
+    --sidebar-border: 0 0% 85%;
     --sidebar-ring: 240 5.9% 10%;
   }
  
@@ -121,4 +121,16 @@
 @keyframes collapseSection {
   0% { max-height: 500px; opacity: 1; }
   100% { max-height: 0; opacity: 0; }
+}
+
+/* Add a subtle shadow to the sidebar for more Apple-like styling */
+[data-sidebar="sidebar"] {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  border-right: 1px solid hsl(var(--sidebar-border));
+}
+
+/* Enhance sidebar menu item hover effects */
+[data-sidebar="menu-button"]:hover {
+  background-color: hsl(var(--sidebar-accent));
+  transition: all 0.2s ease-in-out;
 }
