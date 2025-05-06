@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Check, Cog, User } from 'lucide-react';
 import { ProfileRequiredModal } from '@/components/ProfileRequiredModal';
+import { PageTransition } from '@/components/transitions/PageTransition';
+
 export function MainLayout() {
   const {
     user,
@@ -76,7 +79,9 @@ export function MainLayout() {
         </div>}
 
       <main className={`flex-1 ${!isIndexPage ? 'container py-8' : ''}`}>
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
 
       {!isIndexPage && <footer className="bg-muted py-6 border-t">
