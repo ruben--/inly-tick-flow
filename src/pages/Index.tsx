@@ -6,20 +6,20 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import AnimatedBackground from '@/components/AnimatedBackground';
-import { Github, Mail } from 'lucide-react';
+import { Mail, Briefcase } from 'lucide-react';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const { loginWithSSO } = useAuth();
   const navigate = useNavigate();
   
-  const handleSSOLogin = async (provider: 'github' | 'google') => {
+  const handleSSOLogin = async (provider: 'google' | 'azure') => {
     setIsLoading(provider);
     try {
       await loginWithSSO(provider);
       // No need to navigate here as the OAuth flow will redirect
     } catch (error) {
-      toast.error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login failed. Please try again.`);
+      toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login failed. Please try again.`);
       setIsLoading(null);
     }
   };
@@ -44,15 +44,6 @@ const Index = () => {
             
             <CardContent className="space-y-4">
               <Button 
-                className="w-full flex items-center justify-center gap-2" 
-                onClick={() => handleSSOLogin('github')}
-                disabled={isLoading !== null}
-              >
-                <Github size={18} />
-                {isLoading === 'github' ? 'Connecting...' : 'Continue with GitHub'}
-              </Button>
-              
-              <Button 
                 className="w-full flex items-center justify-center gap-2"
                 variant="outline" 
                 onClick={() => handleSSOLogin('google')}
@@ -60,6 +51,15 @@ const Index = () => {
               >
                 <Mail size={18} />
                 {isLoading === 'google' ? 'Connecting...' : 'Continue with Google'}
+              </Button>
+              
+              <Button 
+                className="w-full flex items-center justify-center gap-2" 
+                onClick={() => handleSSOLogin('azure')}
+                disabled={isLoading !== null}
+              >
+                <Briefcase size={18} />
+                {isLoading === 'azure' ? 'Connecting...' : 'Continue with Microsoft'}
               </Button>
             </CardContent>
             
