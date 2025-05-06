@@ -1,7 +1,4 @@
-
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,29 +6,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileFormFields } from "./profile/ProfileFormFields";
-import { UserProfileFormValues } from "./profile/ProfileForm";
+import { ProfileRequiredForm } from "./profile/ProfileRequiredForm";
 
 export function ProfileRequiredModal() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   
-  const form = useForm<UserProfileFormValues>({
-    defaultValues: {
-      companyName: "",
-      website: "",
-      firstName: "",
-      lastName: "",
-      role: ""
-    }
-  });
-
   // Check if profile is complete
   useEffect(() => {
     const checkProfileCompletion = async () => {
@@ -56,17 +40,6 @@ export function ProfileRequiredModal() {
             !data.role ||
             !data.website) {
           setOpen(true);
-          
-          // Set form default values if profile exists but is incomplete
-          if (data) {
-            form.reset({
-              companyName: data.company_name || "",
-              website: data.website || "",
-              firstName: data.first_name || "",
-              lastName: data.last_name || "",
-              role: data.role || ""
-            });
-          }
         }
       } catch (error) {
         console.error("Error checking profile:", error);
@@ -79,45 +52,11 @@ export function ProfileRequiredModal() {
     };
     
     checkProfileCompletion();
-  }, [user, form, toast]);
+  }, [user, toast]);
 
-  const onSubmit = async (data: UserProfileFormValues) => {
-    if (!user?.id) return;
-    
-    setIsLoading(true);
-    
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          company_name: data.companyName,
-          website: data.website,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          role: data.role,
-          updated_at: new Date().toISOString()
-        });
-        
-      if (error) throw error;
-      
-      toast({
-        title: "Success!",
-        description: "Your profile has been updated",
-      });
-      
-      // Close modal after successful submission
-      setOpen(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update your profile",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // Function to handle successful profile update
+  const handleProfileUpdated = () => {
+    setOpen(false);
   };
 
   // Don't render anything if not needed or if no user
@@ -135,15 +74,7 @@ export function ProfileRequiredModal() {
           </DialogDescription>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <ProfileFormFields form={form} />
-            
-            <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? "Saving..." : "Save Profile"}
-            </Button>
-          </form>
-        </Form>
+        <ProfileRequiredForm userId={user.id} onSuccess={handleProfileUpdated} />
       </DialogContent>
     </Dialog>
   );
