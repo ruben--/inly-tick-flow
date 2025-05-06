@@ -83,11 +83,20 @@ export const MainContent = ({
         <div className="p-4">
           <div className="flex items-center gap-3 mb-6">
             {profileData?.logo_url ? (
-              <div className="h-10 w-10 flex items-center justify-center border border-gray-200 rounded overflow-hidden bg-white">
+              <div className="h-10 w-10 flex items-center justify-center border border-gray-200 rounded overflow-hidden bg-white p-1">
                 <img 
                   src={profileData.logo_url} 
                   alt={profileData?.company_name || "Company logo"}
-                  className="object-contain w-full h-full p-1"
+                  className="object-contain w-full h-full"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    // If image fails to load, we'll show company initials instead
+                    target.style.display = 'none';
+                    target.parentElement!.innerHTML = `<div class="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">
+                      <span class="text-lg font-medium">${profileData?.company_name?.slice(0, 2) || 'CO'}</span>
+                    </div>`;
+                  }}
                 />
               </div>
             ) : (
@@ -176,4 +185,3 @@ export const MainContent = ({
       </div>
     </div>;
 };
-
