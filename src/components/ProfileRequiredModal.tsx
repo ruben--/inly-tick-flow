@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -10,25 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ProfileFormValues {
-  companyName: string;
-  website: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-}
+import { ProfileFormFields } from "./profile/ProfileFormFields";
+import { UserProfileFormValues } from "./profile/ProfileForm";
 
 export function ProfileRequiredModal() {
   const { user } = useAuth();
@@ -36,7 +22,7 @@ export function ProfileRequiredModal() {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   
-  const form = useForm<ProfileFormValues>({
+  const form = useForm<UserProfileFormValues>({
     defaultValues: {
       companyName: "",
       website: "",
@@ -95,7 +81,7 @@ export function ProfileRequiredModal() {
     checkProfileCompletion();
   }, [user, form, toast]);
 
-  const onSubmit = async (data: ProfileFormValues) => {
+  const onSubmit = async (data: UserProfileFormValues) => {
     if (!user?.id) return;
     
     setIsLoading(true);
@@ -151,77 +137,7 @@ export function ProfileRequiredModal() {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                      <Input placeholder="John" {...field} required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                      <Input placeholder="Doe" {...field} required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                      <Input placeholder="Energy Manager" {...field} required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="companyName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company Name <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                      <Input placeholder="Acme Inc." {...field} required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="website"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Website <span className="text-red-500">*</span></FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com" {...field} required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <ProfileFormFields form={form} />
             
             <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading ? "Saving..." : "Save Profile"}

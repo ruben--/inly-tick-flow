@@ -1,0 +1,123 @@
+
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { ProfileFormFields } from "./ProfileFormFields";
+
+export interface UserProfileFormValues {
+  companyName: string;
+  website: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
+export const ProfileForm: React.FC = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const form = useForm<UserProfileFormValues>({
+    defaultValues: {
+      companyName: "",
+      website: "",
+      firstName: "",
+      lastName: "",
+      role: ""
+    }
+  });
+
+  // Fetch existing profile data if available
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user?.id) return;
+      
+      setIsLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+          
+        if (error) {
+          throw error;
+        }
+        
+        if (data) {
+          form.reset({
+            companyName: data.company_name || "",
+            website: data.website || "",
+            firstName: data.first_name || "",
+            lastName: data.last_name || "",
+            role: data.role || ""
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load your profile data",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchProfile();
+  }, [user, form, toast]);
+
+  const onSubmit = async (data: UserProfileFormValues) => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          company_name: data.companyName,
+          website: data.website,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          role: data.role,
+          updated_at: new Date().toISOString()
+        });
+        
+      if (error) throw error;
+      
+      toast({
+        title: "Success!",
+        description: "Your profile has been updated",
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update your profile",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <ProfileFormFields form={form} />
+        
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Saving..." : "Save Profile"}
+        </Button>
+      </form>
+    </Form>
+  );
+};
