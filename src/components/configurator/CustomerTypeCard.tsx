@@ -34,7 +34,7 @@ export const CustomerTypeCard = ({ customerType, onToggle }: CustomerTypeCardPro
       </div>
       <div className="flex-1">
         <div className="flex justify-between">
-          <h3 className="text-black">{customerType.name}</h3>
+          <h3 className="text-black font-medium">{customerType.name}</h3>
           <Checkbox 
             checked={customerType.selected} 
             className="border-gray-400 data-[state=checked]:bg-black data-[state=checked]:border-black" 

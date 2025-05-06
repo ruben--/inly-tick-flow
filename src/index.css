@@ -90,6 +90,6 @@
     @apply bg-background text-foreground font-fever;
   }
   h1, h2, h3, h4, h5, h6, strong, th, .font-medium {
-    font-weight: 500;
+    font-weight: 500; /* Changed from font-weight: 700 (bold) to 500 (medium) */
   }
 }
