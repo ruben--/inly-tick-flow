@@ -1,28 +1,23 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
 import { MeterType } from './MeterTypeCard';
-
 interface MainContentProps {
   selectedCustomer: CustomerType | undefined;
   selectedAssetTypes: AssetType[];
   isAllCustomersSelected: boolean;
   meterTypes: MeterType[];
 }
-
-export const MainContent = ({ 
-  selectedCustomer, 
-  selectedAssetTypes, 
+export const MainContent = ({
+  selectedCustomer,
+  selectedAssetTypes,
   isAllCustomersSelected,
-  meterTypes 
+  meterTypes
 }: MainContentProps) => {
   // Find the FTM and BTM meter types
   const ftmMeter = meterTypes.find(type => type.id === 'ftm');
   const btmMeter = meterTypes.find(type => type.id === 'btm');
-
-  return (
-    <div className="md:w-2/3 lg:w-3/4">
+  return <div className="md:w-2/3 lg:w-3/4">
       {/* Browser Mockup */}
       <div className="border border-gray-200 rounded-lg overflow-hidden shadow-lg bg-white">
         {/* Browser Chrome */}
@@ -43,47 +38,31 @@ export const MainContent = ({
           
           {/* Hero Section */}
           <div className="relative w-full h-[300px] mb-6 rounded-lg overflow-hidden">
-            <img 
-              src={selectedCustomer?.image || '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png'} 
-              alt="Hero" 
-              className="w-full h-full object-cover"
-            />
+            <img src={selectedCustomer?.image || '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png'} alt="Hero" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-8">
               <h1 className="text-4xl font-bold text-white mb-2">
-                {isAllCustomersSelected 
-                  ? 'All customers' 
-                  : selectedCustomer 
-                    ? `Welcome ${selectedCustomer.name}` 
-                    : 'Choose customers'}
+                {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : 'Choose customers'}
               </h1>
-              <p className="text-white/90 text-lg">
-                We got you covered, whatever your needs
-              </p>
+              <p className="text-white/90 text-lg">This is your product offering towards customers. </p>
             </div>
           </div>
 
           {/* Asset Types Section */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Headline about supporting different asset types</CardTitle>
+              <CardTitle>These are the assets you currently optimise:</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {selectedAssetTypes.map((type) => (
-                  <Card key={type.id} className="flex overflow-hidden">
+                {selectedAssetTypes.map(type => <Card key={type.id} className="flex overflow-hidden">
                     <div className="w-20 shrink-0">
-                      <img 
-                        src={type.image} 
-                        alt={type.name} 
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={type.image} alt={type.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="p-4">
                       <h3 className="font-medium">{type.name}</h3>
                       <p className="text-sm text-muted-foreground">{type.description}</p>
                     </div>
-                  </Card>
-                ))}
+                  </Card>)}
               </div>
             </CardContent>
           </Card>
@@ -91,18 +70,13 @@ export const MainContent = ({
           {/* Savings Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Headline about saving and earning</CardTitle>
+              <CardTitle>This is the type of optimisation that is activated: </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {ftmMeter?.selected && (
-                  <Card className="overflow-hidden">
+                {ftmMeter?.selected && <Card className="overflow-hidden">
                     <div className="h-40 bg-muted">
-                      <img 
-                        src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png"
-                        alt="Front of the Meter" 
-                        className="w-full h-full object-cover opacity-50"
-                      />
+                      <img src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png" alt="Front of the Meter" className="w-full h-full object-cover opacity-50" />
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-medium">Front of the Meter</h3>
@@ -110,17 +84,11 @@ export const MainContent = ({
                         {ftmMeter.description}
                       </p>
                     </CardContent>
-                  </Card>
-                )}
+                  </Card>}
                 
-                {btmMeter?.selected && (
-                  <Card className="overflow-hidden">
+                {btmMeter?.selected && <Card className="overflow-hidden">
                     <div className="h-40 bg-muted">
-                      <img 
-                        src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png"
-                        alt="Behind the Meter" 
-                        className="w-full h-full object-cover opacity-50"
-                      />
+                      <img src="/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png" alt="Behind the Meter" className="w-full h-full object-cover opacity-50" />
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-medium">Behind the Meter</h3>
@@ -128,20 +96,16 @@ export const MainContent = ({
                         {btmMeter.description}
                       </p>
                     </CardContent>
-                  </Card>
-                )}
+                  </Card>}
 
                 {/* Show message when no meter types are selected */}
-                {!ftmMeter?.selected && !btmMeter?.selected && (
-                  <div className="col-span-2 text-center py-8">
+                {!ftmMeter?.selected && !btmMeter?.selected && <div className="col-span-2 text-center py-8">
                     <p className="text-muted-foreground">Select meter types to see options</p>
-                  </div>
-                )}
+                  </div>}
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
