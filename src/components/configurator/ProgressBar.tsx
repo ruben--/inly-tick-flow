@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Check, Circle, UserRound, Briefcase, ChartBar, Settings } from 'lucide-react';
@@ -29,7 +29,7 @@ export const ProgressBar = ({
   const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
 
   // Check if profile is complete
-  useState(() => {
+  useEffect(() => {
     const checkProfileStatus = async () => {
       if (!user?.id) return;
       
