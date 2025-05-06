@@ -3,14 +3,7 @@ import React from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-
-interface UserProfileFormValues {
-  companyName: string;
-  website: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-}
+import { UserProfileFormValues } from "./ProfileRequiredForm"; // Import the type from the shared location
 
 interface ProfileFormFieldsProps {
   form: UseFormReturn<UserProfileFormValues>;
