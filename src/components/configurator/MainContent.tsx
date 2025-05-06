@@ -46,7 +46,7 @@ export const MainContent = ({
           <div className="relative w-full h-[300px] mb-6 rounded-lg overflow-hidden">
             <img src={selectedCustomer?.image || '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png'} alt="Hero" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-8">
-              <h1 className="text-4xl font-bold text-white mb-2">
+              <h1 className="font-bold text-white mb-2 text-2xl">
                 {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : 'Choose customers'}
               </h1>
               <p className="text-white/90 text-lg">This is your product offering towards customers. </p>
@@ -56,7 +56,7 @@ export const MainContent = ({
           {/* Asset Types Section */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="text-lg font-normal">Assets being optimised</CardTitle>
+              <CardTitle className="text-lg font-medium">Assets being optimised</CardTitle>
             </CardHeader>
             <CardContent>
               {hasSelectedAssets ? <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -78,7 +78,7 @@ export const MainContent = ({
           {/* Savings Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-normal">Type of optimisation activated</CardTitle>
+              <CardTitle className="text-lg font-medium">Type of optimisation activated</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -62,7 +62,7 @@ export const ConfigSidebar = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-black" />
-              <CardTitle className="text-lg text-black">Asset settings</CardTitle>
+              <CardTitle className="text-black text-base">Asset settings</CardTitle>
             </div>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-black hover:text-black hover:bg-gray-100" onClick={() => setAssetsOpen(!assetsOpen)}>
               {assetsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -84,7 +84,7 @@ export const ConfigSidebar = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-black" />
-              <CardTitle className="text-lg text-black">Optimisation settings</CardTitle>
+              <CardTitle className="text-black text-base">Optimisation settings</CardTitle>
             </div>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-black hover:text-black hover:bg-gray-100" onClick={() => setMetersOpen(!metersOpen)}>
               {metersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
