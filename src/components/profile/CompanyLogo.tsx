@@ -9,15 +9,17 @@ interface CompanyLogoProps {
   companyName: string;
   className?: string;
   onLogoFound?: (logoUrl: string | null) => void;
+  logoUrl?: string | null;
 }
 
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({ 
   website, 
   companyName,
   className = "h-16 w-16",
-  onLogoFound
+  onLogoFound,
+  logoUrl: initialLogoUrl
 }) => {
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +33,13 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     : 'CO';
 
   useEffect(() => {
+    // If we already have a logo URL from props, don't fetch another one
+    if (initialLogoUrl) {
+      setLogoUrl(initialLogoUrl);
+      if (onLogoFound) onLogoFound(initialLogoUrl);
+      return;
+    }
+
     const fetchLogo = async () => {
       if (!website) {
         setLogoUrl(null);
@@ -59,7 +68,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     };
 
     fetchLogo();
-  }, [website, onLogoFound]);
+  }, [website, onLogoFound, initialLogoUrl]);
 
   return (
     <div className="flex flex-col items-center">
