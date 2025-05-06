@@ -15,9 +15,6 @@ const profileSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   website: z.string()
     .min(1, "Website is required")
-    // First validate it's a string with minimum length
-    // Then transform it to add https:// if missing
-    // Then validate it's a URL
     .refine(val => {
       try {
         const url = new URL(!/^https?:\/\//i.test(val) ? `https://${val}` : val);
@@ -42,6 +39,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [savedWebsite, setSavedWebsite] = useState<string | null>(null);
   
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -74,6 +72,8 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         // Set form default values if profile exists but is incomplete
         if (data) {
           setLogoUrl(data.logo_url || null);
+          setSavedWebsite(data.website || null);
+          
           form.reset({
             companyName: data.company_name || "",
             website: data.website || "",
@@ -96,7 +96,9 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   }, [userId, form, toast]);
 
   const handleLogoFound = (foundLogoUrl: string | null) => {
-    setLogoUrl(foundLogoUrl);
+    if (foundLogoUrl) {
+      setLogoUrl(foundLogoUrl);
+    }
   };
 
   const onSubmit = async (data: UserProfileFormValues) => {
@@ -147,6 +149,9 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   // Get current website value for logo display
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
+  
+  // Check if website has changed from saved version to determine if we need a new logo
+  const websiteChanged = savedWebsite !== null && websiteValue !== savedWebsite;
 
   return (
     <Form {...form}>
@@ -157,6 +162,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
             companyName={companyNameValue}
             className="h-16 w-16"
             onLogoFound={handleLogoFound}
+            logoUrl={!websiteChanged ? logoUrl : null}
           />
         </div>
 

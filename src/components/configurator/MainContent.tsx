@@ -101,7 +101,7 @@ export const MainContent = ({
               </div>
             ) : (
               <CompanyLogo
-                website={selectedCustomer?.website || ''}
+                website={profileData?.website || selectedCustomer?.website || ''}
                 companyName={profileData?.company_name || selectedCustomer?.name || 'Company'}
                 className="h-10 w-10"
                 logoUrl={null}

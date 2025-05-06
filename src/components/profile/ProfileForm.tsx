@@ -17,14 +17,13 @@ export const ProfileForm: React.FC = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [savedWebsite, setSavedWebsite] = useState<string | null>(null);
   
   // Use the same profile schema as in ProfileRequiredForm
   const profileSchema = z.object({
     companyName: z.string().min(1, "Company name is required"),
     website: z.string()
       .min(1, "Website is required")
-      // First validate it's a string with minimum length
-      // Then validate it's a URL after transformation
       .refine(val => {
         try {
           const url = new URL(!/^https?:\/\//i.test(val) ? `https://${val}` : val);
@@ -70,6 +69,8 @@ export const ProfileForm: React.FC = () => {
         
         if (data) {
           setLogoUrl(data.logo_url || null);
+          setSavedWebsite(data.website || null);
+          
           form.reset({
             companyName: data.company_name || "",
             website: data.website || "",
@@ -94,7 +95,9 @@ export const ProfileForm: React.FC = () => {
   }, [user, form, toast]);
 
   const handleLogoFound = (foundLogoUrl: string | null) => {
-    setLogoUrl(foundLogoUrl);
+    if (foundLogoUrl) {
+      setLogoUrl(foundLogoUrl);
+    }
   };
 
   const onSubmit = async (data: UserProfileFormValues) => {
@@ -123,6 +126,9 @@ export const ProfileForm: React.FC = () => {
         
       if (error) throw error;
       
+      // Update the saved website to prevent unnecessary API calls
+      setSavedWebsite(normalizedWebsite);
+      
       toast({
         title: "Success!",
         description: "Your profile has been updated",
@@ -142,6 +148,9 @@ export const ProfileForm: React.FC = () => {
   // Get current website value for logo display
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
+  
+  // Check if website has changed from saved version to determine if we need a new logo
+  const websiteChanged = savedWebsite !== null && websiteValue !== savedWebsite;
 
   return (
     <Form {...form}>
@@ -152,6 +161,7 @@ export const ProfileForm: React.FC = () => {
             companyName={companyNameValue}
             className="h-16 w-16"
             onLogoFound={handleLogoFound}
+            logoUrl={!websiteChanged ? logoUrl : null}
           />
           
           <div className="flex-1 w-full">

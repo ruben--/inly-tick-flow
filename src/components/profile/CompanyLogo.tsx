@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Building } from "lucide-react";
-import { fetchCompanyBranding, getBestLogo } from "@/utils/brandfetch";
+import { fetchCompanyBranding, getBestLogo, extractDomain } from "@/utils/brandfetch";
 
 interface CompanyLogoProps {
   website: string;
@@ -22,6 +22,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
 
   const initials = companyName
     ? companyName
@@ -33,10 +34,9 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     : 'CO';
 
   useEffect(() => {
-    // If we already have a logo URL from props, don't fetch another one
+    // If we already have a logo URL from props, use it and don't fetch
     if (initialLogoUrl) {
       setLogoUrl(initialLogoUrl);
-      if (onLogoFound) onLogoFound(initialLogoUrl);
       return;
     }
 
@@ -47,6 +47,14 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         return;
       }
 
+      // Extract domain for comparison
+      const domain = extractDomain(website);
+      
+      // Skip fetch if we've already fetched for this domain
+      if (domain === lastFetchedDomain && logoUrl) {
+        return;
+      }
+      
       setIsLoading(true);
       setError(null);
       
@@ -54,6 +62,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         const brandingData = await fetchCompanyBranding(website);
         const logo = getBestLogo(brandingData);
         setLogoUrl(logo);
+        setLastFetchedDomain(domain);
         
         // Call the callback when we find a logo
         if (onLogoFound) onLogoFound(logo);
@@ -68,7 +77,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     };
 
     fetchLogo();
-  }, [website, onLogoFound, initialLogoUrl]);
+  }, [website, onLogoFound, initialLogoUrl, logoUrl, lastFetchedDomain]);
 
   return (
     <div className="flex flex-col items-center">
