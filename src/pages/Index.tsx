@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  password: z.string().min(1, { message: 'Password is required' }),
 });
 
 const signupSchema = z.object({
@@ -80,6 +80,20 @@ const Index = () => {
     }
   };
 
+  const loginWithTestAccount = async () => {
+    setIsLoggingIn(true);
+    try {
+      await login('q@example.com', 'password123');
+      toast.success('Successfully logged in with test account');
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Test login error:', error);
+      toast.error(`Test login failed: ${error?.message || 'Unknown error'}`);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
   return (
     <>
       <AnimatedBackground />
@@ -141,6 +155,25 @@ const Index = () => {
                       disabled={isLoggingIn}
                     >
                       {isLoggingIn ? 'Logging in...' : 'Log in'}
+                    </Button>
+
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t"></span>
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">During Development</span>
+                      </div>
+                    </div>
+
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      className="w-full" 
+                      onClick={loginWithTestAccount}
+                      disabled={isLoggingIn}
+                    >
+                      Login with Test Account
                     </Button>
                   </form>
                 </Form>
