@@ -1,23 +1,20 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { 
-  useUser, 
-  useAuth as useClerkAuth, 
-  useSignIn,
-  useClerk
-} from '@clerk/clerk-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Session, Provider, User } from '@supabase/supabase-js';
 
-interface User {
+interface AuthUser {
   id: string;
   email: string;
   name: string;
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
+  session: Session | null;
   loading: boolean;
   loginWithSSO: (provider: 'google' | 'microsoft') => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,32 +32,74 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { isLoaded: clerkLoaded, user: clerkUser } = useUser();
-  const { signIn } = useSignIn();
-  const { isLoaded } = useClerkAuth();
-  const clerk = useClerk();
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Transform Clerk User to our User interface
-  const user: User | null = clerkUser ? {
-    id: clerkUser.id,
-    email: clerkUser.primaryEmailAddress?.emailAddress || '',
-    name: clerkUser.firstName || clerkUser.username || 'User',
-  } : null;
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        setSession(currentSession);
+        
+        if (currentSession?.user) {
+          const authUser: AuthUser = {
+            id: currentSession.user.id,
+            email: currentSession.user.email || '',
+            name: currentSession.user.user_metadata?.full_name || 
+                  currentSession.user.user_metadata?.name || 
+                  currentSession.user.email?.split('@')[0] || 'User',
+          };
+          setUser(authUser);
+        } else {
+          setUser(null);
+        }
+        
+        setLoading(false);
+      }
+    );
 
-  // SSO login function with fixed OAuth implementation
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      
+      if (currentSession?.user) {
+        const authUser: AuthUser = {
+          id: currentSession.user.id,
+          email: currentSession.user.email || '',
+          name: currentSession.user.user_metadata?.full_name || 
+                currentSession.user.user_metadata?.name || 
+                currentSession.user.email?.split('@')[0] || 'User',
+        };
+        setUser(authUser);
+      }
+      
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const loginWithSSO = async (provider: 'google' | 'microsoft') => {
     try {
-      // Map our provider names to Clerk's OAuth provider names
-      const strategy = provider === 'microsoft' ? 'oauth_microsoft' : 'oauth_google';
-        
-      // Using the correct method for Clerk v5+
-      await signIn.authenticateWithRedirect({
-        strategy,
-        redirectUrl: `${window.location.origin}/dashboard`,
-        redirectUrlComplete: `${window.location.origin}/dashboard`,
+      // Map our provider names to Supabase OAuth provider names
+      const supabaseProvider: Provider = provider === 'microsoft' ? 'azure' : 'google';
+      console.log(`Starting ${provider} SSO login process...`);
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: supabaseProvider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
       });
       
-      // The redirect will happen automatically, no need to handle it manually
+      if (error) {
+        throw error;
+      }
+      
+      // Supabase handles the redirect automatically
     } catch (error) {
       console.error('SSO login error:', error);
       throw error;
@@ -69,7 +108,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      await clerk.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -80,7 +122,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     <AuthContext.Provider 
       value={{ 
         user, 
-        loading: !isLoaded, 
+        session,
+        loading, 
         loginWithSSO, 
         logout 
       }}

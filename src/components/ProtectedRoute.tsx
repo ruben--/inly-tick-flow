@@ -1,7 +1,6 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -19,7 +18,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Using our custom auth context which wraps Clerk
   if (!user) {
     // Redirect to login and remember where they were trying to go
     return <Navigate to="/" state={{ from: location.pathname }} replace />;

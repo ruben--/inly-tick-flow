@@ -16,7 +16,7 @@ const Index = () => {
     try {
       console.log(`Starting ${provider} SSO login process...`);
       await loginWithSSO(provider);
-      // Clerk will handle the redirect after successful authentication
+      // Supabase will handle the redirect after successful authentication
     } catch (error: any) {
       console.error('SSO login error:', error);
       
