@@ -4,6 +4,9 @@ import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
 import { MeterType } from './MeterTypeCard';
 import { CompanyLogo } from '@/components/profile/CompanyLogo';
+import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MainContentProps {
   selectedCustomer: CustomerType | undefined;
@@ -17,6 +20,9 @@ export const MainContent = ({
   isAllCustomersSelected,
   meterTypes
 }: MainContentProps) => {
+  const { user } = useAuth();
+  const [profileData, setProfileData] = useState<{ logo_url: string | null, company_name: string | null } | null>(null);
+
   // Find the FTM and BTM meter types
   const ftmMeter = meterTypes.find(type => type.id === 'ftm');
   const btmMeter = meterTypes.find(type => type.id === 'btm');
@@ -31,7 +37,33 @@ export const MainContent = ({
   const companyDomain = selectedCustomer?.website 
     ? selectedCustomer.website.replace(/^https?:\/\//, '').split('/')[0] 
     : 'yourcompany.com';
-    
+  
+  // Fetch user profile data including logo_url
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('logo_url, company_name')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching profile data:", error);
+          return;
+        }
+
+        setProfileData(data);
+      } catch (err) {
+        console.error("Error in profile fetch:", err);
+      }
+    };
+
+    fetchProfileData();
+  }, [user]);
+
   return <div className="md:w-2/3 lg:w-3/4">
       {/* Browser Mockup */}
       <div className="border border-gray-200 rounded-lg overflow-hidden shadow-lg bg-white">
@@ -51,9 +83,10 @@ export const MainContent = ({
         <div className="p-4">
           <div className="flex items-center gap-3 mb-6">
             <CompanyLogo
-              website={selectedCustomer?.website || ''}
-              companyName={selectedCustomer?.name || 'Company'}
-              className="h-10 w-10 rounded-full"
+              website={profileData?.logo_url ? '' : selectedCustomer?.website || ''}
+              companyName={profileData?.company_name || selectedCustomer?.name || 'Company'}
+              className="h-10 w-10"
+              logoUrl={profileData?.logo_url}
             />
             <h2 className="text-xl font-medium">Products Preview</h2>
           </div>
