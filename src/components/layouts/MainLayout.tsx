@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Check, Cog, User } from 'lucide-react';
+
 export function MainLayout() {
   const {
     user,
@@ -28,6 +30,9 @@ export function MainLayout() {
                   </Link>
                   <Link to="/configure" className={`font-medium ${isActive('/configure') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
                     Configure
+                  </Link>
+                  <Link to="/profile" className={`font-medium ${isActive('/profile') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
+                    Profile
                   </Link>
                 </> : <>
                   <Link to="/about" className={`font-medium ${isActive('/about') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
