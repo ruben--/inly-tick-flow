@@ -4,16 +4,17 @@ import React, { useEffect, useRef } from 'react';
 const AnimatedBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-  const particlesRef = useRef<Particle[]>([]);
   const animationFrameRef = useRef<number | null>(null);
+  const frequencyPointsRef = useRef<FrequencyPoint[]>([]);
   
-  interface Particle {
+  interface FrequencyPoint {
     x: number;
     y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    opacity: number;
+    amplitude: number;
+    frequency: number;
+    phase: number;
+    speed: number;
+    color: string;
   }
 
   useEffect(() => {
@@ -30,68 +31,102 @@ const AnimatedBackground: React.FC = () => {
       if (canvas) {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        initParticles();
+        initFrequencyPoints();
       }
     };
     
-    // Initialize particles
-    const initParticles = () => {
-      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 8000);
-      particlesRef.current = [];
+    // Initialize frequency points
+    const initFrequencyPoints = () => {
+      const pointCount = 8; // Number of frequency wave sources
+      frequencyPointsRef.current = [];
       
-      for (let i = 0; i < particleCount; i++) {
-        particlesRef.current.push({
+      for (let i = 0; i < pointCount; i++) {
+        frequencyPointsRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          size: Math.random() * 2 + 1,
-          speedX: (Math.random() - 0.5) * 0.5,
-          speedY: (Math.random() - 0.5) * 0.5,
-          opacity: Math.random() * 0.5 + 0.1
+          amplitude: Math.random() * 30 + 20,
+          frequency: Math.random() * 0.02 + 0.01,
+          phase: Math.random() * Math.PI * 2,
+          speed: (Math.random() * 0.01 + 0.005) * (Math.random() > 0.5 ? 1 : -1),
+          color: `rgba(${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, ${80 + Math.floor(Math.random() * 40)}, 0.3)`
         });
       }
+    };
+    
+    // Draw a single frequency wave
+    const drawFrequencyWave = (point: FrequencyPoint, time: number) => {
+      if (!contextRef.current || !canvas) return;
+      
+      const ctx = contextRef.current;
+      const { width, height } = canvas;
+      
+      ctx.beginPath();
+      ctx.strokeStyle = point.color;
+      ctx.lineWidth = 1.5;
+      
+      // Updated phase based on time
+      const currentPhase = point.phase + time * point.speed;
+      
+      // Draw a complete wave across the canvas
+      const segmentCount = Math.floor(width / 2);
+      const segmentSize = width / segmentCount;
+      
+      for (let i = 0; i <= segmentCount; i++) {
+        const x = i * segmentSize;
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(x - point.x, 2) + Math.pow(height/2 - point.y, 2)
+        );
+        
+        // Wave height based on distance, frequency, and phase
+        const waveHeight = Math.sin(distanceFromCenter * point.frequency + currentPhase) * point.amplitude;
+        const y = height/2 + waveHeight;
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      
+      ctx.stroke();
     };
     
     // Animation function
     const animate = () => {
       if (!contextRef.current || !canvas) return;
       
-      contextRef.current.clearRect(0, 0, canvas.width, canvas.height);
+      const ctx = contextRef.current;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Update and draw particles
-      particlesRef.current.forEach((particle, index) => {
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
+      // Get current time for phase calculation
+      const time = performance.now() * 0.001;
+      
+      // Draw each frequency wave
+      frequencyPointsRef.current.forEach(point => {
+        drawFrequencyWave(point, time);
+      });
+      
+      // Draw connection lines between points that are close
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < frequencyPointsRef.current.length; i++) {
+        const pointA = frequencyPointsRef.current[i];
         
-        // Wrap around edges
-        if (particle.x > canvas.width) particle.x = 0;
-        if (particle.x < 0) particle.x = canvas.width;
-        if (particle.y > canvas.height) particle.y = 0;
-        if (particle.y < 0) particle.y = canvas.height;
-        
-        // Draw particle
-        contextRef.current!.beginPath();
-        contextRef.current!.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        contextRef.current!.fillStyle = `rgba(100, 100, 100, ${particle.opacity})`;
-        contextRef.current!.fill();
-        
-        // Connect nearby particles with lines
-        for (let j = index + 1; j < particlesRef.current.length; j++) {
-          const otherParticle = particlesRef.current[j];
+        for (let j = i + 1; j < frequencyPointsRef.current.length; j++) {
+          const pointB = frequencyPointsRef.current[j];
           const distance = Math.sqrt(
-            Math.pow(particle.x - otherParticle.x, 2) +
-            Math.pow(particle.y - otherParticle.y, 2)
+            Math.pow(pointA.x - pointB.x, 2) + Math.pow(pointA.y - pointB.y, 2)
           );
           
-          if (distance < 100) {
-            contextRef.current!.beginPath();
-            contextRef.current!.moveTo(particle.x, particle.y);
-            contextRef.current!.lineTo(otherParticle.x, otherParticle.y);
-            const opacity = 0.2 - (distance / 100) * 0.2;
-            contextRef.current!.strokeStyle = `rgba(75, 75, 75, ${opacity})`;
-            contextRef.current!.stroke();
+          if (distance < canvas.width * 0.4) {
+            ctx.beginPath();
+            ctx.moveTo(pointA.x, pointA.y);
+            ctx.lineTo(pointB.x, pointB.y);
+            const opacity = 0.15 - (distance / (canvas.width * 0.4)) * 0.15;
+            ctx.strokeStyle = `rgba(100, 100, 100, ${opacity})`;
+            ctx.stroke();
           }
         }
-      });
+      }
       
       animationFrameRef.current = requestAnimationFrame(animate);
     };
