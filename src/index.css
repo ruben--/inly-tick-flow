@@ -94,22 +94,28 @@
   }
 }
 
-/* Page Transition Styles - Simplified for pure cross-fade */
+/* Enhanced Page Transition Styles */
 .transition-container {
   position: relative;
   width: 100%;
-  min-height: 50vh; /* Ensure minimal height to prevent layout shifts */
+  min-height: 100px;
+  overflow: hidden;
+  /* Hardware acceleration to prevent flickering */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .transition-wrapper {
   width: 100%;
-  transition: opacity 300ms ease;
+  transition: opacity 300ms ease-out;
   will-change: opacity;
 }
 
 .fadeIn {
   opacity: 1;
-  z-index: 1;
+  position: relative;
+  z-index: 2;
 }
 
 .fadeOut {
@@ -118,8 +124,19 @@
   width: 100%;
   top: 0;
   left: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none; /* Prevent interaction during fade out */
 }
 
-/* Remove unused keyframes */
+.content-loading {
+  opacity: 0;
+}
+
+/* Main layout wrapper - prevent layout shifts */
+#root, 
+#root > div,
+.min-h-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
