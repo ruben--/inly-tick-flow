@@ -43,6 +43,9 @@ const Checklist = () => {
         progress={progress}
         completedTasks={completedItems}
         totalTasks={totalItems}
+        customerTypes={customerTypes}
+        assetTypes={assetTypes}
+        meterTypes={meterTypes}
       />
       
       <div className="flex flex-col md:flex-row gap-6">
