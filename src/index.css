@@ -92,6 +92,10 @@
   h1, h2, h3, h4, h5, h6, strong, th, .font-medium {
     font-weight: 500; /* Changed from font-weight: 700 (bold) to 500 (medium) */
   }
+  /* Make all Lucide icons thinner by default */
+  svg[data-lucide] {
+    stroke-width: 1.5;
+  }
 }
 
 /* Simple page content styling with no transitions */

@@ -45,6 +45,9 @@ export const ConfigurationSidebar = ({
     setActiveSection(activeSection === section ? null : section);
   };
 
+  // Common props for all icons
+  const iconProps = { strokeWidth: 1.5 };
+
   return (
     <>
       <Sidebar side="left" variant="sidebar" collapsible="icon">
@@ -65,11 +68,11 @@ export const ConfigurationSidebar = ({
                     onClick={() => handleSectionClick("customers")}
                     tooltip="Customer Types"
                   >
-                    <Users className="h-5 w-5" />
+                    <Users className="h-5 w-5" {...iconProps} />
                     <span>Customer Types</span>
                     <ChevronRight className={`ml-auto h-4 w-4 transition-transform ${
                       activeSection === "customers" ? "rotate-90" : ""
-                    }`} />
+                    }`} {...iconProps} />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 
@@ -91,11 +94,11 @@ export const ConfigurationSidebar = ({
                     onClick={() => handleSectionClick("assets")}
                     tooltip="Asset Types"
                   >
-                    <Zap className="h-5 w-5" />
+                    <Zap className="h-5 w-5" {...iconProps} />
                     <span>Asset Types</span>
                     <ChevronRight className={`ml-auto h-4 w-4 transition-transform ${
                       activeSection === "assets" ? "rotate-90" : ""
-                    }`} />
+                    }`} {...iconProps} />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 
@@ -117,11 +120,11 @@ export const ConfigurationSidebar = ({
                     onClick={() => handleSectionClick("meters")}
                     tooltip="Optimization Types"
                   >
-                    <BarChart3 className="h-5 w-5" />
+                    <BarChart3 className="h-5 w-5" {...iconProps} />
                     <span>Optimization</span>
                     <ChevronRight className={`ml-auto h-4 w-4 transition-transform ${
                       activeSection === "meters" ? "rotate-90" : ""
-                    }`} />
+                    }`} {...iconProps} />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 
