@@ -8,12 +8,14 @@ interface CompanyLogoProps {
   website: string;
   companyName: string;
   className?: string;
+  onLogoFound?: (logoUrl: string | null) => void;
 }
 
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({ 
   website, 
   companyName,
-  className = "h-16 w-16"
+  className = "h-16 w-16",
+  onLogoFound
 }) => {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +34,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     const fetchLogo = async () => {
       if (!website) {
         setLogoUrl(null);
+        if (onLogoFound) onLogoFound(null);
         return;
       }
 
@@ -42,17 +45,21 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         const brandingData = await fetchCompanyBranding(website);
         const logo = getBestLogo(brandingData);
         setLogoUrl(logo);
+        
+        // Call the callback when we find a logo
+        if (onLogoFound) onLogoFound(logo);
       } catch (err) {
         console.error("Error fetching logo:", err);
         setError("Failed to fetch company logo");
         setLogoUrl(null);
+        if (onLogoFound) onLogoFound(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchLogo();
-  }, [website]);
+  }, [website, onLogoFound]);
 
   return (
     <div className="flex flex-col items-center">

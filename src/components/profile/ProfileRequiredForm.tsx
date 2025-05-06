@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -40,6 +41,7 @@ interface ProfileRequiredFormProps {
 export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId, onSuccess }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -71,6 +73,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         
         // Set form default values if profile exists but is incomplete
         if (data) {
+          setLogoUrl(data.logo_url || null);
           form.reset({
             companyName: data.company_name || "",
             website: data.website || "",
@@ -92,6 +95,10 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     fetchProfile();
   }, [userId, form, toast]);
 
+  const handleLogoFound = (foundLogoUrl: string | null) => {
+    setLogoUrl(foundLogoUrl);
+  };
+
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!userId) return;
     
@@ -112,6 +119,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
+          logo_url: logoUrl,
           updated_at: new Date().toISOString()
         });
         
@@ -148,6 +156,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
             website={websiteValue} 
             companyName={companyNameValue}
             className="h-16 w-16"
+            onLogoFound={handleLogoFound}
           />
         </div>
 
