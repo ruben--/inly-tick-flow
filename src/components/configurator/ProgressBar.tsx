@@ -29,7 +29,7 @@ export const ProgressBar = ({
   assetTypes,
   meterTypes
 }: ProgressBarProps) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Create a unified list of all task items
   const allTasks: TaskItem[] = [
