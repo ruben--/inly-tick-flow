@@ -46,11 +46,14 @@ export const ConfigSidebar = ({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Target customers</CardTitle>
-            <CollapsibleTrigger asChild onClick={() => setCustomersOpen(!customersOpen)}>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                {customersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CollapsibleTrigger>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0"
+              onClick={() => setCustomersOpen(!customersOpen)}
+            >
+              {customersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
           </div>
         </CardHeader>
         <Collapsible open={customersOpen} onOpenChange={setCustomersOpen}>
@@ -73,11 +76,14 @@ export const ConfigSidebar = ({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Asset types</CardTitle>
-            <CollapsibleTrigger asChild onClick={() => setAssetsOpen(!assetsOpen)}>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                {assetsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CollapsibleTrigger>
+            <Button
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0"
+              onClick={() => setAssetsOpen(!assetsOpen)}
+            >
+              {assetsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
           </div>
         </CardHeader>
         <Collapsible open={assetsOpen} onOpenChange={setAssetsOpen}>
@@ -100,11 +106,14 @@ export const ConfigSidebar = ({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">FTM & BTM</CardTitle>
-            <CollapsibleTrigger asChild onClick={() => setMetersOpen(!metersOpen)}>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                {metersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CollapsibleTrigger>
+            <Button
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0"
+              onClick={() => setMetersOpen(!metersOpen)}
+            >
+              {metersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
           </div>
         </CardHeader>
         <Collapsible open={metersOpen} onOpenChange={setMetersOpen}>
