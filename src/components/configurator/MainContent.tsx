@@ -100,7 +100,7 @@ export const MainContent = ({
 
                 {/* Show message when no meter types are selected */}
                 {!ftmMeter?.selected && !btmMeter?.selected && <div className="col-span-2 text-center py-8">
-                    <p className="text-muted-foreground">Select meter types to see options</p>
+                    <p className="text-muted-foreground">Select asset types to see options</p>
                   </div>}
               </div>
             </CardContent>
