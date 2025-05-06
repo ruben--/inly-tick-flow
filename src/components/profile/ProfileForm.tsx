@@ -143,7 +143,7 @@ export const ProfileForm: React.FC = () => {
           <CompanyLogo 
             website={websiteValue} 
             companyName={companyNameValue}
-            className="h-24 w-24 border border-gray-200"
+            className="h-16 w-16"
           />
           
           <div className="flex-1 w-full">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -148,7 +147,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           <CompanyLogo 
             website={websiteValue} 
             companyName={companyNameValue}
-            className="h-24 w-24 border border-gray-200"
+            className="h-16 w-16"
           />
         </div>
 

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Building } from "lucide-react";
 import { fetchCompanyBranding, getBestLogo } from "@/utils/brandfetch";
 
@@ -13,7 +13,7 @@ interface CompanyLogoProps {
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({ 
   website, 
   companyName,
-  className = "h-20 w-20"
+  className = "h-16 w-16"
 }) => {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,18 +56,25 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
 
   return (
     <div className="flex flex-col items-center">
-      <Avatar className={className}>
-        {!isLoading && logoUrl ? (
-          <AvatarImage src={logoUrl} alt={companyName || "Company logo"} className="object-contain p-1" />
-        ) : null}
-        <AvatarFallback className="bg-gray-100 text-gray-500 text-lg">
-          {isLoading ? (
-            <div className="animate-pulse rounded-full bg-gray-300 h-full w-full" />
+      <div className={`border border-gray-200 overflow-hidden ${className}`}>
+        <AspectRatio ratio={1}>
+          {!isLoading && logoUrl ? (
+            <img 
+              src={logoUrl} 
+              alt={companyName || "Company logo"} 
+              className="object-contain p-1 w-full h-full"
+            />
           ) : (
-            initials || <Building className="h-10 w-10" />
+            <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500 text-lg">
+              {isLoading ? (
+                <div className="animate-pulse rounded-none bg-gray-300 h-full w-full" />
+              ) : (
+                initials || <Building className="h-10 w-10" />
+              )}
+            </div>
           )}
-        </AvatarFallback>
-      </Avatar>
+        </AspectRatio>
+      </div>
       {error && <p className="text-xs text-destructive mt-1">{error}</p>}
     </div>
   );
