@@ -16,17 +16,21 @@ export const ProfileForm: React.FC = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Use the same profile schema from ProfileRequiredForm but define it here to maintain consistency
+  // Use the same profile schema as in ProfileRequiredForm
   const profileSchema = z.object({
     companyName: z.string().min(1, "Company name is required"),
-    website: z.string().min(1, "Website is required").transform((val) => {
-      // Check if the string starts with http:// or https://
-      if (!/^https?:\/\//i.test(val)) {
-        // If not, prepend https://
-        return `https://${val}`;
-      }
-      return val;
-    }).url("Must be a valid URL"),
+    website: z.string()
+      .min(1, "Website is required")
+      // First validate it's a string with minimum length
+      // Then validate it's a URL after transformation
+      .refine(val => {
+        try {
+          const url = new URL(!/^https?:\/\//i.test(val) ? `https://${val}` : val);
+          return true;
+        } catch {
+          return false;
+        }
+      }, "Must be a valid URL"),
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     role: z.string().min(1, "Role is required")
@@ -91,13 +95,18 @@ export const ProfileForm: React.FC = () => {
     
     setIsLoading(true);
     
+    // Normalize URL by adding https:// if not present
+    const normalizedWebsite = !/^https?:\/\//i.test(data.website) 
+      ? `https://${data.website}` 
+      : data.website;
+    
     try {
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
           company_name: data.companyName,
-          website: data.website,
+          website: normalizedWebsite,
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
