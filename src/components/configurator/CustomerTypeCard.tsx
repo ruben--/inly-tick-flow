@@ -18,8 +18,10 @@ export const CustomerTypeCard = ({ customerType, onToggle }: CustomerTypeCardPro
   return (
     <div 
       key={customerType.id}
-      className={`flex gap-3 p-3 rounded-md cursor-pointer border transition-all ${
-        customerType.selected ? 'border-primary bg-muted/30' : 'border-border'
+      className={`flex gap-3 p-3 rounded-md cursor-pointer transition-all ${
+        customerType.selected 
+          ? 'bg-gray-800 border border-primary/30' 
+          : 'bg-gray-900/70 border border-gray-800 hover:bg-gray-800/50'
       }`}
       onClick={() => onToggle(customerType.id)}
     >
@@ -32,10 +34,13 @@ export const CustomerTypeCard = ({ customerType, onToggle }: CustomerTypeCardPro
       </div>
       <div className="flex-1">
         <div className="flex justify-between">
-          <h3 className="font-medium">{customerType.name}</h3>
-          <Checkbox checked={customerType.selected} />
+          <h3 className="font-medium text-white">{customerType.name}</h3>
+          <Checkbox 
+            checked={customerType.selected} 
+            className="border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500" 
+          />
         </div>
-        <p className="text-sm text-muted-foreground mt-1">{customerType.description}</p>
+        <p className="text-sm text-gray-300 mt-1">{customerType.description}</p>
       </div>
     </div>
   );

@@ -18,8 +18,10 @@ export const MeterTypeCard = ({ meterType, onToggle }: MeterTypeCardProps) => {
   return (
     <div
       key={meterType.id}
-      className={`flex gap-3 p-3 rounded-md cursor-pointer border transition-all ${
-        meterType.selected ? 'border-primary bg-muted/30' : 'border-border'
+      className={`flex gap-3 p-3 rounded-md cursor-pointer transition-all ${
+        meterType.selected 
+          ? 'bg-gray-800 border border-primary/30' 
+          : 'bg-gray-900/70 border border-gray-800 hover:bg-gray-800/50'
       }`}
       onClick={() => onToggle(meterType.id)}
     >
@@ -32,10 +34,13 @@ export const MeterTypeCard = ({ meterType, onToggle }: MeterTypeCardProps) => {
       </div>
       <div className="flex-1">
         <div className="flex justify-between">
-          <h3 className="font-medium">{meterType.name}</h3>
-          <Checkbox checked={meterType.selected} />
+          <h3 className="font-medium text-white">{meterType.name}</h3>
+          <Checkbox 
+            checked={meterType.selected}
+            className="border-gray-600 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+          />
         </div>
-        <p className="text-sm text-muted-foreground mt-1">{meterType.description}</p>
+        <p className="text-sm text-gray-300 mt-1">{meterType.description}</p>
       </div>
     </div>
   );

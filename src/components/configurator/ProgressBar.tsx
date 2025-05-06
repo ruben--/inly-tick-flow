@@ -94,14 +94,14 @@ export const ProgressBar = ({
     <Collapsible 
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="w-full bg-muted mb-6 rounded-lg p-4 border"
+      className="w-full bg-gray-900 mb-6 rounded-lg p-4 border border-gray-800 text-white"
     >
       <div className="flex justify-between items-center mb-2">
         <div className="font-medium">
           Setup Progress ({completedTasks}/{totalTasks})
         </div>
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-300 hover:text-white hover:bg-gray-800">
             {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </CollapsibleTrigger>
@@ -111,11 +111,11 @@ export const ProgressBar = ({
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
             <span>{progress}% Complete</span>
-            <span className="text-muted-foreground">
+            <span className="text-gray-400">
               {completedTasks} of {totalTasks} tasks completed
             </span>
           </div>
-          <Progress value={progress} className="h-2" />
+          <Progress value={progress} className="h-2 bg-gray-800" />
           
           <div className="mt-4 space-y-3">
             <div className="text-sm font-medium">Setup Steps</div>
@@ -123,16 +123,16 @@ export const ProgressBar = ({
               {setupSteps.map((step) => (
                 <div 
                   key={step.id} 
-                  className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-secondary/50"
+                  className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-gray-800/50"
                 >
                   {step.completed ? (
                     <Check className="h-4 w-4 text-green-500 shrink-0" />
                   ) : (
-                    <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <Circle className="h-4 w-4 text-gray-500 shrink-0" />
                   )}
                   <div className="flex items-center gap-2">
                     {step.icon}
-                    <span className={step.completed ? "text-foreground" : "text-muted-foreground"}>
+                    <span className={step.completed ? "text-white" : "text-gray-400"}>
                       {step.name}
                     </span>
                   </div>
@@ -142,11 +142,11 @@ export const ProgressBar = ({
           </div>
           
           {progress === 100 ? (
-            <div className="mt-2 text-sm text-green-600">
+            <div className="mt-2 text-sm text-green-500">
               All steps completed! Your VPP is fully configured.
             </div>
           ) : (
-            <div className="mt-2 text-sm text-muted-foreground">
+            <div className="mt-2 text-sm text-gray-400">
               Complete all steps to finalize your VPP configuration.
             </div>
           )}
