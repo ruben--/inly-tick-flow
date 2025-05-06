@@ -82,12 +82,22 @@ export const MainContent = ({
         {/* Browser Content */}
         <div className="p-4">
           <div className="flex items-center gap-3 mb-6">
-            <CompanyLogo
-              website={profileData?.logo_url ? '' : selectedCustomer?.website || ''}
-              companyName={profileData?.company_name || selectedCustomer?.name || 'Company'}
-              className="h-10 w-10"
-              logoUrl={profileData?.logo_url}
-            />
+            {profileData?.logo_url ? (
+              <div className="h-10 w-10 border border-gray-200 overflow-hidden">
+                <img 
+                  src={profileData.logo_url} 
+                  alt={profileData?.company_name || "Company logo"}
+                  className="object-contain w-full h-full p-1"
+                />
+              </div>
+            ) : (
+              <CompanyLogo
+                website={selectedCustomer?.website || ''}
+                companyName={profileData?.company_name || selectedCustomer?.name || 'Company'}
+                className="h-10 w-10"
+                logoUrl={null}
+              />
+            )}
             <h2 className="text-xl font-medium">Products Preview</h2>
           </div>
           
