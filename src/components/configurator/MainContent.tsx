@@ -1,7 +1,10 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
 import { MeterType } from './MeterTypeCard';
+import { CompanyLogo } from '@/components/profile/CompanyLogo';
+
 interface MainContentProps {
   selectedCustomer: CustomerType | undefined;
   selectedAssetTypes: AssetType[];
@@ -23,6 +26,12 @@ export const MainContent = ({
 
   // Check if any meter types are selected
   const hasSelectedMeterTypes = meterTypes.some(type => type.selected);
+  
+  // Get company domain from customer's website or use default
+  const companyDomain = selectedCustomer?.website 
+    ? selectedCustomer.website.replace(/^https?:\/\//, '').split('/')[0] 
+    : 'yourcompany.com';
+    
   return <div className="md:w-2/3 lg:w-3/4">
       {/* Browser Mockup */}
       <div className="border border-gray-200 rounded-lg overflow-hidden shadow-lg bg-white">
@@ -34,19 +43,26 @@ export const MainContent = ({
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
           <div className="flex-1 bg-white px-4 py-1 rounded text-xs text-gray-500 text-center">
-            yourcompany.com/products
+            {companyDomain}/products
           </div>
         </div>
         
         {/* Browser Content */}
         <div className="p-4">
-          <h2 className="text-xl font-semibold mb-6">Products Preview</h2>
+          <div className="flex items-center gap-3 mb-6">
+            <CompanyLogo
+              website={selectedCustomer?.website || ''}
+              companyName={selectedCustomer?.name || 'Company'}
+              className="h-10 w-10"
+            />
+            <h2 className="text-xl font-medium">Products Preview</h2>
+          </div>
           
           {/* Hero Section */}
           <div className="relative w-full h-[300px] mb-6 rounded-lg overflow-hidden">
             <img src={selectedCustomer?.image || '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png'} alt="Hero" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-8">
-              <h1 className="font-bold text-white mb-2 text-2xl">
+              <h1 className="font-medium text-white mb-2 text-2xl">
                 {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : 'Choose customers'}
               </h1>
               <p className="text-white/90 text-lg">This is your product offering towards customers. </p>
