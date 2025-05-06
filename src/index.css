@@ -94,57 +94,32 @@
   }
 }
 
-/* Page Transition Styles */
+/* Page Transition Styles - Simplified for pure cross-fade */
 .transition-container {
   position: relative;
   width: 100%;
   min-height: 50vh; /* Ensure minimal height to prevent layout shifts */
-  overflow-x: hidden; /* Only hide horizontal overflow */
 }
 
 .transition-wrapper {
   width: 100%;
-  opacity: 1;
-  transform: translateY(0);
-  transition-property: opacity, transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-  will-change: opacity, transform;
+  transition: opacity 300ms ease;
+  will-change: opacity;
 }
 
 .fadeIn {
   opacity: 1;
-  transform: translateY(0);
+  z-index: 1;
 }
 
 .fadeOut {
   opacity: 0;
-  transform: translateY(-8px);
   position: absolute;
   width: 100%;
   top: 0;
   left: 0;
+  z-index: 0;
   pointer-events: none; /* Prevent interaction during fade out */
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
+/* Remove unused keyframes */

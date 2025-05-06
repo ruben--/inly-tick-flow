@@ -13,8 +13,10 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
 
   useEffect(() => {
     if (location.pathname !== displayLocation.pathname) {
+      // Start fade out
       setTransitionStage('fadeOut');
       
+      // After fade out completes, update location and fade in
       const timeout = setTimeout(() => {
         setDisplayLocation(location);
         setTransitionStage('fadeIn');
