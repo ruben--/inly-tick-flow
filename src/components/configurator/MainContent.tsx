@@ -83,7 +83,7 @@ export const MainContent = ({
         <div className="p-4">
           <div className="flex items-center gap-3 mb-6">
             {profileData?.logo_url ? (
-              <div className="h-10 w-10 border border-gray-200 overflow-hidden">
+              <div className="h-10 w-10 flex items-center justify-center border border-gray-200 rounded overflow-hidden bg-white">
                 <img 
                   src={profileData.logo_url} 
                   alt={profileData?.company_name || "Company logo"}
@@ -176,3 +176,4 @@ export const MainContent = ({
       </div>
     </div>;
 };
+
