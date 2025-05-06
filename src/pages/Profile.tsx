@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -183,9 +184,9 @@ export default function Profile() {
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Website</FormLabel>
+                      <FormLabel>Website <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com" {...field} />
+                        <Input placeholder="https://example.com" {...field} required />
                       </FormControl>
                       <FormDescription>
                         Your company's website URL

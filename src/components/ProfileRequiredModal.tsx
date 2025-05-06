@@ -67,7 +67,8 @@ export function ProfileRequiredModal() {
             !data.company_name || 
             !data.first_name || 
             !data.last_name || 
-            !data.role) {
+            !data.role ||
+            !data.website) {
           setOpen(true);
           
           // Set form default values if profile exists but is incomplete
@@ -212,9 +213,9 @@ export function ProfileRequiredModal() {
                 name="website"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Website</FormLabel>
+                    <FormLabel>Website <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com" {...field} />
+                      <Input placeholder="https://example.com" {...field} required />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
