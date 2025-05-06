@@ -18,8 +18,15 @@ const Index = () => {
     try {
       await loginWithSSO(provider);
       // No need to navigate here as the OAuth flow will redirect
-    } catch (error) {
-      toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login failed. Please try again.`);
+    } catch (error: any) {
+      console.error('SSO login error:', error);
+      
+      // More specific error handling
+      if (error?.message?.includes('provider is not enabled')) {
+        toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login is not enabled. Please configure the provider in Supabase.`);
+      } else {
+        toast.error(`${provider === 'azure' ? 'Microsoft' : 'Google'} login failed: ${error?.message || 'Unknown error'}`);
+      }
       setIsLoading(null);
     }
   };

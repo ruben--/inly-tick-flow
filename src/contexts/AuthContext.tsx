@@ -37,7 +37,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Check if the user is already authenticated
     const fetchUser = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error getting session:', error);
+        setLoading(false);
+        return;
+      }
+      
       if (data.session?.user) {
         const { id, email } = data.session.user;
         const name = email?.split('@')[0] || 'User';
@@ -78,7 +84,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('SSO login error:', error);
+        setLoading(false);
+        throw error;
+      }
     } catch (error) {
       console.error('SSO login error:', error);
       setLoading(false);
@@ -88,10 +98,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+        throw error;
+      }
       setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
+      throw error;
     }
   };
 
