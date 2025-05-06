@@ -9,6 +9,31 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
 
+// Define a type for our config data that matches the Json type from Supabase
+type ConfigData = {
+  customerTypes: Array<{
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+    selected: boolean;
+  }>;
+  assetTypes: Array<{
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+    selected: boolean;
+  }>;
+  meterTypes: Array<{
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+    selected: boolean;
+  }>;
+};
+
 const Checklist = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -93,30 +118,30 @@ const Checklist = () => {
         if (error) throw error;
 
         if (data) {
-          const configData = data.config_data;
-          if (configData.customerTypes) {
+          const configData = data.config_data as unknown as ConfigData;
+          if (configData && configData.customerTypes) {
             setCustomerTypes(prevTypes => 
               prevTypes.map(type => ({
                 ...type,
-                selected: configData.customerTypes.find((ct: any) => ct.id === type.id)?.selected ?? type.selected
+                selected: configData.customerTypes.find(ct => ct.id === type.id)?.selected ?? type.selected
               }))
             );
           }
           
-          if (configData.assetTypes) {
+          if (configData && configData.assetTypes) {
             setAssetTypes(prevTypes => 
               prevTypes.map(type => ({
                 ...type,
-                selected: configData.assetTypes.find((at: any) => at.id === type.id)?.selected ?? type.selected
+                selected: configData.assetTypes.find(at => at.id === type.id)?.selected ?? type.selected
               }))
             );
           }
           
-          if (configData.meterTypes) {
+          if (configData && configData.meterTypes) {
             setMeterTypes(prevTypes => 
               prevTypes.map(type => ({
                 ...type,
-                selected: configData.meterTypes.find((mt: any) => mt.id === type.id)?.selected ?? type.selected
+                selected: configData.meterTypes.find(mt => mt.id === type.id)?.selected ?? type.selected
               }))
             );
           }
@@ -160,7 +185,7 @@ const Checklist = () => {
         const { error: updateError } = await supabase
           .from('user_configs')
           .update({ 
-            config_data: configData,
+            config_data: configData as any,
             updated_at: new Date().toISOString()
           })
           .eq('id', data.id);
@@ -173,7 +198,7 @@ const Checklist = () => {
           .insert({
             user_id: user.id,
             config_type: 'checklist',
-            config_data: configData
+            config_data: configData as any
           });
           
         saveError = insertError;
@@ -190,7 +215,7 @@ const Checklist = () => {
       console.error('Error saving configuration:', error.message);
       toast('Failed to save', {
         description: error.message,
-        variant: 'destructive'
+        variant: 'destructive' as any
       });
     } finally {
       setSaving(false);
