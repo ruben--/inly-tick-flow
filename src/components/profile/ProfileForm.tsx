@@ -11,11 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
 import { UserProfileFormValues } from "./ProfileRequiredForm"; // Import the type
 
-interface ProfileFormProps {
-  onProfileComplete?: () => void;
-}
-
-export const ProfileForm: React.FC<ProfileFormProps> = ({ onProfileComplete }) => {
+export const ProfileForm: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -78,11 +74,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onProfileComplete }) =
             lastName: data.last_name || "",
             role: data.role || ""
           });
-          
-          // Check if profile is complete
-          if (data.company_name && data.website && data.first_name && data.last_name && data.role) {
-            onProfileComplete?.();
-          }
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -97,7 +88,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onProfileComplete }) =
     };
     
     fetchProfile();
-  }, [user, form, toast, onProfileComplete]);
+  }, [user, form, toast]);
 
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!user?.id) return;
@@ -128,9 +119,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onProfileComplete }) =
         title: "Success!",
         description: "Your profile has been updated",
       });
-      
-      // Call onProfileComplete callback if provided
-      onProfileComplete?.();
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
