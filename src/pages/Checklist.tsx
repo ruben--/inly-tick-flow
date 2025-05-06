@@ -69,24 +69,31 @@ const Checklist = () => {
           completedSteps={completedSteps}
         />
         
-        <div className="flex flex-col w-full gap-6 p-6">
-          <ProgressBar 
-            progress={progress}
-            completedTasks={completedCount}
-            totalTasks={totalSteps}
-            customerTypes={customerTypes}
-            assetTypes={assetTypes}
-            meterTypes={meterTypes}
-            onProfileStatusChange={setIsProfileComplete}
-          />
+        <div className="flex flex-col w-full h-svh overflow-hidden">
+          <div className="p-6 pb-0">
+            <ProgressBar 
+              progress={progress}
+              completedTasks={completedCount}
+              totalTasks={totalSteps}
+              customerTypes={customerTypes}
+              assetTypes={assetTypes}
+              meterTypes={meterTypes}
+              onProfileStatusChange={setIsProfileComplete}
+            />
+          </div>
           
-          <MainContent 
-            selectedCustomer={selectedCustomer}
-            selectedAssetTypes={selectedAssetTypes}
-            isAllCustomersSelected={isAllCustomersSelected}
-            meterTypes={meterTypes}
-          />
-          <SaveIndicator saving={saving} lastSaved={lastSaved} />
+          <div className="flex-grow p-6 pt-4 overflow-hidden">
+            <MainContent 
+              selectedCustomer={selectedCustomer}
+              selectedAssetTypes={selectedAssetTypes}
+              isAllCustomersSelected={isAllCustomersSelected}
+              meterTypes={meterTypes}
+            />
+          </div>
+          
+          <div className="p-6 pt-0">
+            <SaveIndicator saving={saving} lastSaved={lastSaved} />
+          </div>
         </div>
       </div>
     </SidebarProvider>

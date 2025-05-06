@@ -64,9 +64,9 @@ export const MainContent = ({
     fetchProfileData();
   }, [user]);
 
-  return <div className="md:w-2/3 lg:w-3/4">
+  return <div className="w-full flex-grow p-0">
       {/* Browser Mockup */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden shadow-lg bg-white">
+      <div className="border border-gray-200 rounded-lg overflow-hidden shadow-lg bg-white h-full">
         {/* Browser Chrome */}
         <div className="bg-gray-100 p-3 border-b border-gray-200 flex items-center">
           <div className="flex space-x-2 mr-4">
@@ -80,7 +80,7 @@ export const MainContent = ({
         </div>
         
         {/* Browser Content */}
-        <div className="p-4">
+        <div className="p-4 overflow-y-auto" style={{ maxHeight: "calc(100vh - 180px)" }}>
           <div className="flex items-center gap-3 mb-6">
             {profileData?.logo_url ? (
               <div className="h-10 w-10 flex items-center justify-center border border-gray-200 rounded overflow-hidden bg-white p-1">
@@ -185,4 +185,3 @@ export const MainContent = ({
       </div>
     </div>;
 };
-
