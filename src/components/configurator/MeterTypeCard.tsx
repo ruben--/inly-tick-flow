@@ -20,8 +20,8 @@ export const MeterTypeCard = ({ meterType, onToggle }: MeterTypeCardProps) => {
       key={meterType.id}
       className={`flex gap-3 p-3 rounded-md cursor-pointer transition-all ${
         meterType.selected 
-          ? 'bg-gray-800 border border-primary/30' 
-          : 'bg-gray-900/70 border border-gray-800 hover:bg-gray-800/50'
+          ? 'bg-white/10 backdrop-blur-sm border border-primary/30' 
+          : 'bg-white/5 border border-gray-800 hover:bg-white/10'
       }`}
       onClick={() => onToggle(meterType.id)}
     >
