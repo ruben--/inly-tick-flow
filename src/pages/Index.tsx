@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,15 +8,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import AnimatedBackground from '@/components/AnimatedBackground';
-
 const Index = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const { login, signup, loading } = useAuth();
+  const {
+    login,
+    signup,
+    loading
+  } = useAuth();
   const navigate = useNavigate();
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -28,15 +29,12 @@ const Index = () => {
       toast.error('Login failed. Please check your credentials.');
     }
   };
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-    
     try {
       await signup(email, password, name);
       toast.success('Account created successfully');
@@ -45,15 +43,11 @@ const Index = () => {
       toast.error('Failed to create account. Please try again.');
     }
   };
-
-  return (
-    <>
+  return <>
       <AnimatedBackground />
       <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center z-10 relative">
         <div className="w-full max-w-md">
-          <h1 className="text-4xl font-bold text-center mb-6 gradient-text">
-            VPP Orchestration Hub
-          </h1>
+          <h1 className="text-4xl font-bold text-center mb-6 gradient-text">Fever Control Room</h1>
           <p className="text-center text-muted-foreground mb-8">
             Configure and manage your virtual power plant with our intuitive platform
           </p>
@@ -70,14 +64,7 @@ const Index = () => {
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="email-login">Email</Label>
-                      <Input
-                        id="email-login"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
+                      <Input id="email-login" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
@@ -86,14 +73,7 @@ const Index = () => {
                           Forgot password?
                         </Link>
                       </div>
-                      <Input
-                        id="password-login"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
+                      <Input id="password-login" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -109,49 +89,19 @@ const Index = () => {
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="John Doe"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                      />
+                      <Input id="name" type="text" placeholder="John Doe" value={name} onChange={e => setName(e.target.value)} required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email-signup">Email</Label>
-                      <Input
-                        id="email-signup"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
+                      <Input id="email-signup" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="password-signup">Password</Label>
-                      <Input
-                        id="password-signup"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        minLength={6}
-                      />
+                      <Input id="password-signup" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="confirmPassword">Confirm Password</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        placeholder="••••••••"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        minLength={6}
-                      />
+                      <Input id="confirmPassword" type="password" placeholder="••••••••" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6} />
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -169,8 +119,6 @@ const Index = () => {
           </p>
         </div>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default Index;
