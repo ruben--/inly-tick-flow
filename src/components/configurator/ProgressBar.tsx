@@ -94,7 +94,7 @@ export const ProgressBar = ({
     <Collapsible 
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="w-full bg-white mb-6 rounded-lg p-4 border border-gray-200 text-gray-800 shadow-sm"
+      className="w-full bg-white mb-6 rounded-lg p-4 border border-gray-200 text-gray-800 shadow-sm font-fever"
     >
       <div className="flex justify-between items-center mb-2">
         <div className="font-medium">
