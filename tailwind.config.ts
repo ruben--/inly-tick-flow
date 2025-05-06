@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,6 +21,10 @@ export default {
 		extend: {
 			fontFamily: {
 				'fever': ['Fever Type', 'sans-serif'],
+			},
+			fontWeight: {
+				normal: '400',
+				medium: '500',
 			},
 			colors: {
 				border: 'hsl(var(--border))',
