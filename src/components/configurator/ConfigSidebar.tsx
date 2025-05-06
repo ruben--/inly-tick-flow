@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerTypeCard, CustomerType } from './CustomerTypeCard';
@@ -7,7 +6,6 @@ import { MeterTypeCard, MeterType } from './MeterTypeCard';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Users, Zap, BarChart3 } from 'lucide-react';
-
 interface ConfigSidebarProps {
   customerTypes: CustomerType[];
   assetTypes: AssetType[];
@@ -16,7 +14,6 @@ interface ConfigSidebarProps {
   toggleAssetType: (id: string) => void;
   toggleMeterType: (id: string) => void;
 }
-
 export const ConfigSidebar = ({
   customerTypes,
   assetTypes,
@@ -29,12 +26,10 @@ export const ConfigSidebar = ({
   const [customersOpen, setCustomersOpen] = useState(true);
   const [assetsOpen, setAssetsOpen] = useState(true);
   const [metersOpen, setMetersOpen] = useState(true);
-  
-  return (
-    <div className="md:w-1/3 lg:w-1/4 space-y-6">
+  return <div className="md:w-1/3 lg:w-1/4 space-y-6">
       <Card className="bg-gradient-to-br from-gray-50 to-gray-100 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-black">Configure Your Offering</CardTitle>
+          <CardTitle className="text-black text-base">Configure Your Offering</CardTitle>
           <CardDescription className="text-black/70">Customise what products and services you'd like to offer to your customers.</CardDescription>
         </CardHeader>
       </Card>
@@ -45,7 +40,7 @@ export const ConfigSidebar = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-black" />
-              <CardTitle className="text-lg text-black">Customer Type settings</CardTitle>
+              <CardTitle className="text-black text-base">Customer Type settings</CardTitle>
             </div>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-black hover:text-black hover:bg-gray-100" onClick={() => setCustomersOpen(!customersOpen)}>
               {customersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -104,6 +99,5 @@ export const ConfigSidebar = ({
           </CollapsibleContent>
         </Collapsible>
       </Card>
-    </div>
-  );
+    </div>;
 };

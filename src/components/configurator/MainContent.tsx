@@ -56,7 +56,7 @@ export const MainContent = ({
           {/* Asset Types Section */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Assets being optimised</CardTitle>
+              <CardTitle className="text-lg font-normal">Assets being optimised</CardTitle>
             </CardHeader>
             <CardContent>
               {hasSelectedAssets ? <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -78,7 +78,7 @@ export const MainContent = ({
           {/* Savings Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Type of optimisation activated</CardTitle>
+              <CardTitle className="text-lg font-normal">Type of optimisation activated</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
