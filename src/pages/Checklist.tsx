@@ -110,6 +110,7 @@ const Checklist = () => {
         selectedCustomer={selectedCustomer}
         selectedAssetTypes={selectedAssetTypes}
         isAllCustomersSelected={isAllCustomersSelected}
+        meterTypes={meterTypes}
       />
     </div>
   );
