@@ -24,7 +24,7 @@ export const MainContent = ({
   meterTypes
 }: MainContentProps) => {
   const { user } = useAuth();
-  const { profileData, companyDomain, logoImage } = useProfileData(user?.id);
+  const { profileData, companyDomain, logoImage, refreshLogo } = useProfileData(user?.id);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -33,6 +33,7 @@ export const MainContent = ({
           companyName={profileData?.company_name}
           website={profileData?.website || selectedCustomer?.website}
           logoImage={logoImage}
+          onRefreshLogo={refreshLogo}
         />
         
         <HeroSection 

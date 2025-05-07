@@ -19,7 +19,7 @@ export const useProfileData = (userId: string | undefined) => {
     : 'yourcompany.com';
     
   // Use the brandLogo hook to ensure consistent logo fetching
-  const { logoImage } = useBrandLogo(profileData?.website || '');
+  const { logoImage, refreshLogo } = useBrandLogo(profileData?.website || '');
 
   // Fetch user profile data
   useEffect(() => {
@@ -58,6 +58,7 @@ export const useProfileData = (userId: string | undefined) => {
     companyDomain, 
     loading,
     // Return the logo from the brand logo hook
-    logoImage: logoImage || profileData?.logo_image
+    logoImage: logoImage || profileData?.logo_image,
+    refreshLogo: () => profileData?.website ? refreshLogo(profileData.website) : null
   };
 };
