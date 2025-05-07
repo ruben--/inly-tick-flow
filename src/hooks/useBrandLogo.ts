@@ -10,7 +10,6 @@ export const useBrandLogo = (website: string) => {
   useEffect(() => {
     // Skip if no website
     if (!website) {
-      setLogoImage(null);
       return;
     }
 
@@ -53,9 +52,19 @@ export const useBrandLogo = (website: string) => {
     fetchLogo();
   }, [website, lastFetchedDomain]);
 
-  // Add a manual refresh function
-  const refreshLogo = () => {
-    setLastFetchedDomain(null); // Reset to trigger a new fetch
+  // Add a manual refresh function that can accept a specific website URL
+  const refreshLogo = (specificWebsite?: string) => {
+    // If a specific website is provided, use that, otherwise reset the lastFetchedDomain
+    if (specificWebsite) {
+      // This will trigger a fetch for the specific website
+      const domain = extractDomain(specificWebsite);
+      if (domain !== lastFetchedDomain) {
+        setLastFetchedDomain(null);
+      }
+    } else {
+      // Just reset the domain to trigger a refetch with the current website
+      setLastFetchedDomain(null);
+    }
   };
 
   return {

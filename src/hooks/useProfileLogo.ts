@@ -18,9 +18,10 @@ export const useProfileLogo = ({
     initialWebsite ? extractDomain(initialWebsite) : null
   );
   
-  // Use the useBrandLogo hook to fetch logo when website changes
+  // Use the useBrandLogo hook but don't automatically trigger updates based on website changes
+  // Only pass website when manually triggering a refresh
   const { logoImage: fetchedLogoImage, isLoading, refreshLogo: brandRefreshLogo } = useBrandLogo(
-    currentWebsite && currentWebsite !== initialWebsite ? currentWebsite : ''
+    '' // Empty string means no automatic fetching
   );
   
   // Update the logo image when a new one is fetched
@@ -30,20 +31,12 @@ export const useProfileLogo = ({
     }
   }, [fetchedLogoImage]);
 
-  // Check if website domain has changed to manage fetching state
-  useEffect(() => {
-    if (currentWebsite) {
-      const domain = extractDomain(currentWebsite);
-      if (domain && domain !== lastFetchedDomain) {
-        setLastFetchedDomain(domain);
-      }
-    }
-  }, [currentWebsite, lastFetchedDomain]);
-
-  // Provide a refresh function that resets the lastFetchedDomain and triggers a new fetch
+  // Provide a manual refresh function that triggers logo fetch with the current website
   const refreshLogo = () => {
-    setLastFetchedDomain(null);
-    brandRefreshLogo(); // Also call the brand refresh function
+    if (currentWebsite) {
+      // This will manually trigger a fetch with the current website
+      brandRefreshLogo(currentWebsite);
+    }
   };
 
   return {
