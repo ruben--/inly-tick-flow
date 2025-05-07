@@ -30,8 +30,6 @@ export const MainContent = ({
     <div className="w-full h-full">
       <BrowserChrome companyDomain={companyDomain}>
         <PreviewHeader 
-          logoImage={profileData?.logo_image} 
-          logoUrl={profileData?.logo_url} 
           companyName={profileData?.company_name}
           website={profileData?.website || selectedCustomer?.website}
         />
