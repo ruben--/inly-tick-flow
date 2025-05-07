@@ -9,9 +9,12 @@ interface SidebarHeaderProps {
 
 export const SidebarHeader = ({ title, className = '', children }: SidebarHeaderProps) => {
   return (
-    <div className={`flex justify-between items-center py-4 border-b-2 border-black px-4 bg-black mt-8 ${className}`}>
-      <h3 className="font-bold text-white text-lg uppercase tracking-wide">{title}</h3>
-      {children}
+    <div className={`flex flex-col ${className}`}>
+      <div className="h-8 bg-white"></div>
+      <div className="flex justify-between items-center py-4 border-b-2 border-black px-4 bg-black">
+        <h3 className="font-bold text-white text-lg uppercase tracking-wide">{title}</h3>
+        {children}
+      </div>
     </div>
   );
 };
