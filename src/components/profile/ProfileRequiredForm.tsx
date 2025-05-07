@@ -40,7 +40,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoImage, setLogoImage] = useState<string | null>(null);
-  const [savedWebsite, setSavedWebsite] = useState<string | null>(null);
+  const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
   
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -75,7 +75,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           // Always prioritize stored image
           setLogoImage(data.logo_image || null);
           setLogoUrl(data.logo_url || null);
-          setSavedWebsite(data.website || null);
+          setCurrentWebsite(data.website || null);
           
           form.reset({
             companyName: data.company_name || "",
@@ -135,6 +135,9 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         
       if (error) throw error;
       
+      // Update the current website
+      setCurrentWebsite(normalizedWebsite);
+      
       toast({
         title: "Success!",
         description: "Your profile has been updated",
@@ -159,7 +162,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   const companyNameValue = form.watch("companyName");
   
   // Check if website has changed from saved version to determine if we need a new logo
-  const websiteChanged = savedWebsite !== null && websiteValue !== savedWebsite;
+  const websiteChanged = websiteValue !== currentWebsite && websiteValue !== "";
 
   return (
     <Form {...form}>

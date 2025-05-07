@@ -26,6 +26,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
+  const [fetchAttempted, setFetchAttempted] = useState(false);
 
   const initials = companyName
     ? companyName
@@ -62,16 +63,18 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     if (initialLogoImage) {
       setLogoImage(initialLogoImage);
       setLogoUrl(initialLogoUrl); // Keep URL in sync
+      setFetchAttempted(true); // No need to fetch
       return;
     }
 
     // If we have a logoUrl but no logoImage, fetch the image data
-    if (logoUrl && !logoImage) {
+    if (logoUrl && !logoImage && !fetchAttempted) {
       const fetchImage = async () => {
         setIsLoading(true);
         const imageData = await fetchAndStoreImage(logoUrl);
         setLogoImage(imageData);
         setIsLoading(false);
+        setFetchAttempted(true);
         
         // Call the callback when we get image data
         if (onLogoFound && imageData) {
@@ -81,33 +84,37 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       
       fetchImage();
     }
-  }, [logoUrl, logoImage, initialLogoImage, initialLogoUrl, onLogoFound]);
+  }, [logoUrl, logoImage, initialLogoImage, initialLogoUrl, onLogoFound, fetchAttempted]);
 
-  // Only fetch a new logo if we don't have any image data yet
+  // Only fetch a new logo if we don't have any image data yet and haven't tried fetching
   useEffect(() => {
-    // Skip fetch if we already have a logo image
-    if (logoImage) {
+    // Skip fetch if we already have a logo image or have attempted to fetch
+    if (logoImage || fetchAttempted) {
       return;
     }
 
     // If we already have a logo URL from props, use it 
     if (initialLogoUrl) {
       setLogoUrl(initialLogoUrl);
+      setFetchAttempted(true);
+      return;
+    }
+
+    // Skip if no website
+    if (!website) {
+      setLogoUrl(null);
+      setFetchAttempted(true);
+      if (onLogoFound) onLogoFound(null, null);
       return;
     }
 
     const fetchLogo = async () => {
-      if (!website) {
-        setLogoUrl(null);
-        if (onLogoFound) onLogoFound(null, null);
-        return;
-      }
-
       // Extract domain for comparison
       const domain = extractDomain(website);
       
       // Skip fetch if we've already fetched for this domain
-      if (domain === lastFetchedDomain && logoUrl) {
+      if (domain === lastFetchedDomain) {
+        setFetchAttempted(true);
         return;
       }
       
@@ -119,6 +126,15 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         const logo = getBestLogo(brandingData);
         setLogoUrl(logo);
         setLastFetchedDomain(domain);
+        
+        // If we found a logo, immediately fetch and store the image data
+        if (logo) {
+          const imageData = await fetchAndStoreImage(logo);
+          setLogoImage(imageData);
+          if (onLogoFound) onLogoFound(logo, imageData);
+        } else {
+          if (onLogoFound) onLogoFound(null, null);
+        }
       } catch (err) {
         console.error("Error fetching logo:", err);
         setError("Failed to fetch company logo");
@@ -126,11 +142,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         if (onLogoFound) onLogoFound(null, null);
       } finally {
         setIsLoading(false);
+        setFetchAttempted(true);
       }
     };
 
     fetchLogo();
-  }, [website, onLogoFound, initialLogoUrl, logoUrl, lastFetchedDomain, logoImage]);
+  }, [website, onLogoFound, initialLogoUrl, logoImage, lastFetchedDomain, fetchAttempted]);
 
   return (
     <div className="flex flex-col items-center">
@@ -147,12 +164,14 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
               src={logoUrl} 
               alt={companyName || "Company logo"} 
               className="object-contain p-1 w-full h-full"
-              onLoad={async (e) => {
-                // After successful load, convert to base64 for storage
-                const imageData = await fetchAndStoreImage(logoUrl);
-                if (imageData) {
-                  setLogoImage(imageData);
-                  if (onLogoFound) onLogoFound(logoUrl, imageData);
+              onLoad={async () => {
+                // After successful load, convert to base64 for storage if we haven't done so already
+                if (!logoImage) {
+                  const imageData = await fetchAndStoreImage(logoUrl);
+                  if (imageData) {
+                    setLogoImage(imageData);
+                    if (onLogoFound) onLogoFound(logoUrl, imageData);
+                  }
                 }
               }}
             />

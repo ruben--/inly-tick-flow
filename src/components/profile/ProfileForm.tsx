@@ -18,7 +18,7 @@ export const ProfileForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoImage, setLogoImage] = useState<string | null>(null);
-  const [savedWebsite, setSavedWebsite] = useState<string | null>(null);
+  const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
   
   // Use the same profile schema as in ProfileRequiredForm
   const profileSchema = z.object({
@@ -72,7 +72,7 @@ export const ProfileForm: React.FC = () => {
           // Always prioritize stored image
           setLogoImage(data.logo_image || null);
           setLogoUrl(data.logo_url || null);
-          setSavedWebsite(data.website || null);
+          setCurrentWebsite(data.website || null);
           
           form.reset({
             companyName: data.company_name || "",
@@ -134,8 +134,8 @@ export const ProfileForm: React.FC = () => {
         
       if (error) throw error;
       
-      // Update the saved website to prevent unnecessary API calls
-      setSavedWebsite(normalizedWebsite);
+      // Update the current website to prevent unnecessary API calls
+      setCurrentWebsite(normalizedWebsite);
       
       toast({
         title: "Success!",
@@ -157,8 +157,8 @@ export const ProfileForm: React.FC = () => {
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
   
-  // Check if website has changed from saved version to determine if we need a new logo
-  const websiteChanged = savedWebsite !== null && websiteValue !== savedWebsite;
+  // Check if website has changed from current version to determine if we need a new logo
+  const websiteChanged = websiteValue !== currentWebsite && websiteValue !== "";
 
   return (
     <Form {...form}>

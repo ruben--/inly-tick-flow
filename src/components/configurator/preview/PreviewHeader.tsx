@@ -25,6 +25,7 @@ export const PreviewHeader = ({ logoImage, logoUrl, companyName, website }: Prev
           companyName={companyName || 'Company'} 
           className="h-10 w-10" 
           logoUrl={logoUrl}
+          logoImage={null}
         />
       )}
       <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
