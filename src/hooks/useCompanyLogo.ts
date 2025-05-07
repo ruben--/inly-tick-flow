@@ -1,6 +1,12 @@
-
-import { useState, useEffect } from "react";
-import { fetchCompanyBranding, getBestLogo, extractDomain } from "@/utils/brandfetch";
+import { useState, useEffect, useRef } from "react";
+import { 
+  fetchCompanyBranding, 
+  getBestLogo, 
+  extractDomain, 
+  cacheLogoInfo, 
+  getCachedLogoInfo, 
+  isValidUrl
+} from "@/utils/brandfetch";
 
 interface UseCompanyLogoProps {
   website: string;
@@ -24,34 +30,17 @@ export const useCompanyLogo = ({
   const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
   const [fetchAttempted, setFetchAttempted] = useState(initialFetchAttempted);
   
-  // Fetch and store the image as base64 data when we have a logo URL
-  const fetchAndStoreImage = async (url: string) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      
-      // Convert blob to base64
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result as string);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (err) {
-      console.error("Error fetching image:", err);
-      return null;
-    }
-  };
+  // Keep track of the current fetch request to avoid race conditions
+  const currentFetchRef = useRef<AbortController | null>(null);
+  
+  // Check if the website is valid
+  const isValidWebsite = website ? isValidUrl(website) : false;
+  
+  // Extract domain for comparison and caching
+  const domain = website ? extractDomain(website) : null;
   
   // If we have a logoUrl but no logoImage, fetch the image data
   useEffect(() => {
-    console.log("Logo image effect triggered", { 
-      initialLogoImage: !!initialLogoImage, 
-      logoImage: !!logoImage 
-    });
-    
     if (initialLogoImage) {
       console.log("Using provided logo image from props");
       setLogoImage(initialLogoImage);
@@ -65,37 +54,24 @@ export const useCompanyLogo = ({
       return;
     }
 
-    // If we have a logoUrl but no logoImage, fetch the image data
+    // If we have a logoUrl but no logoImage, use the logoUrl directly
+    // (Our edge function now returns the image directly)
     if (logoUrl && !logoImage && !fetchAttempted) {
-      console.log("Fetching image data from logo URL");
-      const fetchImage = async () => {
-        setIsLoading(true);
-        const imageData = await fetchAndStoreImage(logoUrl);
-        setLogoImage(imageData);
-        setIsLoading(false);
-        setFetchAttempted(true);
-        
-        // Call the callback when we get image data
-        if (onLogoFound && imageData) {
-          onLogoFound(logoUrl, imageData);
-        }
-      };
+      console.log("Setting logo image from URL");
+      setLogoImage(logoUrl);
+      setFetchAttempted(true);
       
-      fetchImage();
+      // Call the callback when we get image data
+      if (onLogoFound && logoUrl) {
+        onLogoFound(logoUrl, logoUrl);
+      }
     }
   }, [logoUrl, logoImage, initialLogoImage, initialLogoUrl, onLogoFound, fetchAttempted]);
 
   // Only fetch a new logo if we don't have any image data yet and haven't tried fetching
   useEffect(() => {
-    console.log("Logo fetch effect triggered", { 
-      logoImage: !!logoImage, 
-      fetchAttempted, 
-      website 
-    });
-    
     // Skip fetch if we already have a logo image or have attempted to fetch
-    if (logoImage || fetchAttempted) {
-      console.log("Skipping fetch - already have image or attempted fetch");
+    if (logoImage || fetchAttempted || !isValidWebsite) {
       return;
     }
 
@@ -107,18 +83,26 @@ export const useCompanyLogo = ({
       return;
     }
 
-    // Skip if no website
-    if (!website) {
-      console.log("No website provided - skipping fetch");
+    // Skip if no website or invalid website
+    if (!website || !domain) {
       setLogoUrl(null);
       setFetchAttempted(true);
       if (onLogoFound) onLogoFound(null, null);
       return;
     }
-
+    
     const fetchLogo = async () => {
-      // Extract domain for comparison
-      const domain = extractDomain(website);
+      // Check cache first
+      const cachedLogo = getCachedLogoInfo(domain);
+      if (cachedLogo && cachedLogo.logoImage) {
+        console.log("Using cached logo for domain:", domain);
+        setLogoUrl(cachedLogo.logoUrl);
+        setLogoImage(cachedLogo.logoImage);
+        setLastFetchedDomain(domain);
+        setFetchAttempted(true);
+        if (onLogoFound) onLogoFound(cachedLogo.logoUrl, cachedLogo.logoImage);
+        return;
+      }
       
       // Skip fetch if we've already fetched for this domain
       if (domain === lastFetchedDomain) {
@@ -131,21 +115,36 @@ export const useCompanyLogo = ({
       setIsLoading(true);
       setError(null);
       
+      // Cancel any in-flight requests
+      if (currentFetchRef.current) {
+        currentFetchRef.current.abort();
+      }
+      
+      // Create new abort controller for this request
+      const abortController = new AbortController();
+      currentFetchRef.current = abortController;
+      
       try {
         const brandingData = await fetchCompanyBranding(website);
+        
+        // Check if this request was cancelled
+        if (abortController.signal.aborted) {
+          return;
+        }
+        
         const logo = getBestLogo(brandingData);
         setLogoUrl(logo);
+        setLogoImage(logo); // The edge function returns the base64 image directly
         setLastFetchedDomain(domain);
         
-        // If we found a logo, immediately fetch and store the image data
-        if (logo) {
-          console.log("Logo URL found:", logo);
-          const imageData = await fetchAndStoreImage(logo);
-          setLogoImage(imageData);
-          if (onLogoFound) onLogoFound(logo, imageData);
-        } else {
-          console.log("No logo found for domain");
-          if (onLogoFound) onLogoFound(null, null);
+        // Cache the logo
+        if (logo && domain) {
+          cacheLogoInfo(domain, logo, logo);
+        }
+        
+        // Notify parent component
+        if (onLogoFound) {
+          onLogoFound(logo, logo);
         }
       } catch (err) {
         console.error("Error fetching logo:", err);
@@ -153,19 +152,25 @@ export const useCompanyLogo = ({
         setLogoUrl(null);
         if (onLogoFound) onLogoFound(null, null);
       } finally {
+        // Clear the reference to avoid memory leaks
+        if (currentFetchRef.current === abortController) {
+          currentFetchRef.current = null;
+        }
+        
         setIsLoading(false);
         setFetchAttempted(true);
       }
     };
 
     fetchLogo();
-  }, [website, onLogoFound, initialLogoUrl, logoImage, lastFetchedDomain, fetchAttempted]);
+  }, [website, domain, onLogoFound, initialLogoUrl, logoImage, lastFetchedDomain, fetchAttempted, isValidWebsite]);
 
   const handleRetryFetch = () => {
     setFetchAttempted(false);
     setLogoImage(null);
     setLogoUrl(null);
     setError(null);
+    setLastFetchedDomain(null);
   };
 
   return {
@@ -174,6 +179,7 @@ export const useCompanyLogo = ({
     isLoading,
     error,
     fetchAttempted,
-    handleRetryFetch
+    handleRetryFetch,
+    isValidWebsite
   };
 };
