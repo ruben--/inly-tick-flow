@@ -26,7 +26,7 @@ export const PreviewHeader = ({
           isLoading={logoLoading}
         />
       </div>
-      <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
+      <h2 className="text-xl font-display uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
     </div>
   );
 };

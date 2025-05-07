@@ -22,6 +22,7 @@ export default {
 			fontFamily: {
 				'fever': ['Space Mono', 'monospace', 'sans-serif'],
 				'mono': ['Space Mono', 'monospace'],
+				'display': ['Audiowide', 'cursive'], // Adding Audiowide as our display font
 			},
 			fontWeight: {
 				normal: '400',
