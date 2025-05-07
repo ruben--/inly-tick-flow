@@ -1,47 +1,47 @@
 
 import React from "react";
-import { Form } from "@/components/ui/form";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { UserProfileFormValues } from "./types";
-import { ProfileFormFields } from "./ProfileFormFields";
-import { ProfileFormSubmit } from "./ProfileFormSubmit";
-import { useProfileSubmit } from "@/hooks/useProfileSubmit";
-import { useAuth } from "@/contexts/AuthContext";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form } from "@/components/ui/form";
+import { ProfileFormFields } from "@/components/profile/ProfileFormFields";
+import { ProfileFormSubmit } from "@/components/profile/ProfileFormSubmit";
 
-interface ProfileRequiredFormProps {
-  initialData: UserProfileFormValues;
-  onSuccess?: () => void;
+export const profileRequiredFormSchema = z.object({
+  companyName: z.string().min(1, { message: "Company name is required" }),
+  website: z.string().min(1, { message: "Website is required" }),
+});
+
+export type ProfileRequiredFormValues = z.infer<typeof profileRequiredFormSchema>;
+
+export interface ProfileRequiredFormProps {
+  onSubmit: (values: ProfileRequiredFormValues) => void;
+  isLoading?: boolean;
 }
 
-export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ initialData, onSuccess }) => {
-  const { user } = useAuth();
-  const form = useForm<UserProfileFormValues>({
-    defaultValues: initialData
+export function ProfileRequiredForm({ onSubmit, isLoading = false }: ProfileRequiredFormProps) {
+  const form = useForm<ProfileRequiredFormValues>({
+    resolver: zodResolver(profileRequiredFormSchema),
+    defaultValues: {
+      companyName: "",
+      website: "",
+    },
   });
 
-  const { isLoading, handleSubmit } = useProfileSubmit({
-    userId: user?.id || "",
-    initialWebsite: initialData?.website || null,
-    onSuccess
-  });
-
-  const websiteValue = form.watch("website") || "";
-  const companyNameValue = form.watch("companyName") || "";
-
-  const onSubmit = (data: UserProfileFormValues) => {
-    handleSubmit(data);
-  };
+  function handleSubmit(data: ProfileRequiredFormValues) {
+    onSubmit(data);
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <ProfileFormFields form={form} />
         <ProfileFormSubmit 
           isLoading={isLoading} 
-          websiteValue={websiteValue} 
-          companyNameValue={companyNameValue}
+          websiteValue={form.watch("website")}
+          companyNameValue={form.watch("companyName")}
         />
       </form>
     </Form>
   );
-};
+}

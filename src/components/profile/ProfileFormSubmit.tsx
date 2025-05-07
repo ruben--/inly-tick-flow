@@ -1,55 +1,33 @@
 
-import React from "react";
-import { LogoSection } from "./LogoSection";
-import { SubmitButton } from "./SubmitButton";
-import { useLogo } from "@/contexts/LogoContext";
+import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 
-interface ProfileFormSubmitProps {
+export interface ProfileFormSubmitProps {
   isLoading: boolean;
   websiteValue: string;
   companyNameValue: string;
-  logoImage?: string | null;
-  isLogoLoading?: boolean;
-  onRefreshLogo?: () => void;
-  children: React.ReactNode;
+  children?: ReactNode;
 }
 
-export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
-  isLoading,
-  websiteValue,
-  companyNameValue,
-  logoImage,
-  isLogoLoading = false,
-  onRefreshLogo,
-  children
-}) => {
-  const { refreshLogo } = useLogo();
-  
-  const handleRefresh = () => {
-    if (onRefreshLogo) {
-      onRefreshLogo();
-    } else {
-      refreshLogo(websiteValue);
-    }
-  };
+export const ProfileFormSubmit = ({ isLoading, websiteValue, companyNameValue, children }: ProfileFormSubmitProps) => {
+  const isValidWebsite = websiteValue.trim() !== '';
+  const isValidCompanyName = companyNameValue.trim() !== '';
+  const isValid = isValidWebsite && isValidCompanyName;
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row gap-6 items-start">
-        <LogoSection 
-          websiteValue={websiteValue}
-          companyNameValue={companyNameValue}
-          logoImage={logoImage}
-          isLogoLoading={isLogoLoading}
-          onRefreshLogo={handleRefresh}
-        />
-        
-        <div className="flex-1 w-full">
-          {children}
-        </div>
+    <div className="flex items-center justify-between mt-6">
+      <div>
+        {children}
       </div>
-      
-      <SubmitButton isLoading={isLoading} />
-    </>
+      <Button 
+        disabled={!isValid || isLoading} 
+        type="submit" 
+        className="ml-auto"
+      >
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {isLoading ? "Saving..." : "Save Changes"}
+      </Button>
+    </div>
   );
 };

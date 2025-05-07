@@ -1,59 +1,49 @@
 
 import React from "react";
-import { Form } from "@/components/ui/form";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { UserProfileFormValues } from "./types";
-import { ProfileFormFields } from "./ProfileFormFields";
-import { ProfileFormSubmit } from "./ProfileFormSubmit";
-import { useProfileSubmit } from "@/hooks/useProfileSubmit";
-import { useAuth } from "@/contexts/AuthContext";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form } from "@/components/ui/form";
+import { ProfileFormFields } from "@/components/profile/ProfileFormFields";
+import { ProfileFormSubmit } from "@/components/profile/ProfileFormSubmit";
+import { ProfileData } from "./types";
 
-interface ProfileFormProps {
-  initialData: {
-    firstName?: string;
-    lastName?: string;
-    companyName?: string;
-    website?: string;
-    role?: string;
-  };
-  profileLoading?: boolean;
+export const profileFormSchema = z.object({
+  companyName: z.string().min(1, { message: "Company name is required" }),
+  website: z.string().min(1, { message: "Website is required" }),
+});
+
+export type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+export interface ProfileFormProps {
+  onSubmit: (values: ProfileFormValues) => void;
+  isLoading?: boolean;
+  initialData?: ProfileData | null;
 }
 
-export const ProfileForm: React.FC<ProfileFormProps> = ({ initialData, profileLoading = false }) => {
-  const { user } = useAuth();
-  const form = useForm<UserProfileFormValues>({
+export function ProfileForm({ onSubmit, isLoading = false, initialData }: ProfileFormProps) {
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      firstName: initialData?.firstName || "",
-      lastName: initialData?.lastName || "",
       companyName: initialData?.companyName || "",
       website: initialData?.website || "",
-      role: initialData?.role || ""
-    }
+    },
   });
 
-  const { isLoading: submitLoading, handleSubmit } = useProfileSubmit({
-    userId: user?.id || "",
-    initialWebsite: initialData?.website || null,
-    onSuccess: () => form.reset(form.getValues())
-  });
-
-  const websiteValue = form.watch("website") || "";
-  const companyNameValue = form.watch("companyName") || "";
-
-  const onSubmit = (data: UserProfileFormValues) => {
-    handleSubmit(data);
-  };
+  function handleSubmit(data: ProfileFormValues) {
+    onSubmit(data);
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <ProfileFormFields form={form} />
         <ProfileFormSubmit 
-          isLoading={submitLoading} 
-          websiteValue={websiteValue}
-          companyNameValue={companyNameValue}
+          isLoading={isLoading} 
+          websiteValue={form.watch("website")}
+          companyNameValue={form.watch("companyName")}
         />
       </form>
     </Form>
   );
-};
+}
