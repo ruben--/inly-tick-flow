@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useBrandLogo } from "./useBrandLogo";
-import { extractDomain, isValidUrl } from "@/utils/brandfetch";
+import { extractDomain } from "@/utils/brandfetch";
 
 interface UseProfileLogoProps {
   initialWebsite?: string | null;
@@ -14,9 +14,8 @@ export const useProfileLogo = ({
 }: UseProfileLogoProps = {}) => {
   const [currentWebsite, setCurrentWebsite] = useState<string | null>(initialWebsite);
   const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage);
-  const [manualFetch, setManualFetch] = useState(false);
   
-  // Use the brand logo hook for consistent logo fetching
+  // Use the brand logo hook for fetch handling
   const { 
     logoImage: fetchedLogoImage, 
     isLoading, 
@@ -31,35 +30,10 @@ export const useProfileLogo = ({
     }
   }, [fetchedLogoImage]);
 
-  // Handle website URL normalization
+  // Normalize website URL
   const setNormalizedWebsite = useCallback((website: string | null) => {
-    if (!website) {
-      setCurrentWebsite(null);
-      return;
-    }
-    
-    // Ensure website has http/https prefix
-    const normalizedWebsite = !/^https?:\/\//i.test(website) 
-      ? `https://${website}` 
-      : website;
-      
-    setCurrentWebsite(normalizedWebsite);
+    setCurrentWebsite(website ? website : null);
   }, []);
-
-  // Manual refresh function that uses the brand logo hook
-  const handleRefreshLogo = useCallback(() => {
-    if (!currentWebsite) return;
-    
-    setManualFetch(true);
-    refreshLogo();
-  }, [currentWebsite, refreshLogo]);
-
-  // Auto-fetch logo on initial load if we have a website but no logo
-  useEffect(() => {
-    if (currentWebsite && !logoImage && !manualFetch) {
-      refreshLogo();
-    }
-  }, [currentWebsite, logoImage, refreshLogo, manualFetch]);
 
   return {
     currentWebsite,
@@ -68,6 +42,6 @@ export const useProfileLogo = ({
     setLogoImage,
     isLogoLoading: isLoading,
     error,
-    refreshLogo: handleRefreshLogo
+    refreshLogo
   };
 };

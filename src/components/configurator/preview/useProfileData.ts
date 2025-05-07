@@ -13,12 +13,12 @@ export const useProfileData = (userId: string | undefined) => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Extract domain from profile website or use default
+  // Extract domain from website
   const companyDomain = profileData?.website 
     ? new URL(!/^https?:\/\//i.test(profileData.website) ? `https://${profileData.website}` : profileData.website).hostname 
     : 'yourcompany.com';
     
-  // Use the brandLogo hook to ensure consistent logo fetching
+  // Use the brandLogo hook for logo
   const { logoImage, refreshLogo } = useBrandLogo(profileData?.website || '');
 
   // Fetch user profile data
@@ -38,7 +38,7 @@ export const useProfileData = (userId: string | undefined) => {
           .maybeSingle();
           
         if (error) {
-          console.error("Error fetching profile data:", error);
+          console.error("Error fetching profile:", error);
           return;
         }
         
@@ -57,8 +57,7 @@ export const useProfileData = (userId: string | undefined) => {
     profileData, 
     companyDomain, 
     loading,
-    // Return the logo from the brand logo hook
     logoImage: logoImage || profileData?.logo_image,
-    refreshLogo: () => profileData?.website ? refreshLogo(profileData.website) : null
+    refreshLogo
   };
 };

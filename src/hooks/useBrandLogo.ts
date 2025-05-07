@@ -12,7 +12,7 @@ export const useBrandLogo = (website: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const [lastFetchTime, setLastFetchTime] = useState(0);
+  const fetchTimeoutRef = useRef<number | null>(null);
   
   // Get cached logo, if available
   const getFromCache = useCallback((domain: string): string | null => {
@@ -21,17 +21,15 @@ export const useBrandLogo = (website: string) => {
       if (!cachedData) return null;
       
       const { logo, timestamp } = JSON.parse(cachedData);
-      const now = Date.now();
       
-      // Check if cache is expired
-      if (now - timestamp > LOGO_CACHE_EXPIRATION) {
+      if (Date.now() - timestamp > LOGO_CACHE_EXPIRATION) {
         localStorage.removeItem(`${LOGO_CACHE_PREFIX}${domain}`);
         return null;
       }
       
       return logo;
     } catch (e) {
-      console.error("Error reading from cache:", e);
+      console.error("Cache error:", e);
       return null;
     }
   }, []);
@@ -41,50 +39,43 @@ export const useBrandLogo = (website: string) => {
     if (!domain || !logoData) return;
     
     try {
-      const cacheData = {
+      localStorage.setItem(`${LOGO_CACHE_PREFIX}${domain}`, JSON.stringify({
         logo: logoData,
         timestamp: Date.now()
-      };
-      localStorage.setItem(`${LOGO_CACHE_PREFIX}${domain}`, JSON.stringify(cacheData));
+      }));
     } catch (e) {
-      console.error("Error saving to cache:", e);
+      console.error("Cache save error:", e);
     }
   }, []);
 
   // Fetch the logo
-  const fetchLogo = useCallback(async (domainToFetch: string) => {
-    if (!domainToFetch) {
+  const fetchLogo = useCallback(async (domain: string) => {
+    if (!domain) {
       setError("No domain provided");
       return;
     }
     
-    // Prevent multiple fetches within a short timeframe (500ms)
-    const now = Date.now();
-    if (now - lastFetchTime < 500) {
-      console.log("Throttling logo fetch requests");
-      return;
-    }
-    setLastFetchTime(now);
-    
     // Cancel any in-flight requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      abortControllerRef.current = null;
     }
     
-    // Create new controller
+    // Clear any pending timeout
+    if (fetchTimeoutRef.current !== null) {
+      window.clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = null;
+    }
+    
     const controller = new AbortController();
     abortControllerRef.current = controller;
     
-    console.log("Fetching logo for domain:", domainToFetch);
     setIsLoading(true);
     setError(null);
     
     try {
       // Check cache first
-      const cachedLogo = getFromCache(domainToFetch);
+      const cachedLogo = getFromCache(domain);
       if (cachedLogo) {
-        console.log("Using cached logo for:", domainToFetch);
         setLogoImage(cachedLogo);
         setIsLoading(false);
         return;
@@ -92,39 +83,30 @@ export const useBrandLogo = (website: string) => {
       
       // Fetch from edge function
       const response = await supabase.functions.invoke('fetch-brand-logo', {
-        body: { website: domainToFetch }
+        body: { website: domain }
       });
       
-      // Check if this request was aborted
-      if (controller.signal.aborted) {
-        console.log("Request was aborted");
-        return;
-      }
+      if (controller.signal.aborted) return;
       
       if (response.error) {
-        console.error("Logo fetch error:", response.error);
         setError("Failed to fetch company logo");
       } else if (response.data?.logoImage) {
-        // Add timestamp to prevent browser caching
-        const responseImage = response.data.logoImage;
-        setLogoImage(responseImage);
-        saveToCache(domainToFetch, responseImage);
+        setLogoImage(response.data.logoImage);
+        saveToCache(domain, response.data.logoImage);
       } else {
-        setError("No logo found for this website");
+        setError("No logo found");
       }
     } catch (err: any) {
       if (controller.signal.aborted) return;
-      
-      console.error("Error fetching logo:", err);
       setError(err.message || "Failed to fetch logo");
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
       }
     }
-  }, [getFromCache, saveToCache, lastFetchTime]);
+  }, [getFromCache, saveToCache]);
 
-  // Fetch logo automatically when website changes
+  // Fetch logo when website changes
   useEffect(() => {
     if (!website) {
       setLogoImage(null);
@@ -134,14 +116,19 @@ export const useBrandLogo = (website: string) => {
 
     const domain = extractDomain(website);
     if (!domain) {
-      setError("Invalid website URL");
+      setError("Invalid URL");
       return;
     }
     
-    fetchLogo(domain);
+    // Add a small delay to prevent rapid consecutive requests
+    fetchTimeoutRef.current = window.setTimeout(() => {
+      fetchLogo(domain);
+    }, 300);
     
-    // Clean up on unmount
     return () => {
+      if (fetchTimeoutRef.current !== null) {
+        window.clearTimeout(fetchTimeoutRef.current);
+      }
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
@@ -150,21 +137,15 @@ export const useBrandLogo = (website: string) => {
 
   // Manual refresh function
   const refreshLogo = useCallback(() => {
-    if (!website) {
-      setError("No website provided");
-      return;
-    }
+    if (!website) return;
     
     const domain = extractDomain(website);
     if (domain) {
-      // Clear the cache for this domain
       try {
         localStorage.removeItem(`${LOGO_CACHE_PREFIX}${domain}`);
       } catch (e) {
-        console.error("Error clearing cache:", e);
+        console.error("Cache clear error:", e);
       }
-      
-      // Fetch fresh logo
       fetchLogo(domain);
     }
   }, [website, fetchLogo]);

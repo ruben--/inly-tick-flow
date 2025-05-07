@@ -21,12 +21,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   
-  // Reset error state when logo image changes
+  // Reset error state when logo changes
   useEffect(() => {
     setImageError(false);
   }, [logoImage]);
   
-  // Extract initials for the placeholder
+  // Extract initials for placeholder
   const initials = companyName
     ? companyName
         .split(' ')
@@ -36,12 +36,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
-  // Add a unique timestamp to prevent caching issues
+  // Add cache-busting timestamp
   const logoSrc = logoImage && !imageError ? 
     `${logoImage}${logoImage.includes('?') ? '&' : '?'}t=${Date.now()}` : 
     null;
 
-  // Extract size classes from className
+  // Extract size classes
   const widthClass = className.match(/w-\d+/)?.at(0) || 'w-16';
   const heightClass = className.match(/h-\d+/)?.at(0) || 'h-16';
 
@@ -62,10 +62,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
             src={logoSrc} 
             alt={companyName || "Company logo"} 
             className="object-contain p-1 w-full h-full"
-            onError={() => {
-              console.error("Failed to load logo image:", logoSrc);
-              setImageError(true);
-            }}
+            onError={() => setImageError(true)}
           />
         ) : (
           <LogoPlaceholder 

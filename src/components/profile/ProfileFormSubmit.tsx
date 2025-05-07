@@ -30,7 +30,6 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
           companyNameValue={companyNameValue}
           logoImage={logoImage}
           isLogoLoading={isLogoLoading}
-          onRefreshLogo={onRefreshLogo}
         />
         
         <div className="flex-1 w-full">
