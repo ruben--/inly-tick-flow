@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';

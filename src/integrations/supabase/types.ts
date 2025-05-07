@@ -15,6 +15,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          logo_image: string | null
           logo_url: string | null
           role: string | null
           updated_at: string | null
@@ -25,6 +26,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          logo_image?: string | null
           logo_url?: string | null
           role?: string | null
           updated_at?: string | null
@@ -35,6 +37,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          logo_image?: string | null
           logo_url?: string | null
           role?: string | null
           updated_at?: string | null
