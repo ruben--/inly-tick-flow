@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { extractDomain } from "@/utils/brandfetch";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,7 +78,7 @@ export const useBrandLogo = (website: string) => {
       }
       
       // If no cached logo, fetch from edge function
-      const { data, error } = await supabase.functions.invoke('fetch-brand-logo', {
+      const response = await supabase.functions.invoke('fetch-brand-logo', {
         body: { website: domainToFetch },
       });
       
@@ -87,19 +88,28 @@ export const useBrandLogo = (website: string) => {
         return;
       }
       
-      if (error || !data?.success) {
-        console.error("Error in logo fetch process:", error || data?.error);
-        setError(data?.error || "Failed to fetch company logo");
+      if (response.error) {
+        console.error("Logo fetch error:", response.error);
+        
+        // Provide more specific error messages based on error status
+        if (response.error.toString().includes("403")) {
+          setError("API authorization failed. Please try again later.");
+        } else if (response.error.toString().includes("404")) {
+          setError("No logo found for this website");
+        } else {
+          setError("Failed to fetch logo. Please try again later.");
+        }
+        
         setLogoImage(null);
-      } else if (data.logoImage) {
-        setLogoImage(data.logoImage);
-        saveToCache(domainToFetch, data.logoImage);
+      } else if (response.data?.logoImage) {
+        setLogoImage(response.data.logoImage);
+        saveToCache(domainToFetch, response.data.logoImage);
         setLastFetchedDomain(domainToFetch);
       } else {
         setLogoImage(null);
-        setError("No logo found for this company");
+        setError(response.data?.error || "No logo found for this website");
       }
-    } catch (err) {
+    } catch (err: any) {
       // Ignore aborted request errors
       if (err.name === 'AbortError') {
         console.log("Request was aborted:", domainToFetch);
@@ -107,7 +117,7 @@ export const useBrandLogo = (website: string) => {
       }
       
       console.error("Error in logo fetch process:", err);
-      setError("Failed to fetch company logo");
+      setError("Failed to fetch company logo. Please try again later.");
       setLogoImage(null);
     } finally {
       // Only update loading state if this is the latest request

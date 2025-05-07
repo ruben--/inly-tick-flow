@@ -78,6 +78,7 @@ export const useProfileLogo = ({
   // Provide a manual refresh function that triggers logo fetch with the current website
   const refreshLogo = useCallback(() => {
     if (currentWebsite) {
+      setError(null); // Clear any previous errors
       setIsManualRefresh(true);
       brandRefreshLogo(currentWebsite);
     } else {

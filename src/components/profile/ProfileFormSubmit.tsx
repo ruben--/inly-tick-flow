@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { CompanyLogo } from "./CompanyLogo";
+import { RefreshCw } from "lucide-react";
 
 interface ProfileFormSubmitProps {
   isLoading: boolean;
@@ -19,12 +20,13 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
   companyNameValue,
   logoImage,
   isLogoLoading = false,
+  onRefreshLogo,
   children
 }) => {
   return (
     <>
       <div className="flex flex-col md:flex-row gap-6 items-start">
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col items-center space-y-2">
           <CompanyLogo 
             website={websiteValue}
             companyName={companyNameValue}
@@ -32,6 +34,20 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
             className="h-20 w-20"
             isLoading={isLogoLoading}
           />
+          
+          {websiteValue && onRefreshLogo && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm"
+              onClick={onRefreshLogo}
+              disabled={isLogoLoading}
+              className="text-xs flex items-center gap-1"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Refresh Logo
+            </Button>
+          )}
         </div>
         
         <div className="flex-1 w-full">
