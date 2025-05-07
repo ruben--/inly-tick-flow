@@ -1,0 +1,38 @@
+
+/* Sidebar Styling */
+[data-sidebar="sidebar"] {
+  border-right: 1px solid hsl(var(--sidebar-border));
+  background-color: #F9F9F9;
+}
+
+[data-sidebar="menu-button"]:hover {
+  background-color: #FF9300;
+  color: #000000;
+  transition: all 0.15s ease-in-out;
+}
+
+.group-data-\[collapsible\=icon\] .truncate {
+  display: none;
+}
+
+[data-sidebar="header"] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #F1F1F1;
+  border-bottom: 1px solid #E1E1E1;
+}
+
+.group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] {
+  justify-content: center;
+}
+
+.group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] > svg:first-child {
+  margin-right: 0;
+}
+
+/* Simple page content styling with no transitions */
+.page-content {
+  width: 100%;
+  min-height: 50vh;
+}

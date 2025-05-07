@@ -1,0 +1,28 @@
+
+/* Animation utilities */
+.config-sidebar-expand {
+  animation: expandSection 0.2s ease-out forwards;
+}
+
+.config-sidebar-collapse {
+  animation: collapseSection 0.2s ease-out forwards;
+}
+
+@keyframes expandSection {
+  0% { max-height: 0; opacity: 0; }
+  100% { max-height: 500px; opacity: 1; }
+}
+
+@keyframes collapseSection {
+  0% { max-height: 500px; opacity: 1; }
+  100% { max-height: 0; opacity: 0; }
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
