@@ -14,16 +14,26 @@ import { CompanyLogo } from "./CompanyLogo";
 
 interface ProfileFormProps {
   initialLogoImage?: string | null;
+  initialLogoUrl?: string | null;
 }
 
-export const ProfileForm: React.FC<ProfileFormProps> = ({ initialLogoImage }) => {
+export const ProfileForm: React.FC<ProfileFormProps> = ({ 
+  initialLogoImage,
+  initialLogoUrl
+}) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
   const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
-  const [fetchAttempted, setFetchAttempted] = useState(initialLogoImage ? true : false);
+  const [fetchAttempted, setFetchAttempted] = useState(!!initialLogoImage);
+  
+  console.log("ProfileForm initialized with:", { 
+    initialLogoImage: !!initialLogoImage, 
+    initialLogoUrl: !!initialLogoUrl,
+    fetchAttempted 
+  });
   
   // Use the same profile schema as in ProfileRequiredForm
   const profileSchema = z.object({
@@ -63,6 +73,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ initialLogoImage }) =>
       setIsLoading(true);
       
       try {
+        console.log("Fetching profile data in form");
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -75,11 +86,16 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ initialLogoImage }) =>
         
         if (data) {
           // Always prioritize stored image
-          if (data.logo_image) {
+          if (data.logo_image && !logoImage) {
+            console.log("Setting logo image from profile data");
             setLogoImage(data.logo_image);
             setFetchAttempted(true);
           }
-          setLogoUrl(data.logo_url || null);
+          
+          if (data.logo_url && !logoUrl) {
+            setLogoUrl(data.logo_url);
+          }
+          
           setCurrentWebsite(data.website || null);
           
           form.reset({
@@ -103,9 +119,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ initialLogoImage }) =>
     };
     
     fetchProfile();
-  }, [user, form, toast]);
+  }, [user, form, toast, logoImage, logoUrl]);
 
   const handleLogoFound = (foundLogoUrl: string | null, foundLogoImage: string | null) => {
+    console.log("Logo found callback:", { foundLogoUrl, foundLogoImage: !!foundLogoImage });
+    
     // Prioritize image data over URL
     if (foundLogoImage) {
       setLogoImage(foundLogoImage);
@@ -126,6 +144,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ initialLogoImage }) =>
       : data.website;
     
     try {
+      console.log("Saving profile with logo:", { 
+        hasLogoUrl: !!logoUrl, 
+        hasLogoImage: !!logoImage 
+      });
+      
       const { error } = await supabase
         .from('profiles')
         .upsert({

@@ -8,13 +8,19 @@ import { supabase } from "@/integrations/supabase/client";
 export default function Profile() {
   const { user } = useAuth();
   const [logoImage, setLogoImage] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Fetch the user's logo on component mount
+  // Fetch the user's profile data on component mount
   useEffect(() => {
-    const fetchProfileLogo = async () => {
-      if (!user?.id) return;
+    const fetchProfileData = async () => {
+      if (!user?.id) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
+        console.log("Fetching profile data for user:", user.id);
         const { data, error } = await supabase
           .from('profiles')
           .select('logo_image, logo_url')
@@ -23,19 +29,24 @@ export default function Profile() {
           
         if (error) {
           console.error("Error fetching profile logo:", error);
+          setIsLoading(false);
           return;
         }
         
-        // Set the logo image if available
-        if (data && data.logo_image) {
+        // Set the logo image and URL if available
+        console.log("Profile data fetched:", data);
+        if (data) {
           setLogoImage(data.logo_image);
+          setLogoUrl(data.logo_url);
         }
       } catch (err) {
         console.error("Error in profile fetch:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
     
-    fetchProfileLogo();
+    fetchProfileData();
   }, [user]);
 
   return (
@@ -48,7 +59,16 @@ export default function Profile() {
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <ProfileForm initialLogoImage={logoImage} />
+          {isLoading ? (
+            <div className="flex justify-center py-4">
+              <div className="animate-pulse h-16 w-16 bg-gray-200 rounded-full"></div>
+            </div>
+          ) : (
+            <ProfileForm 
+              initialLogoImage={logoImage} 
+              initialLogoUrl={logoUrl}
+            />
+          )}
         </CardContent>
       </Card>
     </div>
