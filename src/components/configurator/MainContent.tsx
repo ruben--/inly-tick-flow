@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
@@ -94,9 +95,9 @@ export const MainContent = ({
             <h2 className="text-xl font-medium text-gray-800 sidebar-heading-content">Products Preview</h2>
           </div>
           
-          {/* Hero Section - Updated with neutral background image */}
+          {/* Hero Section - Updated with new solar panels image */}
           <div className="relative w-full h-[300px] mb-6 rounded-lg overflow-hidden shadow-md">
-            <img src="/lovable-uploads/2c050251-ea30-49f9-b719-a85e8c8c54e4.png" alt="EV Charger with Wood Background" className="w-full h-full object-cover" />
+            <img src="/lovable-uploads/17d06cc6-f9c6-41e0-ad77-ead2dd1e4f23.png" alt="Solar Panels on Roof" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-gray-800/70 to-gray-600/20 flex flex-col justify-center p-8">
               <h1 className="font-medium text-white mb-2 text-2xl shadow-sm">
                 {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : <span className="text-[42px]">Choose customers</span>}
@@ -138,7 +139,7 @@ export const MainContent = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {ftmMeter?.selected && <Card className="overflow-hidden border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="h-40 bg-gray-50 relative">
-                      <img src="/lovable-uploads/2c050251-ea30-49f9-b719-a85e8c8c54e4.png" alt="Front of the Meter" className="w-full h-full object-cover opacity-100" />
+                      <img src="/lovable-uploads/671cc0ed-4154-4959-969b-8f7eaca4ccf8.png" alt="Front of the Meter - White Tesla" className="w-full h-full object-cover opacity-100" />
                       <div className="absolute top-2 right-2 bg-gray-600 text-white px-2 py-1 rounded-md text-xs">Active</div>
                     </div>
                     <CardContent className="p-4 bg-gradient-to-b from-white to-gray-50">
@@ -151,7 +152,7 @@ export const MainContent = ({
                 
                 {btmMeter?.selected && <Card className="overflow-hidden border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="h-40 bg-gray-50 relative">
-                      <img alt="Behind the Meter" className="w-full h-full object-cover opacity-100" src="/lovable-uploads/92486d5d-2202-48c8-ab14-f8f1a4c3c7ba.png" />
+                      <img alt="Behind the Meter - Energy Storage" className="w-full h-full object-cover opacity-100" src="/lovable-uploads/03305c38-a152-4c5e-96aa-3c6978288e76.png" />
                       <div className="absolute top-2 right-2 bg-gray-600 text-white px-2 py-1 rounded-md text-xs">Active</div>
                     </div>
                     <CardContent className="p-4 bg-gradient-to-b from-white to-gray-50">
