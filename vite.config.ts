@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => ({
         // Optimize asset chunking
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['/components/ui/'],
+          ui: ['@/components/ui'],  // Fix incorrect path reference here
         },
       },
     },
@@ -36,8 +36,8 @@ export default defineConfig(({ mode }) => ({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
-        drop_debugger: true,
+        drop_console: mode !== 'development',  // Keep console logs in development
+        drop_debugger: mode !== 'development',
       },
     },
     // Optimize CSS
