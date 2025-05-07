@@ -12,7 +12,7 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Simple check if user profile exists
+  // Check if user profile exists
   useEffect(() => {
     const checkProfileData = async () => {
       if (!user?.id) {
@@ -65,7 +65,7 @@ export default function Profile() {
               <div className="animate-pulse h-4 w-36 bg-gray-200 rounded"></div>
             </div>
           ) : (
-            <ProfileForm />
+            <ProfileForm key={`profile-form-${user?.id}`} />
           )}
         </CardContent>
       </Card>

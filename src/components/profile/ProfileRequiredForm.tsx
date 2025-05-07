@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
 import { CompanyLogo } from "./CompanyLogo";
-import { useBrandLogo } from "@/hooks/useBrandLogo";
+import { useProfileLogo } from "@/hooks/useProfileLogo";
 
 // Create validation schema
 const profileSchema = z.object({
@@ -39,8 +39,14 @@ interface ProfileRequiredFormProps {
 export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId, onSuccess }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
-  const [logoImage, setLogoImage] = useState<string | null>(null);
+  
+  const {
+    currentWebsite,
+    setCurrentWebsite,
+    logoImage,
+    setLogoImage,
+    isLogoLoading
+  } = useProfileLogo();
   
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -94,24 +100,18 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     };
     
     fetchProfile();
-  }, [userId, form, toast]);
+  }, [userId, form, toast, setCurrentWebsite, setLogoImage]);
 
   // Watch for website changes
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
   
-  // Fetch logo when website changes and it's different from current website
-  const { logoImage: fetchedLogoImage } = useBrandLogo(
-    websiteValue && websiteValue !== currentWebsite ? websiteValue : ''
-  );
-  
-  // Update logo image when fetched
+  // Update current website when form website value changes
   useEffect(() => {
-    if (fetchedLogoImage && websiteValue !== currentWebsite) {
-      setLogoImage(fetchedLogoImage);
+    if (websiteValue && websiteValue !== currentWebsite) {
       setCurrentWebsite(websiteValue);
     }
-  }, [fetchedLogoImage, websiteValue, currentWebsite]);
+  }, [websiteValue, currentWebsite, setCurrentWebsite]);
 
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!userId) return;
@@ -175,8 +175,8 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
 
         <ProfileFormFields form={form} />
         
-        <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "Saving..." : "Save Profile"}
+        <Button type="submit" disabled={isLoading || isLogoLoading} className="w-full">
+          {isLoading || isLogoLoading ? "Saving..." : "Save Profile"}
         </Button>
       </form>
     </Form>

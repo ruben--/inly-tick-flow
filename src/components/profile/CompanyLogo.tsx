@@ -2,7 +2,6 @@
 import React from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { LogoPlaceholder } from "./LogoPlaceholder";
-import { useBrandLogo } from "@/hooks/useBrandLogo";
 
 interface CompanyLogoProps {
   website: string;
@@ -17,12 +16,6 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   logoImage,
   className = "h-16 w-16"
 }) => {
-  const {
-    logoImage: fetchedLogoImage,
-    isLoading,
-    error
-  } = useBrandLogo(logoImage ? '' : website);  // Only fetch if we don't have a logo image
-
   const initials = companyName
     ? companyName
         .split(' ')
@@ -32,15 +25,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
-  // Use the provided logoImage if available, otherwise use the fetched one
-  const displayedImage = logoImage || fetchedLogoImage;
-
   return (
     <div className="border border-gray-200 overflow-hidden rounded-md flex items-center justify-center" style={{ width: className.match(/w-\d+/)?.at(0), height: className.match(/h-\d+/)?.at(0) }}>
       <AspectRatio ratio={1}>
-        {displayedImage ? (
+        {logoImage ? (
           <img 
-            src={displayedImage} 
+            src={logoImage} 
             alt={companyName || "Company logo"} 
             className="object-contain p-1 w-full h-full"
             onError={() => {
@@ -50,7 +40,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         ) : (
           <LogoPlaceholder 
             initials={initials} 
-            isLoading={isLoading} 
+            isLoading={false} 
           />
         )}
       </AspectRatio>

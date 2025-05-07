@@ -11,23 +11,13 @@ import { ProfileFormFields } from "./ProfileFormFields";
 import { UserProfileFormValues } from "./ProfileRequiredForm";
 import { useProfileLogo } from "@/hooks/useProfileLogo";
 import { ProfileFormSubmit } from "./ProfileFormSubmit";
-import { useBrandLogo } from "@/hooks/useBrandLogo";
 
 export const ProfileForm: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Use the custom hook for logo handling
-  const {
-    currentWebsite,
-    setCurrentWebsite,
-    logoImage,
-    setLogoImage,
-    isWebsiteChanged
-  } = useProfileLogo();
-  
-  // Use the same profile schema as in ProfileRequiredForm
+  // Define profile schema
   const profileSchema = z.object({
     companyName: z.string().min(1, "Company name is required"),
     website: z.string()
@@ -54,24 +44,28 @@ export const ProfileForm: React.FC = () => {
       lastName: "",
       role: ""
     },
-    mode: "onChange" // Validate on change for better user experience
+    mode: "onChange"
   });
 
-  // Watch for website changes to update logo
+  // Use the custom hook for logo handling with empty initial values
+  // These will be populated once we fetch the profile data
+  const {
+    currentWebsite,
+    setCurrentWebsite,
+    logoImage,
+    setLogoImage,
+    isLogoLoading
+  } = useProfileLogo();
+  
+  // Watch for website changes in the form
   const websiteValue = form.watch("website");
   
-  // Fetch logo when website changes
-  const { logoImage: fetchedLogoImage, isLoading: isLogoLoading } = useBrandLogo(
-    isWebsiteChanged(websiteValue) ? websiteValue : ''
-  );
-  
-  // Update logo image when fetched
+  // Update current website when form website value changes
   useEffect(() => {
-    if (fetchedLogoImage && isWebsiteChanged(websiteValue)) {
-      setLogoImage(fetchedLogoImage);
+    if (websiteValue && websiteValue !== currentWebsite) {
       setCurrentWebsite(websiteValue);
     }
-  }, [fetchedLogoImage, websiteValue, setLogoImage, setCurrentWebsite, isWebsiteChanged]);
+  }, [websiteValue, currentWebsite, setCurrentWebsite]);
 
   // Fetch existing profile data if available
   useEffect(() => {
@@ -173,7 +167,7 @@ export const ProfileForm: React.FC = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <ProfileFormSubmit 
-          isLoading={isLoading}
+          isLoading={isLoading || isLogoLoading}
           websiteValue={websiteValue}
           companyNameValue={companyNameValue}
           logoImage={logoImage}
