@@ -58,31 +58,33 @@ const Checklist = () => {
 
   return (
     <SidebarProvider defaultOpen={sidebarOpen}>
-      <div className="flex min-h-svh w-full">
-        <ConfigurationSidebar 
-          customerTypes={customerTypes}
-          assetTypes={assetTypes}
-          meterTypes={meterTypes}
-          toggleCustomerType={toggleCustomerType}
-          toggleAssetType={toggleAssetType}
-          toggleMeterType={toggleMeterType}
-          completedSteps={completedSteps}
-        />
+      <div className="flex flex-col w-full min-h-svh">
+        <div className="p-6 pb-0">
+          <ProgressBar 
+            progress={progress}
+            completedTasks={completedCount}
+            totalTasks={totalSteps}
+            customerTypes={customerTypes}
+            assetTypes={assetTypes}
+            meterTypes={meterTypes}
+            onProfileStatusChange={setIsProfileComplete}
+          />
+        </div>
         
-        <div className="flex flex-col w-full h-svh overflow-hidden">
-          <div className="p-6 pb-0">
-            <ProgressBar 
-              progress={progress}
-              completedTasks={completedCount}
-              totalTasks={totalSteps}
+        <div className="flex flex-col md:flex-row w-full flex-grow overflow-hidden">
+          <div className="md:w-64 border-r border-gray-200 overflow-y-auto">
+            <ConfigurationSidebar 
               customerTypes={customerTypes}
               assetTypes={assetTypes}
               meterTypes={meterTypes}
-              onProfileStatusChange={setIsProfileComplete}
+              toggleCustomerType={toggleCustomerType}
+              toggleAssetType={toggleAssetType}
+              toggleMeterType={toggleMeterType}
+              completedSteps={completedSteps}
             />
           </div>
           
-          <div className="flex-grow p-6 pt-4 overflow-hidden">
+          <div className="flex-grow p-6 pt-4 overflow-auto">
             <MainContent 
               selectedCustomer={selectedCustomer}
               selectedAssetTypes={selectedAssetTypes}
@@ -90,10 +92,10 @@ const Checklist = () => {
               meterTypes={meterTypes}
             />
           </div>
-          
-          <div className="p-6 pt-0">
-            <SaveIndicator saving={saving} lastSaved={lastSaved} />
-          </div>
+        </div>
+        
+        <div className="p-6 pt-0">
+          <SaveIndicator saving={saving} lastSaved={lastSaved} />
         </div>
       </div>
     </SidebarProvider>
