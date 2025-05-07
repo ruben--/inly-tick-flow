@@ -18,8 +18,8 @@ export const useProfileData = (userId: string | undefined) => {
     ? new URL(!/^https?:\/\//i.test(profileData.website) ? `https://${profileData.website}` : profileData.website).hostname 
     : 'yourcompany.com';
     
-  // Use the brandLogo hook for logo
-  const { logoImage, refreshLogo } = useBrandLogo(profileData?.website || '');
+  // Use the brandLogo hook for logo with proper dependency handling
+  const { logoImage, isLoading, refreshLogo } = useBrandLogo(profileData?.website || '');
 
   // Fetch user profile data
   useEffect(() => {
@@ -57,6 +57,7 @@ export const useProfileData = (userId: string | undefined) => {
     profileData, 
     companyDomain, 
     loading,
+    logoLoading: isLoading,
     logoImage: logoImage || profileData?.logo_image,
     refreshLogo
   };

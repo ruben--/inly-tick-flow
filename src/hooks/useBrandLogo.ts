@@ -15,14 +15,21 @@ export const useBrandLogo = (website: string) => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const fetchTimeoutRef = useRef<number | null>(null);
 
-  // Try to load cached logo on initial mount
+  // Try to load cached logo on initial mount or when website changes
   useEffect(() => {
+    // Reset states when website changes
+    if (!website) {
+      setLogoImage(null);
+      setError(null);
+      return;
+    }
+
     const loadCachedLogo = () => {
       try {
-        if (!website) return;
+        if (!website) return false;
         
         const domain = extractDomain(website);
-        if (!domain) return;
+        if (!domain) return false;
         
         const cacheKey = `${LOGO_CACHE_KEY}_${domain}`;
         const timestampKey = `${LOGO_CACHE_TIMESTAMP_KEY}_${domain}`;
@@ -51,11 +58,27 @@ export const useBrandLogo = (website: string) => {
     if (!loadCachedLogo() && website) {
       const domain = extractDomain(website);
       if (domain) {
-        setTimeout(() => {
+        // Clear any pending timeouts
+        if (fetchTimeoutRef.current !== null) {
+          window.clearTimeout(fetchTimeoutRef.current);
+        }
+        
+        // Add a small delay to prevent rapid consecutive requests
+        fetchTimeoutRef.current = window.setTimeout(() => {
           fetchLogo(domain);
         }, 300);
       }
     }
+    
+    return () => {
+      // Cleanup on unmount or website change
+      if (fetchTimeoutRef.current !== null) {
+        window.clearTimeout(fetchTimeoutRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [website]);
 
   // Cache logo in localStorage
