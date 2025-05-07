@@ -5,15 +5,18 @@ import { SaveIndicator } from '@/components/configurator/SaveIndicator';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { useChecklistConfig } from '@/hooks/useChecklistConfig';
 import { useState, useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { 
+  SidebarProvider, 
+  Sidebar, 
+  SidebarTrigger, 
+  SidebarContent 
+} from '@/components/ui/sidebar';
 import { ConfigurationSidebar } from '@/components/configurator/ConfigurationSidebar';
 import { MainContent } from '@/components/configurator/MainContent';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const Checklist = () => {
   const { user } = useAuth();
   const [isProfileComplete, setIsProfileComplete] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   
   const {
     loading,
@@ -29,15 +32,6 @@ const Checklist = () => {
     selectedAssetTypes,
     isAllCustomersSelected
   } = useChecklistConfig(user?.id);
-
-  // Ensure sidebar is open on component mount
-  useEffect(() => {
-    // Short delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      setSidebarOpen(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   if (loading) {
     return <LoadingState />;
@@ -58,20 +52,22 @@ const Checklist = () => {
   const progress = Math.round((completedCount / totalSteps) * 100);
 
   return (
-    <SidebarProvider defaultOpen={sidebarOpen}>
-      <div className="flex h-svh">
-        {/* Sidebar */}
-        <div className="w-80 border-r border-gray-200 flex-shrink-0 overflow-y-auto bg-gray-50">
-          <ConfigurationSidebar 
-            customerTypes={customerTypes}
-            assetTypes={assetTypes}
-            meterTypes={meterTypes}
-            toggleCustomerType={toggleCustomerType}
-            toggleAssetType={toggleAssetType}
-            toggleMeterType={toggleMeterType}
-            completedSteps={completedSteps}
-          />
-        </div>
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex h-svh w-full">
+        {/* Main Sidebar using shadcn/ui components */}
+        <Sidebar>
+          <SidebarContent>
+            <ConfigurationSidebar 
+              customerTypes={customerTypes}
+              assetTypes={assetTypes}
+              meterTypes={meterTypes}
+              toggleCustomerType={toggleCustomerType}
+              toggleAssetType={toggleAssetType}
+              toggleMeterType={toggleMeterType}
+              completedSteps={completedSteps}
+            />
+          </SidebarContent>
+        </Sidebar>
         
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">

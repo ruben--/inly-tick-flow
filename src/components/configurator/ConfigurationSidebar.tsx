@@ -5,12 +5,6 @@ import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
 import { MeterType } from './MeterTypeCard';
 import { ConfigSidebarItem } from './ConfigSidebarItem';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 interface ConfigurationSidebarProps {
   customerTypes: CustomerType[];
@@ -37,9 +31,6 @@ export const ConfigurationSidebar = ({
   // Calculate progress percentage
   const progressPercentage = Math.round((completedSteps.filter(Boolean).length / completedSteps.length) * 100);
 
-  // Define sections that will always be expanded (all of them)
-  const alwaysExpandedSections = ["customers", "assets", "optimization"];
-
   return (
     <div className="h-full flex flex-col w-full">
       <div className="flex justify-between items-center py-4 border-b border-gray-200 px-4 bg-white">
@@ -50,7 +41,7 @@ export const ConfigurationSidebar = ({
         <div className="mb-6">
           <div className="text-gray-700 text-sm font-medium mb-3">Configure Your Offering</div>
           <div className="space-y-2">
-            {/* Remove Accordion's collapsible behavior by rendering sections directly */}
+            {/* All sections are permanently expanded */}
             <div className="space-y-2">
               <div className="border-none">
                 <div className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200">
