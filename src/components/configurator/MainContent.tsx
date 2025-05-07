@@ -151,7 +151,7 @@ export const MainContent = ({
                 
                 {btmMeter?.selected && <Card className="overflow-hidden border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="h-40 bg-gray-50 relative">
-                      <img src="/lovable-uploads/2c050251-ea30-49f9-b719-a85e8c8c54e4.png" alt="Behind the Meter" className="w-full h-full object-cover opacity-70" />
+                      <img alt="Behind the Meter" className="w-full h-full object-cover opacity-100" src="/lovable-uploads/92486d5d-2202-48c8-ab14-f8f1a4c3c7ba.png" />
                       <div className="absolute top-2 right-2 bg-gray-600 text-white px-2 py-1 rounded-md text-xs">Active</div>
                     </div>
                     <CardContent className="p-4 bg-gradient-to-b from-white to-gray-50">
