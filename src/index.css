@@ -156,3 +156,12 @@
 .group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] > svg:first-child {
   margin-right: 0;
 }
+
+/* Hide sidebar footer text and browser chrome content when sidebar is collapsed */
+.group-data-\[collapsible\=icon\] .sidebar-footer-text,
+.group-data-\[collapsible\=icon\] .sidebar-browser-domain,
+.group-data-\[collapsible\=icon\] .sidebar-company-name,
+.group-data-\[collapsible\=icon\] .sidebar-heading-content,
+.group-data-\[collapsible\=icon\] .sidebar-collapse-text {
+  display: none;
+}

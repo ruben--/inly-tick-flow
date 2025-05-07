@@ -54,7 +54,7 @@ export const ConfigurationSidebar = ({
       <Sidebar side="left" variant="sidebar" collapsible="icon">
         <SidebarRail />
         <SidebarHeader className="flex justify-between items-center py-4">
-          <h3 className="font-medium text-sidebar-foreground text-sm px-4">Configuration</h3>
+          <h3 className="font-medium text-sidebar-foreground text-sm px-4 sidebar-collapse-text">Configuration</h3>
           <SidebarTrigger className="mr-2" />
         </SidebarHeader>
         
@@ -147,7 +147,7 @@ export const ConfigurationSidebar = ({
         
         <SidebarFooter className="pb-4">
           <div className="px-3">
-            <div className="text-xs text-sidebar-foreground/70 mb-2">Configuration Progress</div>
+            <div className="text-xs text-sidebar-foreground/70 mb-2 sidebar-footer-text">Configuration Progress</div>
             <div className="w-full bg-sidebar-accent h-1 rounded-full overflow-hidden">
               <div 
                 className="bg-sidebar-primary h-full rounded-full transition-all duration-500 ease-in-out"
@@ -156,7 +156,7 @@ export const ConfigurationSidebar = ({
                 }}
               ></div>
             </div>
-            <div className="text-xs text-sidebar-foreground/70 mt-2 text-right">
+            <div className="text-xs text-sidebar-foreground/70 mt-2 text-right sidebar-footer-text">
               {completedSteps.filter(Boolean).length} of {completedSteps.length} complete
             </div>
           </div>

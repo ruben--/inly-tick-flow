@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
@@ -73,7 +74,7 @@ export const MainContent = ({
             <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-          <div className="flex-1 bg-white px-4 py-1 rounded text-xs text-gray-500 text-center">
+          <div className="flex-1 bg-white px-4 py-1 rounded text-xs text-gray-500 text-center sidebar-browser-domain">
             {companyDomain}/products
           </div>
         </div>
@@ -92,8 +93,8 @@ export const MainContent = ({
                     target.onerror = null;
                     // If image fails to load, we'll show company initials instead
                     target.style.display = 'none';
-                    target.parentElement!.innerHTML = `<div class="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">
-                      <span class="text-lg font-medium">${profileData?.company_name?.slice(0, 2) || 'CO'}</span>
+                    target.parentElement!.innerHTML = `<div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">
+                      <span className="text-lg font-medium sidebar-company-name">${profileData?.company_name?.slice(0, 2) || 'CO'}</span>
                     </div>`;
                   }}
                 />
@@ -106,7 +107,7 @@ export const MainContent = ({
                 logoUrl={null}
               />
             )}
-            <h2 className="text-xl font-medium">Products Preview</h2>
+            <h2 className="text-xl font-medium sidebar-heading-content">Products Preview</h2>
           </div>
           
           {/* Hero Section - Updated with new background image */}
@@ -122,7 +123,7 @@ export const MainContent = ({
                   <span className="text-[42px]">Choose customers</span>
                 )}
               </h1>
-              <p className="text-white/90 text-lg">This is your product offering towards customers. </p>
+              <p className="text-white/90 text-lg sidebar-collapse-text">This is your product offering towards customers. </p>
             </div>
           </div>
 
@@ -139,11 +140,11 @@ export const MainContent = ({
                       </div>
                       <div className="p-4">
                         <h3 className="font-medium">{type.name}</h3>
-                        <p className="text-sm text-muted-foreground">{type.description}</p>
+                        <p className="text-sm text-muted-foreground sidebar-collapse-text">{type.description}</p>
                       </div>
                     </Card>)}
                 </div> : <div className="text-center py-8">
-                  <p className="text-muted-foreground">No assets are being optimised</p>
+                  <p className="text-muted-foreground sidebar-collapse-text">No assets are being optimised</p>
                 </div>}
             </CardContent>
           </Card>
@@ -161,7 +162,7 @@ export const MainContent = ({
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-medium">Front of the Meter</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground sidebar-collapse-text">
                         {ftmMeter.description}
                       </p>
                     </CardContent>
@@ -173,7 +174,7 @@ export const MainContent = ({
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-medium">Behind the Meter</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground sidebar-collapse-text">
                         {btmMeter.description}
                       </p>
                     </CardContent>
@@ -181,7 +182,7 @@ export const MainContent = ({
 
                 {/* Show message when no meter types are selected */}
                 {!hasSelectedMeterTypes && <div className="col-span-2 text-center py-8">
-                    <p className="text-muted-foreground">No optimisation is activated</p>
+                    <p className="text-muted-foreground sidebar-collapse-text">No optimisation is activated</p>
                   </div>}
               </div>
             </CardContent>
