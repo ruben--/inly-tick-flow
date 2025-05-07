@@ -24,7 +24,7 @@ export const LogoSection: React.FC<LogoSectionProps> = ({
         className="h-20 w-20"
         isLoading={isLogoLoading}
       />
-      <span className="text-sm text-muted-foreground">{companyNameValue}</span>
+      <span className="text-sm text-muted-foreground">{companyNameValue || 'Company'}</span>
     </div>
   );
 };

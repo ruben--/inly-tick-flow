@@ -32,7 +32,7 @@ export const useProfileLogo = ({
 
   // Normalize website URL
   const setNormalizedWebsite = useCallback((website: string | null) => {
-    setCurrentWebsite(website ? website : null);
+    setCurrentWebsite(website ? website.trim() : null);
   }, []);
 
   return {

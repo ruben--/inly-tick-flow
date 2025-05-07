@@ -14,13 +14,24 @@ export const useBrandLogo = (website: string) => {
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const fetchTimeoutRef = useRef<number | null>(null);
+  const previousWebsiteRef = useRef<string | null>(null);
+
+  // Clear logo when website changes completely
+  useEffect(() => {
+    if (previousWebsiteRef.current !== website) {
+      setLogoImage(null);
+      setError(null);
+      previousWebsiteRef.current = website;
+    }
+  }, [website]);
 
   // Try to load cached logo on initial mount or when website changes
   useEffect(() => {
-    // Reset states when website changes
+    // Reset states when website changes to empty
     if (!website) {
       setLogoImage(null);
       setError(null);
+      setIsLoading(false);
       return;
     }
 
@@ -74,9 +85,11 @@ export const useBrandLogo = (website: string) => {
       // Cleanup on unmount or website change
       if (fetchTimeoutRef.current !== null) {
         window.clearTimeout(fetchTimeoutRef.current);
+        fetchTimeoutRef.current = null;
       }
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
     };
   }, [website]);
@@ -129,20 +142,20 @@ export const useBrandLogo = (website: string) => {
       
       if (response.error) {
         setError("Failed to fetch company logo");
+        setIsLoading(false);
       } else if (response.data?.logoImage) {
         setLogoImage(response.data.logoImage);
+        setIsLoading(false);
         // Cache the logo in localStorage
         cacheLogo(domain, response.data.logoImage);
       } else {
         setError("No logo found");
+        setIsLoading(false);
       }
     } catch (err: any) {
       if (controller.signal.aborted) return;
       setError(err.message || "Failed to fetch logo");
-    } finally {
-      if (!controller.signal.aborted) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   }, [cacheLogo]);
 
@@ -164,6 +177,8 @@ export const useBrandLogo = (website: string) => {
         console.error("Error clearing localStorage:", err);
       }
       
+      // Reset state before fetching
+      setLogoImage(null);
       fetchLogo(domain);
     }
   }, [website, fetchLogo]);

@@ -22,7 +22,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Reset error state when logo changes
+  // Reset states when logo changes
   useEffect(() => {
     setImageError(false);
     setImageLoaded(false);
@@ -38,7 +38,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
-  // Use the logo directly without cache busting
+  // Use the logo directly
   const logoSrc = logoImage && !imageError ? logoImage : null;
 
   // Extract size classes
@@ -51,6 +51,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         "overflow-hidden rounded-md flex items-center justify-center bg-white",
         widthClass,
         heightClass,
+        className,
         isLoading && "animate-pulse bg-gray-100"
       )}
       aria-label={`${companyName || "Company"} logo`}

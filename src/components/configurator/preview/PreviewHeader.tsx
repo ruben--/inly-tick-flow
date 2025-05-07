@@ -5,13 +5,15 @@ interface PreviewHeaderProps {
   companyName: string | null;
   website: string | null;
   logoImage?: string | null;
-  onRefreshLogo?: () => void; // Keeping prop for compatibility but not using it
+  logoLoading?: boolean;
+  onRefreshLogo?: () => void;
 }
 
 export const PreviewHeader = ({ 
   companyName, 
   website, 
-  logoImage
+  logoImage,
+  logoLoading = false
 }: PreviewHeaderProps) => {
   return (
     <div className="flex flex-col items-center mb-6 bg-white p-3 rounded-none border-2 border-black">
@@ -21,7 +23,7 @@ export const PreviewHeader = ({
           companyName={companyName || 'Company'} 
           logoImage={logoImage}
           className="h-full w-full" 
-          isLoading={false}
+          isLoading={logoLoading}
         />
       </div>
       <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
