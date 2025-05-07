@@ -40,9 +40,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ initia
           isLoading={isLoading} 
           websiteValue={websiteValue} 
           companyNameValue={companyNameValue}
-        >
-          <ProfileFormFields form={form} />
-        </ProfileFormSubmit>
+        />
       </form>
     </Form>
   );

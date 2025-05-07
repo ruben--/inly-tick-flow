@@ -47,20 +47,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ initialData, profileLo
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <ProfileFormFields 
-          form={form} 
-          profileLoading={profileLoading}
-        />
+        <ProfileFormFields form={form} />
         <ProfileFormSubmit 
           isLoading={submitLoading} 
           websiteValue={websiteValue}
           companyNameValue={companyNameValue}
-        >
-          <ProfileFormFields 
-            form={form} 
-            profileLoading={profileLoading}
-          />
-        </ProfileFormSubmit>
+        />
       </form>
     </Form>
   );
