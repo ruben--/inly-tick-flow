@@ -20,6 +20,7 @@ export const ProfileForm: React.FC = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [initialWebsite, setInitialWebsite] = useState<string | null>(null);
   
   // Define profile schema with better validation
   const profileSchema = z.object({
@@ -90,6 +91,8 @@ export const ProfileForm: React.FC = () => {
           console.log("Profile data fetched:", data);
           setCurrentWebsite(data.website || null);
           setLogoImage(data.logo_image || null);
+          // Store initial website value for comparison later
+          setInitialWebsite(data.website || null);
           
           form.reset({
             companyName: data.company_name || "",
@@ -122,6 +125,9 @@ export const ProfileForm: React.FC = () => {
     setIsLoading(true);
     
     try {
+      // Check if website has changed
+      const websiteChanged = initialWebsite !== data.website;
+      
       // Set the website value before saving
       handleWebsiteBlur();
       
@@ -139,6 +145,14 @@ export const ProfileForm: React.FC = () => {
         });
         
       if (error) throw error;
+      
+      // If website changed, fetch a new logo
+      if (websiteChanged && data.website) {
+        console.log("Website changed, fetching new logo");
+        refreshLogo();
+        // Update the initial website to the new value
+        setInitialWebsite(data.website);
+      }
       
       toast({
         title: "Success!",

@@ -36,6 +36,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [initialWebsite, setInitialWebsite] = useState<string | null>(null);
   
   const {
     currentWebsite,
@@ -80,6 +81,8 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         if (data) {
           setCurrentWebsite(data.website || null);
           setLogoImage(data.logo_image || null);
+          // Store initial website value for comparison later
+          setInitialWebsite(data.website || null);
           
           form.reset({
             companyName: data.company_name || "",
@@ -121,6 +124,9 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     setIsLoading(true);
     
     try {
+      // Check if website has changed
+      const websiteChanged = initialWebsite !== data.website;
+      
       // Update the current website before saving
       if (data.website) {
         setCurrentWebsite(data.website);
@@ -140,6 +146,12 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         });
         
       if (error) throw error;
+      
+      // If website changed, fetch a new logo
+      if (websiteChanged && data.website) {
+        console.log("Website changed, fetching new logo");
+        refreshLogo();
+      }
       
       toast({
         title: "Success!",
