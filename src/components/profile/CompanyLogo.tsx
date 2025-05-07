@@ -22,16 +22,20 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Add debugging
+  // Enhanced debugging
   useEffect(() => {
     console.log("CompanyLogo render with logoImage:", logoImage ? "exists" : "null");
     console.log("CompanyLogo isLoading:", isLoading);
-  }, [logoImage, isLoading]);
+    console.log("CompanyLogo imageError:", imageError);
+    console.log("CompanyLogo imageLoaded:", imageLoaded);
+  }, [logoImage, isLoading, imageError, imageLoaded]);
   
   // Reset states when logo changes
   useEffect(() => {
-    setImageError(false);
-    setImageLoaded(false);
+    if (logoImage) {
+      setImageError(false);
+      setImageLoaded(false);
+    }
   }, [logoImage]);
   
   // Extract initials for placeholder
@@ -44,7 +48,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
-  // Use the logo directly
+  // Use the logo directly if available and not in error state
   const logoSrc = logoImage && !imageError ? logoImage : null;
 
   // Extract size classes

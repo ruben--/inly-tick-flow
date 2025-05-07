@@ -13,7 +13,8 @@ export const PreviewHeader = ({
   companyName, 
   website, 
   logoImage,
-  logoLoading = false
+  logoLoading = false,
+  onRefreshLogo
 }: PreviewHeaderProps) => {
   // Add debugging
   console.log("PreviewHeader logoImage:", logoImage ? "exists" : "null");

@@ -13,6 +13,7 @@ export const useProfileData = (userId: string | undefined) => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [logoImageState, setLogoImageState] = useState<string | null>(null);
+  const [logoFetchAttempted, setLogoFetchAttempted] = useState(false);
 
   // Extract domain from website
   const companyDomain = profileData?.website 
@@ -22,7 +23,7 @@ export const useProfileData = (userId: string | undefined) => {
   // Use the brandLogo hook for logo with proper dependency handling
   // Only try to fetch if we don't already have a logo_image from the database
   const { logoImage: fetchedLogoImage, isLoading: logoFetchLoading, refreshLogo } = useBrandLogo(
-    profileData?.logo_image ? '' : (profileData?.website || '')
+    (!logoImageState && profileData?.website && !logoFetchAttempted) ? (profileData?.website || '') : ''
   );
 
   // Fetch user profile data
@@ -53,6 +54,9 @@ export const useProfileData = (userId: string | undefined) => {
         if (data?.logo_image) {
           console.log("Using logo from database:", data.logo_image.substring(0, 50) + "...");
           setLogoImageState(data.logo_image);
+        } else {
+          // Mark that we need to fetch a logo if not found in DB
+          setLogoFetchAttempted(false);
         }
       } catch (err) {
         console.error("Error in profile fetch:", err);
@@ -67,21 +71,23 @@ export const useProfileData = (userId: string | undefined) => {
   // Update logo state when fetched logo changes
   useEffect(() => {
     if (fetchedLogoImage && !logoImageState) {
-      console.log("Using fetched logo");
+      console.log("Using fetched logo from BrandFetch");
       setLogoImageState(fetchedLogoImage);
+      setLogoFetchAttempted(true);
     }
   }, [fetchedLogoImage, logoImageState]);
 
   // Get the final logo to use - prioritize stored logo over fetched logo
-  const finalLogo = logoImageState || fetchedLogoImage || profileData?.logo_image || null;
+  const finalLogo = logoImageState || profileData?.logo_image || null;
   
   console.log("Final logo state:", finalLogo ? "Logo exists" : "No logo");
+  console.log("Logo loading state:", logoFetchLoading && !logoImageState);
 
   return { 
     profileData, 
     companyDomain, 
     loading,
-    logoLoading: logoFetchLoading && !logoImageState,
+    logoLoading: logoFetchLoading && !logoImageState && !logoFetchAttempted,
     logoImage: finalLogo,
     refreshLogo
   };
