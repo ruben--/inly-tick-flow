@@ -1,9 +1,10 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 
+// Component kept for compatibility but no longer used in the application
 interface RefreshLogoButtonProps {
   onRefresh: () => void;
   isDisabled?: boolean;
@@ -13,48 +14,5 @@ export const RefreshLogoButton: React.FC<RefreshLogoButtonProps> = ({
   onRefresh,
   isDisabled = false
 }) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    
-    // Clear any localStorage cache related to logo
-    try {
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('brand-logo-cache-') || key.startsWith('logo_cache_'))) {
-          keysToRemove.push(key);
-        }
-      }
-      
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-    } catch (e) {
-      console.error("Error clearing logo cache:", e);
-    }
-    
-    // Call the refresh function passed as prop
-    onRefresh();
-    
-    toast.success("Logo refresh initiated", {
-      description: "Fetching the latest company logo..."
-    });
-    
-    // Reset the animation after a reasonable time
-    setTimeout(() => setIsRefreshing(false), 2000);
-  };
-  
-  return (
-    <Button 
-      type="button" 
-      variant="outline" 
-      size="sm"
-      onClick={handleRefresh}
-      disabled={isDisabled || isRefreshing}
-      className="text-xs flex items-center gap-1 hover:bg-slate-100"
-    >
-      <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-      {isRefreshing ? 'Refreshing...' : 'Refresh Logo'}
-    </Button>
-  );
+  return null; // Component not rendered
 };
