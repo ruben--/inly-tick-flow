@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,9 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
 import { CheckCircle2, RefreshCcw } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { OemLogosGrid } from '@/components/configurator/OemLogosGrid';
+import { useOemLogos } from '@/hooks/oem/useOemLogos';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ConfigState {
   vppName: string;
@@ -50,6 +52,8 @@ const getStoredConfig = (): ConfigState | null => {
 };
 
 const Configure = () => {
+  const { user } = useAuth();
+  const { oemLogos, loading: oemsLoading, toggleOem, saving: oemsSaving } = useOemLogos(user?.id);
   const [config, setConfig] = useState<ConfigState>({
     vppName: 'My Virtual Power Plant',
     capacityMW: '10',
@@ -209,11 +213,12 @@ const Configure = () => {
       </Alert>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-5 mb-8">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="energy-sources">Energy Sources</TabsTrigger>
           <TabsTrigger value="response-modes">Response Modes</TabsTrigger>
           <TabsTrigger value="control">Control Settings</TabsTrigger>
+          <TabsTrigger value="oems">OEMs</TabsTrigger>
         </TabsList>
 
         {/* General Tab */}
@@ -461,6 +466,44 @@ const Configure = () => {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* OEMs Tab */}
+        <TabsContent value="oems" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>OEM Partners</CardTitle>
+              <CardDescription>
+                Select the original equipment manufacturers (OEMs) you work with
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Click on the logos to enable or disable specific OEMs in your virtual power plant configuration.
+                  All selected OEMs will be integrated into your system.
+                </p>
+                
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-medium">OEM Partners</h3>
+                  <div className="flex items-center gap-2">
+                    {oemsSaving && (
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <RefreshCcw className="h-3 w-3 mr-1 animate-spin" />
+                        <span>Saving...</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <OemLogosGrid 
+                  oemLogos={oemLogos} 
+                  onToggle={toggleOem}
+                  loading={oemsLoading}
+                />
               </div>
             </CardContent>
           </Card>

@@ -54,7 +54,6 @@ export const useProfileSubmit = ({
         description: "Your profile has been updated",
       });
       
-      // Call the onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
       }
