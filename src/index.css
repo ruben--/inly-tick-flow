@@ -127,11 +127,12 @@
 [data-sidebar="sidebar"] {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   border-right: 1px solid hsl(var(--sidebar-border));
+  background-color: #f0f8ff; /* Light blue background for sidebar */
 }
 
 /* Enhance sidebar menu item hover effects */
 [data-sidebar="menu-button"]:hover {
-  background-color: hsl(var(--sidebar-accent));
+  background-color: #e2efff; /* Light blue hover effect */
   transition: all 0.2s ease-in-out;
 }
 
@@ -145,6 +146,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #e6f2ff; /* Light blue header */
 }
 
 /* Icon-only mode styling for collapsed sidebar */
@@ -163,5 +165,21 @@
 .group-data-\[collapsible\=icon\] .sidebar-company-name,
 .group-data-\[collapsible\=icon\] .sidebar-heading-content,
 .group-data-\[collapsible\=icon\] .sidebar-collapse-text {
-  display: none;
+  display: none !important; /* Added !important to ensure it overrides other styles */
+}
+
+/* New styles for card elements */
+.card {
+  border: 2px solid #c8e1ff !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom color for browser chrome */
+.bg-gray-100 {
+  background-color: #e6f2ff !important;
 }

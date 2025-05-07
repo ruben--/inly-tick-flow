@@ -66,24 +66,24 @@ export const MainContent = ({
 
   return <div className="w-full flex-grow p-0">
       {/* Browser Mockup */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden shadow-lg bg-white h-full">
+      <div className="border border-blue-300 rounded-lg overflow-hidden shadow-lg bg-white h-full">
         {/* Browser Chrome */}
-        <div className="bg-gray-100 p-3 border-b border-gray-200 flex items-center">
+        <div className="bg-blue-100 p-3 border-b border-blue-200 flex items-center">
           <div className="flex space-x-2 mr-4">
             <div className="w-3 h-3 rounded-full bg-red-500"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-          <div className="flex-1 bg-white px-4 py-1 rounded text-xs text-gray-500 text-center sidebar-browser-domain">
+          <div className="flex-1 bg-white px-4 py-1 rounded text-xs text-blue-600 text-center font-medium sidebar-browser-domain border border-blue-200">
             {companyDomain}/products
           </div>
         </div>
         
         {/* Browser Content */}
         <div className="p-4 overflow-y-auto" style={{ maxHeight: "calc(100vh - 180px)" }}>
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-6 bg-blue-50 p-3 rounded-md">
             {profileData?.logo_url ? (
-              <div className="h-10 w-10 flex items-center justify-center border border-gray-200 rounded overflow-hidden bg-white p-1">
+              <div className="h-10 w-10 flex items-center justify-center border border-blue-200 rounded-full overflow-hidden bg-white p-1">
                 <img 
                   src={profileData.logo_url} 
                   alt={profileData?.company_name || "Company logo"}
@@ -93,7 +93,7 @@ export const MainContent = ({
                     target.onerror = null;
                     // If image fails to load, we'll show company initials instead
                     target.style.display = 'none';
-                    target.parentElement!.innerHTML = `<div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">
+                    target.parentElement!.innerHTML = `<div className="flex items-center justify-center w-full h-full bg-blue-100 text-blue-500">
                       <span className="text-lg font-medium sidebar-company-name">${profileData?.company_name?.slice(0, 2) || 'CO'}</span>
                     </div>`;
                   }}
@@ -107,74 +107,78 @@ export const MainContent = ({
                 logoUrl={null}
               />
             )}
-            <h2 className="text-xl font-medium sidebar-heading-content">Products Preview</h2>
+            <h2 className="text-xl font-medium text-blue-800 sidebar-heading-content">Products Preview</h2>
           </div>
           
           {/* Hero Section - Updated with new background image */}
-          <div className="relative w-full h-[300px] mb-6 rounded-lg overflow-hidden">
+          <div className="relative w-full h-[300px] mb-6 rounded-lg overflow-hidden shadow-md">
             <img 
               src="/lovable-uploads/2c050251-ea30-49f9-b719-a85e8c8c54e4.png" 
               alt="EV Charger with Wood Background" 
               className="w-full h-full object-cover" 
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-8">
-              <h1 className="font-medium text-white mb-2 text-2xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-800/70 to-blue-600/20 flex flex-col justify-center p-8">
+              <h1 className="font-medium text-white mb-2 text-2xl shadow-sm">
                 {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : (
                   <span className="text-[42px]">Choose customers</span>
                 )}
               </h1>
-              <p className="text-white/90 text-lg sidebar-collapse-text">This is your product offering towards customers. </p>
+              <p className="text-white/90 text-lg backdrop-blur-sm bg-blue-900/30 p-2 rounded-md inline-block sidebar-collapse-text">
+                This is your product offering towards customers. 
+              </p>
             </div>
           </div>
 
           {/* Asset Types Section */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium">Assets being optimised</CardTitle>
+          <Card className="mb-6 border-blue-300 shadow-md">
+            <CardHeader className="bg-blue-50 border-b border-blue-200">
+              <CardTitle className="text-lg font-medium text-blue-800">Assets being optimised</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               {hasSelectedAssets ? <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {selectedAssetTypes.map(type => <Card key={type.id} className="flex overflow-hidden">
-                      <div className="w-20 shrink-0">
+                  {selectedAssetTypes.map(type => <Card key={type.id} className="flex overflow-hidden border-blue-200 shadow-sm hover:shadow-md transition-all">
+                      <div className="w-20 shrink-0 bg-blue-50">
                         <img src={type.image} alt={type.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="p-4">
-                        <h3 className="font-medium">{type.name}</h3>
-                        <p className="text-sm text-muted-foreground sidebar-collapse-text">{type.description}</p>
+                        <h3 className="font-medium text-blue-700">{type.name}</h3>
+                        <p className="text-sm text-blue-600 sidebar-collapse-text">{type.description}</p>
                       </div>
                     </Card>)}
                 </div> : <div className="text-center py-8">
-                  <p className="text-muted-foreground sidebar-collapse-text">No assets are being optimised</p>
+                  <p className="text-blue-500 sidebar-collapse-text">No assets are being optimised</p>
                 </div>}
             </CardContent>
           </Card>
 
           {/* Savings Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-medium">Type of optimisation activated</CardTitle>
+          <Card className="border-blue-300 shadow-md">
+            <CardHeader className="bg-blue-50 border-b border-blue-200">
+              <CardTitle className="text-lg font-medium text-blue-800">Type of optimisation activated</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {ftmMeter?.selected && <Card className="overflow-hidden">
-                    <div className="h-40 bg-muted">
+                {ftmMeter?.selected && <Card className="overflow-hidden border-blue-200 shadow-sm hover:shadow-md transition-all">
+                    <div className="h-40 bg-blue-50 relative">
                       <img src="/lovable-uploads/2c050251-ea30-49f9-b719-a85e8c8c54e4.png" alt="Front of the Meter" className="w-full h-full object-cover opacity-70" />
+                      <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-md text-xs">Active</div>
                     </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-medium">Front of the Meter</h3>
-                      <p className="text-sm text-muted-foreground sidebar-collapse-text">
+                    <CardContent className="p-4 bg-gradient-to-b from-white to-blue-50">
+                      <h3 className="font-medium text-blue-800">Front of the Meter</h3>
+                      <p className="text-sm text-blue-600 sidebar-collapse-text">
                         {ftmMeter.description}
                       </p>
                     </CardContent>
                   </Card>}
                 
-                {btmMeter?.selected && <Card className="overflow-hidden">
-                    <div className="h-40 bg-muted">
+                {btmMeter?.selected && <Card className="overflow-hidden border-blue-200 shadow-sm hover:shadow-md transition-all">
+                    <div className="h-40 bg-blue-50 relative">
                       <img src="/lovable-uploads/2c050251-ea30-49f9-b719-a85e8c8c54e4.png" alt="Behind the Meter" className="w-full h-full object-cover opacity-70" />
+                      <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-md text-xs">Active</div>
                     </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-medium">Behind the Meter</h3>
-                      <p className="text-sm text-muted-foreground sidebar-collapse-text">
+                    <CardContent className="p-4 bg-gradient-to-b from-white to-blue-50">
+                      <h3 className="font-medium text-blue-800">Behind the Meter</h3>
+                      <p className="text-sm text-blue-600 sidebar-collapse-text">
                         {btmMeter.description}
                       </p>
                     </CardContent>
@@ -182,7 +186,7 @@ export const MainContent = ({
 
                 {/* Show message when no meter types are selected */}
                 {!hasSelectedMeterTypes && <div className="col-span-2 text-center py-8">
-                    <p className="text-muted-foreground sidebar-collapse-text">No optimisation is activated</p>
+                    <p className="text-blue-500 sidebar-collapse-text">No optimisation is activated</p>
                   </div>}
               </div>
             </CardContent>
