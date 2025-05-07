@@ -49,7 +49,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
           <img 
             src={logoImage} 
             alt={companyName || "Company logo"} 
-            className="object-contain p-1 w-full h-full"
+            className="object-contain p-1 w-full h-full border border-gray-300"
             onError={(e) => {
               console.error("Failed to load logo image");
               (e.target as HTMLImageElement).style.display = 'none';
