@@ -3,26 +3,22 @@ import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserProfileFormValues } from "@/components/profile/types";
+import { useLogo } from "@/contexts/LogoContext";
 
 interface UseProfileSubmitProps {
   userId: string;
   initialWebsite: string | null;
-  setCurrentWebsite: (website: string | null) => void;
-  logoImage: string | null;
-  refreshLogo: () => void;
   onSuccess?: () => void;
 }
 
 export const useProfileSubmit = ({
   userId,
   initialWebsite,
-  setCurrentWebsite,
-  logoImage,
-  refreshLogo,
   onSuccess
 }: UseProfileSubmitProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { logoImage, refreshLogo } = useLogo();
 
   const handleSubmit = useCallback(async (data: UserProfileFormValues) => {
     if (!userId) return;
@@ -32,11 +28,6 @@ export const useProfileSubmit = ({
     try {
       // Check if website has changed
       const websiteChanged = initialWebsite !== data.website;
-      
-      // Update the current website before saving
-      if (data.website) {
-        setCurrentWebsite(data.website);
-      }
       
       const { error } = await supabase
         .from('profiles')
@@ -55,8 +46,7 @@ export const useProfileSubmit = ({
       
       // If website changed, fetch a new logo
       if (websiteChanged && data.website) {
-        console.log("Website changed, fetching new logo");
-        refreshLogo();
+        refreshLogo(data.website);
       }
       
       toast({
@@ -78,7 +68,7 @@ export const useProfileSubmit = ({
     } finally {
       setIsLoading(false);
     }
-  }, [userId, initialWebsite, setCurrentWebsite, logoImage, refreshLogo, toast, onSuccess]);
+  }, [userId, initialWebsite, logoImage, refreshLogo, toast, onSuccess]);
 
   return {
     isLoading,

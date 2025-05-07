@@ -1,6 +1,7 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { LogoProvider } from '@/contexts/LogoContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -23,5 +24,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/" state={{ from: location.pathname }} replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <LogoProvider userId={user.id}>
+      {children}
+    </LogoProvider>
+  );
 }

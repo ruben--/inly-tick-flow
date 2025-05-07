@@ -24,9 +24,7 @@ export const MainContent = ({
   meterTypes
 }: MainContentProps) => {
   const { user } = useAuth();
-  const { profileData, companyDomain, logoImage, logoLoading, refreshLogo } = useProfileData(user?.id);
-
-  console.log("MainContent rendering with logoImage:", logoImage ? "exists" : "null");
+  const { profileData, companyDomain } = useProfileData(user?.id);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -34,9 +32,6 @@ export const MainContent = ({
         <PreviewHeader 
           companyName={profileData?.company_name}
           website={profileData?.website || selectedCustomer?.website}
-          logoImage={logoImage}
-          logoLoading={logoLoading}
-          onRefreshLogo={refreshLogo}
         />
         
         <HeroSection 

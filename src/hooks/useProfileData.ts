@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserProfileFormValues, profileSchema } from "@/components/profile/types";
-import { useProfileLogo } from "./useProfileLogo";
+import { useLogo } from "@/contexts/LogoContext";
 
 interface UseProfileDataProps {
   userId: string;
@@ -28,17 +28,14 @@ export const useProfileData = ({ userId }: UseProfileDataProps) => {
     mode: "onChange"
   });
 
-  // Use the custom hook for logo handling with empty initial values
-  // We'll populate these from the database fetch
-  const {
-    currentWebsite,
-    setCurrentWebsite,
-    logoImage,
-    setLogoImage,
-    isLogoLoading,
+  // Use the logo context
+  const { 
+    logoImage, 
+    isLoading: isLogoLoading, 
     error: logoError,
-    refreshLogo
-  } = useProfileLogo();
+    refreshLogo,
+    setLogoImage
+  } = useLogo();
   
   // Fetch existing profile data if available
   useEffect(() => {
@@ -58,20 +55,19 @@ export const useProfileData = ({ userId }: UseProfileDataProps) => {
         }
         
         if (data) {
-          // Set logo data first to prevent unnecessary API calls
-          setLogoImage(data.logo_image || null);
+          // Set logo data if available
+          if (data.logo_image) {
+            setLogoImage(data.logo_image);
+          }
           
-          // Then update the website after a short delay
-          // to ensure the logo is set first
-          setTimeout(() => {
-            setCurrentWebsite(data.website || null);
-            setInitialWebsite(data.website || null);
-          }, 100);
+          // Update website and set initial website
+          const website = data.website || "";
+          setInitialWebsite(website);
           
           // Update form values
           form.reset({
             companyName: data.company_name || "",
-            website: data.website || "",
+            website: website,
             firstName: data.first_name || "",
             lastName: data.last_name || "",
             role: data.role || ""
@@ -90,7 +86,7 @@ export const useProfileData = ({ userId }: UseProfileDataProps) => {
     };
     
     fetchProfile();
-  }, [userId, form, toast, setCurrentWebsite, setLogoImage]);
+  }, [userId, form, toast, setLogoImage]);
 
   // Watch for website changes in the form
   const websiteValue = form.watch("website");
@@ -100,8 +96,6 @@ export const useProfileData = ({ userId }: UseProfileDataProps) => {
     form,
     profileLoading,
     initialWebsite,
-    currentWebsite,
-    setCurrentWebsite,
     logoImage,
     isLogoLoading,
     logoError,

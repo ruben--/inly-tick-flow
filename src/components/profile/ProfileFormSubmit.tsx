@@ -2,6 +2,7 @@
 import React from "react";
 import { LogoSection } from "./LogoSection";
 import { SubmitButton } from "./SubmitButton";
+import { useLogo } from "@/contexts/LogoContext";
 
 interface ProfileFormSubmitProps {
   isLoading: boolean;
@@ -22,9 +23,15 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
   onRefreshLogo,
   children
 }) => {
-  // Add logging to help debug logo issues
-  console.log("ProfileFormSubmit logoImage:", logoImage ? "exists" : "null");
-  console.log("ProfileFormSubmit isLogoLoading:", isLogoLoading);
+  const { refreshLogo } = useLogo();
+  
+  const handleRefresh = () => {
+    if (onRefreshLogo) {
+      onRefreshLogo();
+    } else {
+      refreshLogo(websiteValue);
+    }
+  };
 
   return (
     <>
@@ -34,6 +41,7 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
           companyNameValue={companyNameValue}
           logoImage={logoImage}
           isLogoLoading={isLogoLoading}
+          onRefreshLogo={handleRefresh}
         />
         
         <div className="flex-1 w-full">

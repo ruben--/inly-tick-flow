@@ -3,9 +3,10 @@ import React, { useState, useEffect } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { LogoPlaceholder } from "./LogoPlaceholder";
 import { cn } from "@/lib/utils";
+import { useLogo } from "@/contexts/LogoContext";
 
 interface CompanyLogoProps {
-  website: string;
+  website?: string;
   companyName: string;
   logoImage?: string | null;
   className?: string;
@@ -13,30 +14,26 @@ interface CompanyLogoProps {
 }
 
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({ 
-  website, 
   companyName,
-  logoImage,
+  logoImage: propLogo,
   className = "h-16 w-16",
-  isLoading = false
+  isLoading: propLoading = false
 }) => {
+  const { logoImage: contextLogo, isLoading: contextLoading } = useLogo();
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Enhanced debugging
-  useEffect(() => {
-    console.log("CompanyLogo render with logoImage:", logoImage ? "exists" : "null");
-    console.log("CompanyLogo isLoading:", isLoading);
-    console.log("CompanyLogo imageError:", imageError);
-    console.log("CompanyLogo imageLoaded:", imageLoaded);
-  }, [logoImage, isLoading, imageError, imageLoaded]);
+  // Determine which logo to use (prop or context)
+  const logoSrc = (propLogo || contextLogo) && !imageError ? (propLogo || contextLogo) : null;
+  const isLoading = propLoading || contextLoading;
   
   // Reset states when logo changes
   useEffect(() => {
-    if (logoImage) {
+    if (logoSrc) {
       setImageError(false);
       setImageLoaded(false);
     }
-  }, [logoImage]);
+  }, [logoSrc]);
   
   // Extract initials for placeholder
   const initials = companyName
@@ -47,9 +44,6 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .join('')
         .toUpperCase()
     : 'CO';
-
-  // Use the logo directly if available and not in error state
-  const logoSrc = logoImage && !imageError ? logoImage : null;
 
   // Extract size classes
   const widthClass = className.match(/w-\d+/)?.at(0) || 'w-16';
@@ -87,14 +81,8 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
               )}
               loading="lazy"
               decoding="async"
-              onLoad={() => {
-                console.log("Logo image loaded successfully");
-                setImageLoaded(true);
-              }}
-              onError={(e) => {
-                console.error("Logo image failed to load:", e);
-                setImageError(true);
-              }}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
             />
           </>
         ) : (
