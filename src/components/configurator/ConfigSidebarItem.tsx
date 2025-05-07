@@ -14,8 +14,8 @@ export const ConfigSidebarItem = ({ itemType, onToggle }: ConfigSidebarItemProps
     <div 
       className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition-all 
         ${itemType.selected 
-          ? 'bg-sidebar-accent text-sidebar-accent-foreground' 
-          : 'hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+          ? 'bg-white text-black border border-black' 
+          : 'hover:bg-white/80 hover:text-black hover:border hover:border-black/50'
         }`}
       onClick={onToggle}
     >
