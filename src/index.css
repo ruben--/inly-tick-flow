@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,75 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
 @layer base {
-  /* Default theme */
-  :root.theme-default {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 221 83% 53%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 221 83% 53%;
-    --radius: 0.5rem;
-    
-    /* Sidebar theme variables - default style */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 10%;
-    --sidebar-accent: 221 83% 53%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-primary: 221 83% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 221 83% 53%;
-  }
-  
-  /* Teenage Engineering theme */
-  :root.theme-teenage-engineering {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 30 100% 50%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 93%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 0 0% 93%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 0 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 85%;
-    --input: 0 0% 85%;
-    --ring: 0 0% 10%;
-    --radius: 0.25rem;
-    
-    /* Sidebar theme variables - TE style */
-    --sidebar-background: 0 0% 96%;
-    --sidebar-foreground: 0 0% 10%;
-    --sidebar-accent: 30 100% 50%;
-    --sidebar-accent-foreground: 0 0% 10%;
-    --sidebar-primary: 0 0% 30%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 0 0% 10%;
-  }
-  
-  /* Set default theme */
+  /* Teenage Engineering theme (now the main theme) */
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 10%;
@@ -152,57 +85,21 @@
   }
 }
 
-/* Default theme styles */
-.theme-default .btn-te {
-  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium;
-  @apply bg-blue-600 text-white rounded-md hover:bg-blue-700;
-  @apply transition-colors duration-200;
-  box-shadow: none;
-}
-
-.theme-default .sidebar-container {
-  @apply border-r border-gray-200;
-}
-
-.theme-default .config-sidebar-item {
-  @apply rounded-md border border-transparent;
-}
-
-.theme-default .config-sidebar-header {
-  @apply bg-gray-100 border-b border-gray-200 px-4;
-}
-
-.theme-default .browser-container {
-  @apply rounded-lg border border-gray-200 overflow-hidden shadow-sm;
-}
-
-.theme-default .browser-chrome {
-  @apply bg-gray-100 p-2 border-b border-gray-200;
-}
-
-.theme-default .browser-address {
-  @apply rounded-md bg-white px-3;
-}
-
-.theme-default .progress-bar-container {
-  @apply rounded-full;
-}
-
 /* TE-inspired styles */
-.theme-teenage-engineering .te-container {
+.te-container {
   @apply border border-te-gray-200 bg-white rounded-none;
 }
 
-.theme-teenage-engineering .te-header {
+.te-header {
   @apply bg-te-gray-100 border-b border-te-gray-200 text-te-gray-900 font-mono uppercase text-xs tracking-wider font-bold py-3 px-4;
 }
 
-.theme-teenage-engineering .te-section {
+.te-section {
   @apply border border-te-gray-200 mb-6;
 }
 
-.theme-teenage-engineering .te-button,
-.theme-teenage-engineering .btn-te {
+.te-button,
+.btn-te {
   @apply inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-bold uppercase tracking-wider;
   @apply bg-te-orange text-black border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)];
   @apply hover:translate-y-[-1px] hover:translate-x-[-1px] hover:shadow-[4px_4px_0px_rgba(0,0,0,1)];
@@ -210,36 +107,36 @@
   @apply transition-all duration-100;
 }
 
-.theme-teenage-engineering .te-button-secondary {
+.te-button-secondary {
   @apply bg-te-gray-200 hover:bg-te-gray-300 text-black text-xs uppercase tracking-wider font-bold py-2 px-4 rounded-none border border-black;
 }
 
-.theme-teenage-engineering .te-input {
+.te-input {
   @apply bg-te-gray-100 border border-te-gray-300 rounded-none py-2 px-3 font-mono text-sm;
 }
 
-.theme-teenage-engineering .te-browser {
+.te-browser {
   @apply border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)];
   border-radius: 0;
 }
 
-.theme-teenage-engineering .te-browser-chrome {
+.te-browser-chrome {
   @apply bg-te-gray-100 p-2 border-b-2 border-black;
 }
 
-.theme-teenage-engineering .te-browser-button {
+.te-browser-button {
   @apply w-3 h-3 rounded-full;
 }
 
-.theme-teenage-engineering .te-browser-address {
+.te-browser-address {
   @apply bg-white px-4 py-1 text-xs text-te-gray-600 text-center font-mono border border-black;
 }
 
-.theme-teenage-engineering .te-progress {
+.te-progress {
   @apply h-2 bg-te-gray-200;
 }
 
-.theme-teenage-engineering .te-progress-bar {
+.te-progress-bar {
   @apply bg-te-orange h-full;
 }
 
@@ -305,28 +202,6 @@
   margin-right: 0;
 }
 
-/* TE-style card elements */
-.theme-default .card {
-  @apply border border-gray-200 shadow-sm rounded-lg;
-  transition: all 0.2s ease-in-out;
-}
-
-.theme-default .card:hover {
-  @apply shadow-md;
-  transform: translateY(-2px);
-}
-
-.theme-teenage-engineering .card {
-  border: 1px solid #E1E1E1 !important;
-  transition: all 0.2s ease-in-out;
-  border-radius: 0 !important;
-}
-
-.theme-teenage-engineering .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
-}
-
 /* TE-style browser chrome */
 .te-browser {
   @apply border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)];
@@ -370,33 +245,19 @@
   @apply bg-te-red text-white;
 }
 
-/* Apply font family based on theme */
-.theme-default {
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-.theme-teenage-engineering {
+/* Apply font family */
+body {
   font-family: 'Space Mono', monospace, sans-serif;
 }
 
-/* Apply different card styles based on theme */
-.theme-default .card {
-  @apply border border-gray-200 shadow-sm rounded-lg;
-  transition: all 0.2s ease-in-out;
-}
-
-.theme-default .card:hover {
-  @apply shadow-md;
-  transform: translateY(-2px);
-}
-
-.theme-teenage-engineering .card {
+/* Apply card styles */
+.card {
   border: 1px solid #E1E1E1 !important;
   transition: all 0.2s ease-in-out;
   border-radius: 0 !important;
 }
 
-.theme-teenage-engineering .card:hover {
+.card:hover {
   transform: translateY(-2px);
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
 }

@@ -1,38 +1,24 @@
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-
-type ThemeType = 'default' | 'teenage-engineering';
+import { createContext, useContext, useEffect, ReactNode } from 'react';
 
 interface ThemeContextType {
-  theme: ThemeType;
-  setTheme: (theme: ThemeType) => void;
+  theme: string;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Get initial theme from localStorage or default to 'teenage-engineering'
-  const [theme, setTheme] = useState<ThemeType>(() => {
-    const savedTheme = localStorage.getItem('theme') as ThemeType;
-    return savedTheme || 'teenage-engineering';
-  });
-
-  // Update localStorage whenever theme changes
+  // Apply TE theme styling to document root
   useEffect(() => {
     const root = window.document.documentElement;
     
-    // Remove previous theme class
-    root.classList.remove('theme-default', 'theme-teenage-engineering');
-    
-    // Add current theme class
-    root.classList.add(`theme-${theme}`);
-    
-    // Save to localStorage
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    // Remove any other theme classes and set TE theme
+    root.classList.remove('theme-default');
+    root.classList.add('theme-teenage-engineering');
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme: 'teenage-engineering' }}>
       {children}
     </ThemeContext.Provider>
   );
