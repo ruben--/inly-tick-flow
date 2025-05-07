@@ -9,7 +9,7 @@ interface SidebarHeaderProps {
 
 export const SidebarHeader = ({ title, className = '', children }: SidebarHeaderProps) => {
   return (
-    <div className={`flex justify-between items-center py-4 border-b-2 border-black px-4 bg-black ${className}`}>
+    <div className={`flex justify-between items-center py-4 border-b-2 border-black px-4 bg-black mt-4 ${className}`}>
       <h3 className="font-bold text-white text-lg uppercase tracking-wide">{title}</h3>
       {children}
     </div>
