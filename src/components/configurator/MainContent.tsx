@@ -101,7 +101,7 @@ export const MainContent = ({
               <h1 className="font-medium text-white mb-2 text-2xl shadow-sm">
                 {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : <span className="text-[42px]">Choose customers</span>}
               </h1>
-              <p className="text-white/90 text-lg backdrop-blur-sm bg-gray-900/30 p-2 rounded-md inline-block sidebar-collapse-text">
+              <p className="text-white/90 text-lg p-2 rounded-md inline-block sidebar-collapse-text">
                 This is your product offering towards customers. 
               </p>
             </div>
