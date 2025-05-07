@@ -37,6 +37,9 @@ export const ConfigurationSidebar = ({
   // Calculate progress percentage
   const progressPercentage = Math.round((completedSteps.filter(Boolean).length / completedSteps.length) * 100);
 
+  // Define sections that will always be expanded (all of them)
+  const alwaysExpandedSections = ["customers", "assets", "optimization"];
+
   return (
     <div className="h-full flex flex-col w-full">
       <div className="flex justify-between items-center py-4 border-b border-gray-200 px-4 bg-white">
@@ -47,15 +50,16 @@ export const ConfigurationSidebar = ({
         <div className="mb-6">
           <div className="text-gray-700 text-sm font-medium mb-3">Configure Your Offering</div>
           <div className="space-y-2">
-            <Accordion type="multiple" defaultValue={["customers", "assets", "optimization"]} className="space-y-2">
-              <AccordionItem value="customers" className="border-none">
-                <AccordionTrigger className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200 no-underline hover:no-underline">
+            {/* Remove Accordion's collapsible behavior by rendering sections directly */}
+            <div className="space-y-2">
+              <div className="border-none">
+                <div className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200">
                   <div className="flex items-center">
                     <Users className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                     <span className="text-gray-800">Customer Types</span>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-2 pb-0">
+                </div>
+                <div className="pt-2 pb-0">
                   <div className="ml-4 space-y-3 bg-white p-3 rounded-md border border-gray-100">
                     {customerTypes.map(type => (
                       <ConfigSidebarItem
@@ -65,17 +69,17 @@ export const ConfigurationSidebar = ({
                       />
                     ))}
                   </div>
-                </AccordionContent>
-              </AccordionItem>
+                </div>
+              </div>
               
-              <AccordionItem value="assets" className="border-none">
-                <AccordionTrigger className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200 no-underline hover:no-underline">
+              <div className="border-none">
+                <div className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200">
                   <div className="flex items-center">
                     <Zap className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                     <span className="text-gray-800">Asset Types</span>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-2 pb-0">
+                </div>
+                <div className="pt-2 pb-0">
                   <div className="ml-4 space-y-3 bg-white p-3 rounded-md border border-gray-100">
                     {assetTypes.map(type => (
                       <ConfigSidebarItem
@@ -85,17 +89,17 @@ export const ConfigurationSidebar = ({
                       />
                     ))}
                   </div>
-                </AccordionContent>
-              </AccordionItem>
+                </div>
+              </div>
               
-              <AccordionItem value="optimization" className="border-none">
-                <AccordionTrigger className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200 no-underline hover:no-underline">
+              <div className="border-none">
+                <div className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200">
                   <div className="flex items-center">
                     <BarChart3 className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                     <span className="text-gray-800">Optimization</span>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-2 pb-0">
+                </div>
+                <div className="pt-2 pb-0">
                   <div className="ml-4 space-y-3 bg-white p-3 rounded-md border border-gray-100">
                     {meterTypes.map(type => (
                       <ConfigSidebarItem
@@ -105,9 +109,9 @@ export const ConfigurationSidebar = ({
                       />
                     ))}
                   </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
