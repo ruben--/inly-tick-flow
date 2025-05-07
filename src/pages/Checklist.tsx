@@ -62,8 +62,8 @@ const Checklist = () => {
       
       {/* Main Content Area - TE style */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <div className="p-6 pb-0">
-          <div className="flex items-center justify-between mb-4">
+        <div className="p-6 pb-0 pt-4">
+          <div className="flex items-center justify-between mb-2">
             <ProgressBar 
               progress={progress}
               completedTasks={completedCount}
@@ -76,7 +76,7 @@ const Checklist = () => {
           </div>
         </div>
         
-        <div className="flex-1 p-6 pt-2 overflow-auto">
+        <div className="flex-1 p-6 pt-0 overflow-auto">
           <MainContent 
             selectedCustomer={selectedCustomer}
             selectedAssetTypes={selectedAssetTypes}
