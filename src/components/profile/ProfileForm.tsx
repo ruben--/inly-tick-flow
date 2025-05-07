@@ -69,8 +69,9 @@ export const ProfileForm: React.FC = () => {
         }
         
         if (data) {
-          setLogoUrl(data.logo_url || null);
+          // Always prioritize stored image
           setLogoImage(data.logo_image || null);
+          setLogoUrl(data.logo_url || null);
           setSavedWebsite(data.website || null);
           
           form.reset({
@@ -97,11 +98,12 @@ export const ProfileForm: React.FC = () => {
   }, [user, form, toast]);
 
   const handleLogoFound = (foundLogoUrl: string | null, foundLogoImage: string | null) => {
-    if (foundLogoUrl) {
-      setLogoUrl(foundLogoUrl);
-    }
+    // Prioritize image data over URL
     if (foundLogoImage) {
       setLogoImage(foundLogoImage);
+    }
+    if (foundLogoUrl && !logoUrl) {
+      setLogoUrl(foundLogoUrl);
     }
   };
 

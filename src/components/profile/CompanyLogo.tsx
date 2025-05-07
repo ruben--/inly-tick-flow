@@ -57,10 +57,11 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     }
   };
 
+  // First priority: Use the provided logo image if available
   useEffect(() => {
-    // If we already have a logo image from props, use it and don't fetch
     if (initialLogoImage) {
       setLogoImage(initialLogoImage);
+      setLogoUrl(initialLogoUrl); // Keep URL in sync
       return;
     }
 
@@ -80,10 +81,16 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       
       fetchImage();
     }
-  }, [logoUrl, logoImage, initialLogoImage, onLogoFound]);
+  }, [logoUrl, logoImage, initialLogoImage, initialLogoUrl, onLogoFound]);
 
+  // Only fetch a new logo if we don't have any image data yet
   useEffect(() => {
-    // If we already have a logo URL from props, use it and don't fetch
+    // Skip fetch if we already have a logo image
+    if (logoImage) {
+      return;
+    }
+
+    // If we already have a logo URL from props, use it 
     if (initialLogoUrl) {
       setLogoUrl(initialLogoUrl);
       return;
@@ -112,9 +119,6 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         const logo = getBestLogo(brandingData);
         setLogoUrl(logo);
         setLastFetchedDomain(domain);
-        
-        // We'll fetch the image data in the other useEffect now
-        
       } catch (err) {
         console.error("Error fetching logo:", err);
         setError("Failed to fetch company logo");
@@ -126,7 +130,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     };
 
     fetchLogo();
-  }, [website, onLogoFound, initialLogoUrl, logoUrl, lastFetchedDomain]);
+  }, [website, onLogoFound, initialLogoUrl, logoUrl, lastFetchedDomain, logoImage]);
 
   return (
     <div className="flex flex-col items-center">
@@ -143,6 +147,14 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
               src={logoUrl} 
               alt={companyName || "Company logo"} 
               className="object-contain p-1 w-full h-full"
+              onLoad={async (e) => {
+                // After successful load, convert to base64 for storage
+                const imageData = await fetchAndStoreImage(logoUrl);
+                if (imageData) {
+                  setLogoImage(imageData);
+                  if (onLogoFound) onLogoFound(logoUrl, imageData);
+                }
+              }}
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">

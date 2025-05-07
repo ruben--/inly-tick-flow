@@ -17,34 +17,6 @@ export const PreviewHeader = ({ logoImage, logoUrl, companyName, website }: Prev
             src={logoImage} 
             alt={companyName || "Company logo"} 
             className="object-contain w-full h-full" 
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              // If image fails to load, we'll show company initials instead
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = `
-                <div class="flex items-center justify-center w-full h-full bg-te-gray-100 text-black">
-                  <span class="text-lg font-bold uppercase sidebar-company-name">${companyName?.slice(0, 2) || 'CO'}</span>
-                </div>`;
-            }} 
-          />
-        </div>
-      ) : logoUrl ? (
-        <div className="h-10 w-10 flex items-center justify-center border-2 border-black rounded-none overflow-hidden bg-white p-1">
-          <img 
-            src={logoUrl} 
-            alt={companyName || "Company logo"} 
-            className="object-contain w-full h-full" 
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              // If image fails to load, we'll show company initials instead
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = `
-                <div class="flex items-center justify-center w-full h-full bg-te-gray-100 text-black">
-                  <span class="text-lg font-bold uppercase sidebar-company-name">${companyName?.slice(0, 2) || 'CO'}</span>
-                </div>`;
-            }} 
           />
         </div>
       ) : (
@@ -52,7 +24,7 @@ export const PreviewHeader = ({ logoImage, logoUrl, companyName, website }: Prev
           website={website || ''} 
           companyName={companyName || 'Company'} 
           className="h-10 w-10" 
-          logoUrl={null}
+          logoUrl={logoUrl}
         />
       )}
       <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
