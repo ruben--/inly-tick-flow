@@ -7,12 +7,6 @@ interface ProfileFormSubmitProps {
   isLoading: boolean;
   websiteValue: string;
   companyNameValue: string;
-  logoUrl: string | null;
-  logoImage: string | null;
-  fetchAttempted: boolean;
-  websiteChanged: boolean;
-  onLogoFound: (logoUrl: string | null, imageData?: string | null) => void;
-  onLogoUpload: (imageData: string) => void;
   children: React.ReactNode;
 }
 
@@ -20,12 +14,6 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
   isLoading,
   websiteValue,
   companyNameValue,
-  logoUrl,
-  logoImage,
-  fetchAttempted,
-  websiteChanged,
-  onLogoFound,
-  onLogoUpload,
   children
 }) => {
   return (
@@ -35,12 +23,6 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
           website={websiteValue}
           companyName={companyNameValue}
           className="h-20 w-20"
-          onLogoFound={onLogoFound}
-          logoUrl={!websiteChanged ? logoUrl : null}
-          logoImage={logoImage}
-          fetchAttempted={websiteChanged ? false : fetchAttempted}
-          onLogoUpload={onLogoUpload}
-          showUploadButton={true}
         />
         
         <div className="flex-1 w-full">

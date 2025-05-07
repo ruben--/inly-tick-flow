@@ -38,8 +38,6 @@ interface ProfileRequiredFormProps {
 export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId, onSuccess }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [logoImage, setLogoImage] = useState<string | null>(null);
   const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
   
   const form = useForm<UserProfileFormValues>({
@@ -72,9 +70,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         
         // Set form default values if profile exists but is incomplete
         if (data) {
-          // Always prioritize stored image
-          setLogoImage(data.logo_image || null);
-          setLogoUrl(data.logo_url || null);
           setCurrentWebsite(data.website || null);
           
           form.reset({
@@ -98,16 +93,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     fetchProfile();
   }, [userId, form, toast]);
 
-  const handleLogoFound = (foundLogoUrl: string | null, foundLogoImage: string | null) => {
-    // Prioritize image data over URL
-    if (foundLogoImage) {
-      setLogoImage(foundLogoImage);
-    }
-    if (foundLogoUrl && !logoUrl) {
-      setLogoUrl(foundLogoUrl);
-    }
-  };
-
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!userId) return;
     
@@ -128,8 +113,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
-          logo_url: logoUrl,
-          logo_image: logoImage,
           updated_at: new Date().toISOString()
         });
         
@@ -160,9 +143,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   // Get current website value for logo display
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
-  
-  // Check if website has changed from saved version to determine if we need a new logo
-  const websiteChanged = websiteValue !== currentWebsite && websiteValue !== "";
 
   return (
     <Form {...form}>
@@ -172,9 +152,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
             website={websiteValue} 
             companyName={companyNameValue}
             className="h-16 w-16"
-            onLogoFound={handleLogoFound}
-            logoUrl={!websiteChanged ? logoUrl : null}
-            logoImage={!websiteChanged ? logoImage : null}
           />
         </div>
 

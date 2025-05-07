@@ -12,33 +12,17 @@ import { UserProfileFormValues } from "./ProfileRequiredForm";
 import { useProfileLogo } from "@/hooks/useProfileLogo";
 import { ProfileFormSubmit } from "./ProfileFormSubmit";
 
-interface ProfileFormProps {
-  initialLogoImage?: string | null;
-  initialLogoUrl?: string | null;
-}
-
-export const ProfileForm: React.FC<ProfileFormProps> = ({ 
-  initialLogoImage,
-  initialLogoUrl
-}) => {
+export const ProfileForm: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
   // Use the custom hook for logo handling
   const {
-    logoUrl,
-    logoImage,
     currentWebsite,
-    fetchAttempted,
     setCurrentWebsite,
-    handleLogoFound,
-    handleLogoUpload,
     isWebsiteChanged
-  } = useProfileLogo({
-    initialLogoImage,
-    initialLogoUrl
-  });
+  } = useProfileLogo();
   
   // Use the same profile schema as in ProfileRequiredForm
   const profileSchema = z.object({
@@ -129,11 +113,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       : data.website;
     
     try {
-      console.log("Saving profile with logo:", { 
-        hasLogoUrl: !!logoUrl, 
-        hasLogoImage: !!logoImage 
-      });
-      
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -143,8 +122,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
-          logo_url: logoUrl,
-          logo_image: logoImage,
           updated_at: new Date().toISOString()
         });
         
@@ -172,9 +149,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // Get current website value for logo display
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
-  
-  // Check if website has changed from current version
-  const websiteChanged = isWebsiteChanged(websiteValue);
 
   return (
     <Form {...form}>
@@ -183,12 +157,6 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           isLoading={isLoading}
           websiteValue={websiteValue}
           companyNameValue={companyNameValue}
-          logoUrl={logoUrl}
-          logoImage={logoImage}
-          fetchAttempted={fetchAttempted}
-          websiteChanged={websiteChanged}
-          onLogoFound={handleLogoFound}
-          onLogoUpload={handleLogoUpload}
         >
           <ProfileFormFields form={form} />
         </ProfileFormSubmit>

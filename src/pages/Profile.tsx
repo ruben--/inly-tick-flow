@@ -9,59 +9,36 @@ import { AlertCircle } from "lucide-react";
 
 export default function Profile() {
   const { user } = useAuth();
-  const [logoImage, setLogoImage] = useState<string | null>(null);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Fetch the user's profile data on component mount
+  // Simple check if user profile exists
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const checkProfileData = async () => {
       if (!user?.id) {
         setIsLoading(false);
         return;
       }
       
       try {
-        console.log("Fetching profile data for user:", user.id);
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('profiles')
-          .select('logo_image, logo_url, company_name')
+          .select('company_name')
           .eq('id', user.id)
           .maybeSingle();
           
         if (error) {
-          console.error("Error fetching profile data:", error);
           setError("Could not load your profile data. Please try again later.");
-          setIsLoading(false);
-          return;
-        }
-        
-        // Set the logo image and URL if available
-        console.log("Profile data fetched:", data);
-        if (data) {
-          if (data.logo_image) {
-            console.log("Found logo image in profile data");
-            setLogoImage(data.logo_image);
-          } else {
-            console.log("No logo image found in profile data");
-          }
-          
-          if (data.logo_url) {
-            setLogoUrl(data.logo_url);
-          }
-        } else {
-          console.log("No profile data found");
         }
       } catch (err) {
-        console.error("Error in profile fetch:", err);
+        console.error("Error in profile check:", err);
         setError("An unexpected error occurred while loading your profile.");
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchProfileData();
+    checkProfileData();
   }, [user]);
 
   return (
@@ -88,10 +65,7 @@ export default function Profile() {
               <div className="animate-pulse h-4 w-36 bg-gray-200 rounded"></div>
             </div>
           ) : (
-            <ProfileForm 
-              initialLogoImage={logoImage} 
-              initialLogoUrl={logoUrl}
-            />
+            <ProfileForm />
           )}
         </CardContent>
       </Card>

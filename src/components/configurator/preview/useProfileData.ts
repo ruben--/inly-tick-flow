@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileData {
-  logo_url: string | null;
-  logo_image: string | null;
   company_name: string | null;
   website: string | null;
 }
@@ -30,7 +28,7 @@ export const useProfileData = (userId: string | undefined) => {
         setLoading(true);
         const { data, error } = await supabase
           .from('profiles')
-          .select('logo_url, logo_image, company_name, website')
+          .select('company_name, website')
           .eq('id', userId)
           .maybeSingle();
           
