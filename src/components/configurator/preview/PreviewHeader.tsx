@@ -14,7 +14,7 @@ export const PreviewHeader = ({
   logoImage
 }: PreviewHeaderProps) => {
   return (
-    <div className="flex flex-col items-center mb-6 bg-te-gray-50 p-3 rounded-none border-2 border-black">
+    <div className="flex flex-col items-center mb-6 bg-white p-3 rounded-none border-2 border-black">
       <div className="h-12 w-12 mb-3 flex items-center justify-center overflow-hidden bg-white">
         <CompanyLogo 
           website={website || ''} 
