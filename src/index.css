@@ -21,65 +21,52 @@
  
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
+    /* Dark Warfare Control Theme - Default Dark Mode */
+    --background: 222 17% 14%; /* warfare-dark #1A1F2C */
+    --foreground: 210 1% 63%; /* warfare-text #9F9EA1 */
     
-    /* Sidebar Apple-style theme variables - updated for more contrast */
-    --sidebar-background: 0 0% 96%;
-    --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-accent: 0 0% 92%;
-    --sidebar-accent-foreground: 240 5% 15%;
-    --sidebar-primary: 210 100% 50%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 240 5.9% 10%;
-  }
- 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
+    --card: 256 10% 14%; /* warfare-charcoal #221F26 */
+    --card-foreground: 0 0% 95%; /* light text on cards */
+    
+    --popover: 256 10% 14%;
+    --popover-foreground: 0 0% 95%;
+    
+    --primary: 196 74% 49%; /* warfare-accent #1EAEDB */
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 196 85% 43%; /* warfare-secondary #0FA0CE */
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
+    
+    --muted: 223 9% 25%;
+    --muted-foreground: 215 5% 65%;
+    
+    --accent: 196 74% 25%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    
+    --destructive: 6 78% 57%; /* warfare-danger #e74c3c */
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    
+    --border: 240 4% 26%; /* warfare-border #403E43 */
+    --input: 240 4% 26%;
+    --ring: 196 74% 49%;
+    --radius: 0.375rem; /* Slightly reduced radius for more tactical feel */
+    
+    /* Sidebar theme variables */
+    --sidebar-background: 256 10% 12%;
+    --sidebar-foreground: 210 1% 63%;
+    --sidebar-accent: 223 9% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-primary: 196 74% 49%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-border: 240 4% 26%;
+    --sidebar-ring: 196 74% 49%;
   }
 }
  
 /* Add backdrop blur for when the profile modal is active */
 .DialogOverlay {
   backdrop-filter: blur(1.5px);
-  background-color: rgba(0, 0, 0, 0.1) !important; /* 10% dark background */
+  background-color: rgba(0, 0, 0, 0.3) !important; /* 30% dark background */
 }
 
 @layer base {
@@ -90,11 +77,86 @@
     @apply bg-background text-foreground font-fever;
   }
   h1, h2, h3, h4, h5, h6, strong, th, .font-medium {
-    font-weight: 500; /* Changed from font-weight: 700 (bold) to 500 (medium) */
+    font-weight: 500;
+    @apply text-white; /* Make headings white for better contrast */
   }
   /* Make all Lucide icons thinner by default */
   svg[data-lucide] {
     stroke-width: 1.5;
+  }
+  /* Add a subtle line pattern overlay to the background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(rgba(30, 174, 219, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 174, 219, 0.02) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+/* Utility classes for warfare theme */
+@layer components {
+  .warfare-panel {
+    @apply bg-warfare-dark border border-warfare-border rounded-md p-4 relative overflow-hidden;
+  }
+  
+  .warfare-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: theme('colors.warfare.accent');
+    opacity: 0.7;
+    box-shadow: 0 0 10px theme('colors.warfare.accent');
+  }
+  
+  .warfare-input {
+    @apply bg-warfare-charcoal border-warfare-border text-warfare-text focus:border-warfare-accent focus:ring-1 focus:ring-warfare-accent;
+  }
+  
+  .warfare-button {
+    @apply bg-warfare-accent text-white hover:bg-warfare-secondary transition-all;
+  }
+  
+  .warfare-status-indicator {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+  
+  .warfare-status-active {
+    @apply warfare-status-indicator bg-warfare-success animate-pulse;
+  }
+  
+  .warfare-status-warning {
+    @apply warfare-status-indicator bg-warfare-warning animate-pulse;
+  }
+  
+  .warfare-status-offline {
+    @apply warfare-status-indicator bg-warfare-danger;
+  }
+  
+  /* Add a scanning line effect to panels */
+  .warfare-scan-line::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to bottom, 
+      rgba(30, 174, 219, 0), 
+      rgba(30, 174, 219, 0.2), 
+      rgba(30, 174, 219, 0));
+    animation: scan-line 4s linear infinite;
+    opacity: 0.3;
+    pointer-events: none;
   }
 }
 
@@ -123,9 +185,9 @@
   100% { max-height: 0; opacity: 0; }
 }
 
-/* Add a subtle shadow to the sidebar for more Apple-like styling */
+/* Update sidebar styling for warfare theme */
 [data-sidebar="sidebar"] {
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   border-right: 1px solid hsl(var(--sidebar-border));
 }
 
@@ -155,4 +217,46 @@
 /* Ensure icons are visible in collapsed mode */
 .group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] > svg:first-child {
   margin-right: 0;
+}
+
+/* Add warfare theme styles to buttons */
+button[class*="bg-primary"] {
+  box-shadow: 0 0 5px rgba(30, 174, 219, 0.5);
+}
+
+button[class*="bg-primary"]:hover {
+  box-shadow: 0 0 10px rgba(30, 174, 219, 0.7);
+}
+
+/* Add glow effect to cards */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, 
+    rgba(30, 174, 219, 0), 
+    rgba(30, 174, 219, 0.5), 
+    rgba(30, 174, 219, 0));
+}
+
+/* Checkbox custom styling */
+[data-radix-checkbox-root][data-state="checked"] {
+  background-color: theme('colors.warfare.accent') !important;
+  border-color: theme('colors.warfare.accent') !important;
+}
+
+/* Make progress bars look tactical */
+[role="progressbar"] > div {
+  background: linear-gradient(90deg, 
+    theme('colors.warfare.accent'), 
+    theme('colors.warfare.secondary')) !important;
+  box-shadow: 0 0 10px rgba(30, 174, 219, 0.3);
 }
