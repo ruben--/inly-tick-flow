@@ -29,6 +29,13 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
+  // Add timestamp to logo URL to prevent caching
+  const logoSrc = logoImage ? 
+    (logoImage.includes('?') ? 
+      `${logoImage}&t=${Date.now()}` : 
+      `${logoImage}?t=${Date.now()}`) : 
+    null;
+
   // Extract size classes from className
   const widthClass = className.match(/w-\d+/)?.at(0) || 'w-16';
   const heightClass = className.match(/h-\d+/)?.at(0) || 'h-16';
@@ -36,7 +43,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   return (
     <div 
       className={cn(
-        "border border-gray-200 overflow-hidden rounded-md flex items-center justify-center",
+        "overflow-hidden rounded-md flex items-center justify-center",
         widthClass,
         heightClass,
         isLoading && "animate-pulse bg-gray-100"
@@ -45,9 +52,9 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       role="img"
     >
       <AspectRatio ratio={1}>
-        {logoImage && !isLoading ? (
+        {logoSrc && !isLoading ? (
           <img 
-            src={logoImage} 
+            src={logoSrc} 
             alt={companyName || "Company logo"} 
             className="object-contain p-1 w-full h-full"
             onError={(e) => {

@@ -49,8 +49,18 @@ export const useBrandLogo = (website: string) => {
     }
   }, []);
   
+  // Clear cache for a specific domain
+  const clearCacheForDomain = useCallback((domain: string) => {
+    try {
+      localStorage.removeItem(`${LOGO_CACHE_PREFIX}${domain}`);
+      console.log(`Cache cleared for domain: ${domain}`);
+    } catch (e) {
+      console.error("Error clearing cache:", e);
+    }
+  }, []);
+  
   // Memoize the fetch logo function to avoid recreation on each render
-  const fetchLogo = useCallback(async (domainToFetch: string) => {
+  const fetchLogo = useCallback(async (domainToFetch: string, forceRefresh = false) => {
     if (!domainToFetch) return;
     
     // Cancel any in-flight requests
@@ -62,22 +72,27 @@ export const useBrandLogo = (website: string) => {
     abortControllerRef.current = new AbortController();
     const requestId = Date.now().toString();
     
-    console.log("Fetching logo for domain:", domainToFetch, "requestId:", requestId);
+    console.log("Fetching logo for domain:", domainToFetch, "requestId:", requestId, "forceRefresh:", forceRefresh);
     setIsLoading(true);
     setError(null);
     
     try {
-      // First check the cache
-      const cachedLogo = getFromCache(domainToFetch);
-      if (cachedLogo) {
-        console.log("Using cached logo for:", domainToFetch);
-        setLogoImage(cachedLogo);
-        setLastFetchedDomain(domainToFetch);
-        setIsLoading(false);
-        return;
+      // Check the cache only if we're not forcing a refresh
+      if (!forceRefresh) {
+        const cachedLogo = getFromCache(domainToFetch);
+        if (cachedLogo) {
+          console.log("Using cached logo for:", domainToFetch);
+          setLogoImage(cachedLogo);
+          setLastFetchedDomain(domainToFetch);
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        // Clear the cache if we're forcing a refresh
+        clearCacheForDomain(domainToFetch);
       }
       
-      // If no cached logo, fetch from edge function
+      // If no cached logo or forcing refresh, fetch from edge function
       const response = await supabase.functions.invoke('fetch-brand-logo', {
         body: { website: domainToFetch },
       });
@@ -102,7 +117,8 @@ export const useBrandLogo = (website: string) => {
         
         setLogoImage(null);
       } else if (response.data?.logoImage) {
-        setLogoImage(response.data.logoImage);
+        const logoWithTimestamp = response.data.logoImage + (response.data.logoImage.includes('?') ? '&' : '?') + `t=${Date.now()}`;
+        setLogoImage(logoWithTimestamp);
         saveToCache(domainToFetch, response.data.logoImage);
         setLastFetchedDomain(domainToFetch);
       } else {
@@ -125,7 +141,7 @@ export const useBrandLogo = (website: string) => {
         setIsLoading(false);
       }
     }
-  }, [getFromCache, saveToCache]);
+  }, [getFromCache, saveToCache, clearCacheForDomain]);
 
   // Handle automatic fetching based on website prop
   useEffect(() => {
@@ -151,31 +167,20 @@ export const useBrandLogo = (website: string) => {
     };
   }, [website, lastFetchedDomain, fetchLogo]);
 
-  // Add a manual refresh function that can accept a specific website URL
+  // Add a manual refresh function that can accept a specific website URL and force refresh
   const refreshLogo = useCallback((specificWebsite?: string) => {
     if (specificWebsite) {
       const domain = extractDomain(specificWebsite);
       if (domain) {
-        // Remove from cache to force refresh
-        try {
-          localStorage.removeItem(`${LOGO_CACHE_PREFIX}${domain}`);
-        } catch (e) {
-          console.error("Error clearing cache:", e);
-        }
-        // Directly fetch with the provided website
-        fetchLogo(domain);
+        // Force refresh by passing true as second parameter
+        fetchLogo(domain, true);
       }
     } else if (website) {
       // Refresh with current website
       const domain = extractDomain(website);
       if (domain) {
-        // Remove from cache to force refresh
-        try {
-          localStorage.removeItem(`${LOGO_CACHE_PREFIX}${domain}`);
-        } catch (e) {
-          console.error("Error clearing cache:", e);
-        }
-        fetchLogo(domain);
+        // Force refresh by passing true as second parameter
+        fetchLogo(domain, true);
       }
     }
   }, [website, fetchLogo]);
