@@ -39,6 +39,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoImage, setLogoImage] = useState<string | null>(null);
   const [savedWebsite, setSavedWebsite] = useState<string | null>(null);
   
   const form = useForm<UserProfileFormValues>({
@@ -72,6 +73,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         // Set form default values if profile exists but is incomplete
         if (data) {
           setLogoUrl(data.logo_url || null);
+          setLogoImage(data.logo_image || null);
           setSavedWebsite(data.website || null);
           
           form.reset({
@@ -95,9 +97,12 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     fetchProfile();
   }, [userId, form, toast]);
 
-  const handleLogoFound = (foundLogoUrl: string | null) => {
+  const handleLogoFound = (foundLogoUrl: string | null, foundLogoImage: string | null) => {
     if (foundLogoUrl) {
       setLogoUrl(foundLogoUrl);
+    }
+    if (foundLogoImage) {
+      setLogoImage(foundLogoImage);
     }
   };
 
@@ -122,6 +127,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           last_name: data.lastName,
           role: data.role,
           logo_url: logoUrl,
+          logo_image: logoImage,
           updated_at: new Date().toISOString()
         });
         
@@ -163,6 +169,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
             className="h-16 w-16"
             onLogoFound={handleLogoFound}
             logoUrl={!websiteChanged ? logoUrl : null}
+            logoImage={!websiteChanged ? logoImage : null}
           />
         </div>
 

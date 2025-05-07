@@ -1,15 +1,16 @@
 
 import React, { useState, useEffect } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Building } from "lucide-react";
 import { fetchCompanyBranding, getBestLogo, extractDomain } from "@/utils/brandfetch";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CompanyLogoProps {
   website: string;
   companyName: string;
   className?: string;
-  onLogoFound?: (logoUrl: string | null) => void;
+  onLogoFound?: (logoUrl: string | null, imageData?: string | null) => void;
   logoUrl?: string | null;
+  logoImage?: string | null;
 }
 
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({ 
@@ -17,9 +18,11 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   companyName,
   className = "h-16 w-16",
   onLogoFound,
-  logoUrl: initialLogoUrl
+  logoUrl: initialLogoUrl,
+  logoImage: initialLogoImage
 }) => {
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
+  const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
@@ -33,6 +36,52 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
+  // Fetch and store the image as base64 data when we have a logo URL
+  const fetchAndStoreImage = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      
+      // Convert blob to base64
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (err) {
+      console.error("Error fetching image:", err);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    // If we already have a logo image from props, use it and don't fetch
+    if (initialLogoImage) {
+      setLogoImage(initialLogoImage);
+      return;
+    }
+
+    // If we have a logoUrl but no logoImage, fetch the image data
+    if (logoUrl && !logoImage) {
+      const fetchImage = async () => {
+        setIsLoading(true);
+        const imageData = await fetchAndStoreImage(logoUrl);
+        setLogoImage(imageData);
+        setIsLoading(false);
+        
+        // Call the callback when we get image data
+        if (onLogoFound && imageData) {
+          onLogoFound(logoUrl, imageData);
+        }
+      };
+      
+      fetchImage();
+    }
+  }, [logoUrl, logoImage, initialLogoImage, onLogoFound]);
+
   useEffect(() => {
     // If we already have a logo URL from props, use it and don't fetch
     if (initialLogoUrl) {
@@ -43,7 +92,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     const fetchLogo = async () => {
       if (!website) {
         setLogoUrl(null);
-        if (onLogoFound) onLogoFound(null);
+        if (onLogoFound) onLogoFound(null, null);
         return;
       }
 
@@ -64,13 +113,13 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         setLogoUrl(logo);
         setLastFetchedDomain(domain);
         
-        // Call the callback when we find a logo
-        if (onLogoFound) onLogoFound(logo);
+        // We'll fetch the image data in the other useEffect now
+        
       } catch (err) {
         console.error("Error fetching logo:", err);
         setError("Failed to fetch company logo");
         setLogoUrl(null);
-        if (onLogoFound) onLogoFound(null);
+        if (onLogoFound) onLogoFound(null, null);
       } finally {
         setIsLoading(false);
       }
@@ -83,7 +132,13 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     <div className="flex flex-col items-center">
       <div className={`border border-gray-200 overflow-hidden ${className}`}>
         <AspectRatio ratio={1}>
-          {!isLoading && logoUrl ? (
+          {!isLoading && logoImage ? (
+            <img 
+              src={logoImage} 
+              alt={companyName || "Company logo"} 
+              className="object-contain p-1 w-full h-full"
+            />
+          ) : !isLoading && logoUrl ? (
             <img 
               src={logoUrl} 
               alt={companyName || "Company logo"} 

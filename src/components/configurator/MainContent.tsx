@@ -23,6 +23,7 @@ export const MainContent = ({
   } = useAuth();
   const [profileData, setProfileData] = useState<{
     logo_url: string | null;
+    logo_image: string | null;
     company_name: string | null;
     website: string | null;
   } | null>(null);
@@ -48,7 +49,7 @@ export const MainContent = ({
         const {
           data,
           error
-        } = await supabase.from('profiles').select('logo_url, company_name, website').eq('id', user.id).maybeSingle();
+        } = await supabase.from('profiles').select('logo_url, logo_image, company_name, website').eq('id', user.id).maybeSingle();
         if (error) {
           console.error("Error fetching profile data:", error);
           return;
@@ -80,18 +81,50 @@ export const MainContent = ({
         maxHeight: "calc(100vh - 180px)"
       }}>
           <div className="flex items-center gap-3 mb-6 bg-te-gray-50 p-3 rounded-none border-2 border-black">
-            {profileData?.logo_url ? <div className="h-10 w-10 flex items-center justify-center border-2 border-black rounded-none overflow-hidden bg-white p-1">
-                <img src={profileData.logo_url} alt={profileData?.company_name || "Company logo"} className="object-contain w-full h-full" onError={e => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null;
-              // If image fails to load, we'll show company initials instead
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = `
+            {profileData?.logo_image ? (
+              <div className="h-10 w-10 flex items-center justify-center border-2 border-black rounded-none overflow-hidden bg-white p-1">
+                <img 
+                  src={profileData.logo_image} 
+                  alt={profileData?.company_name || "Company logo"} 
+                  className="object-contain w-full h-full" 
+                  onError={e => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    // If image fails to load, we'll show company initials instead
+                    target.style.display = 'none';
+                    target.parentElement!.innerHTML = `
                       <div class="flex items-center justify-center w-full h-full bg-te-gray-100 text-black">
                         <span class="text-lg font-bold uppercase sidebar-company-name">${profileData?.company_name?.slice(0, 2) || 'CO'}</span>
                       </div>`;
-            }} />
-              </div> : <CompanyLogo website={profileData?.website || selectedCustomer?.website || ''} companyName={profileData?.company_name || selectedCustomer?.name || 'Company'} className="h-10 w-10" logoUrl={null} />}
+                  }} 
+                />
+              </div>
+            ) : profileData?.logo_url ? (
+              <div className="h-10 w-10 flex items-center justify-center border-2 border-black rounded-none overflow-hidden bg-white p-1">
+                <img 
+                  src={profileData.logo_url} 
+                  alt={profileData?.company_name || "Company logo"} 
+                  className="object-contain w-full h-full" 
+                  onError={e => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    // If image fails to load, we'll show company initials instead
+                    target.style.display = 'none';
+                    target.parentElement!.innerHTML = `
+                      <div class="flex items-center justify-center w-full h-full bg-te-gray-100 text-black">
+                        <span class="text-lg font-bold uppercase sidebar-company-name">${profileData?.company_name?.slice(0, 2) || 'CO'}</span>
+                      </div>`;
+                  }} 
+                />
+              </div>
+            ) : (
+              <CompanyLogo 
+                website={profileData?.website || selectedCustomer?.website || ''} 
+                companyName={profileData?.company_name || selectedCustomer?.name || 'Company'} 
+                className="h-10 w-10" 
+                logoUrl={null}
+              />
+            )}
             <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
           </div>
           

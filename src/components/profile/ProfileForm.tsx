@@ -17,6 +17,7 @@ export const ProfileForm: React.FC = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoImage, setLogoImage] = useState<string | null>(null);
   const [savedWebsite, setSavedWebsite] = useState<string | null>(null);
   
   // Use the same profile schema as in ProfileRequiredForm
@@ -69,6 +70,7 @@ export const ProfileForm: React.FC = () => {
         
         if (data) {
           setLogoUrl(data.logo_url || null);
+          setLogoImage(data.logo_image || null);
           setSavedWebsite(data.website || null);
           
           form.reset({
@@ -94,9 +96,12 @@ export const ProfileForm: React.FC = () => {
     fetchProfile();
   }, [user, form, toast]);
 
-  const handleLogoFound = (foundLogoUrl: string | null) => {
+  const handleLogoFound = (foundLogoUrl: string | null, foundLogoImage: string | null) => {
     if (foundLogoUrl) {
       setLogoUrl(foundLogoUrl);
+    }
+    if (foundLogoImage) {
+      setLogoImage(foundLogoImage);
     }
   };
 
@@ -121,6 +126,7 @@ export const ProfileForm: React.FC = () => {
           last_name: data.lastName,
           role: data.role,
           logo_url: logoUrl,
+          logo_image: logoImage,
           updated_at: new Date().toISOString()
         });
         
@@ -162,6 +168,7 @@ export const ProfileForm: React.FC = () => {
             className="h-16 w-16"
             onLogoFound={handleLogoFound}
             logoUrl={!websiteChanged ? logoUrl : null}
+            logoImage={!websiteChanged ? logoImage : null}
           />
           
           <div className="flex-1 w-full">
