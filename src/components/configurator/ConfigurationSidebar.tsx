@@ -36,7 +36,12 @@ export const ConfigurationSidebar = ({
   const totalCount = completedSteps.length;
 
   return (
-    <div className="h-full flex flex-col w-full">
+    <div className="h-full flex flex-col w-full relative">
+      {/* Inner shadow overlay on the right edge */}
+      <div className="absolute top-0 right-0 bottom-0 w-2 pointer-events-none" style={{
+        background: 'linear-gradient(to left, rgba(0,0,0,0.15), rgba(0,0,0,0))'
+      }}></div>
+      
       <SidebarHeader title="Configuration" />
       
       <div className="flex-1 overflow-y-auto p-4">

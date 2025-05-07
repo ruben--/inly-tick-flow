@@ -48,7 +48,7 @@ const Checklist = () => {
   return (
     <div className="flex h-svh bg-te-gray-50">
       {/* Sidebar fixed on the left side - TE style */}
-      <div className="w-80 border-r-2 border-black flex-shrink-0 overflow-y-auto bg-te-gray-100 h-full">
+      <div className="w-80 border-r-2 border-black flex-shrink-0 overflow-y-auto bg-te-gray-100 h-full relative">
         <ConfigurationSidebar 
           customerTypes={customerTypes}
           assetTypes={assetTypes}
@@ -60,8 +60,8 @@ const Checklist = () => {
         />
       </div>
       
-      {/* Main Content Area - TE style */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      {/* Main Content Area - TE style with subtle shadow for depth */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden shadow-lg">
         <div className="p-4 pb-0">
           <div className="flex items-center justify-between mb-2">
             <ProgressBar 
