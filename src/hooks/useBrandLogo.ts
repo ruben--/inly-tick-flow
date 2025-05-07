@@ -3,12 +3,74 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { extractDomain } from "@/utils/brandfetch";
 import { supabase } from "@/integrations/supabase/client";
 
+// Define constants for localStorage keys
+const LOGO_CACHE_KEY = 'brand_logo_cache';
+const LOGO_CACHE_TIMESTAMP_KEY = 'brand_logo_timestamp';
+const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
 export const useBrandLogo = (website: string) => {
   const [logoImage, setLogoImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const fetchTimeoutRef = useRef<number | null>(null);
+
+  // Try to load cached logo on initial mount
+  useEffect(() => {
+    const loadCachedLogo = () => {
+      try {
+        if (!website) return;
+        
+        const domain = extractDomain(website);
+        if (!domain) return;
+        
+        const cacheKey = `${LOGO_CACHE_KEY}_${domain}`;
+        const timestampKey = `${LOGO_CACHE_TIMESTAMP_KEY}_${domain}`;
+        
+        const cachedLogo = localStorage.getItem(cacheKey);
+        const cachedTimestamp = localStorage.getItem(timestampKey);
+        
+        if (cachedLogo && cachedTimestamp) {
+          const timestamp = parseInt(cachedTimestamp, 10);
+          const now = Date.now();
+          
+          // Check if cache is still valid
+          if (now - timestamp < CACHE_EXPIRY_TIME) {
+            setLogoImage(cachedLogo);
+            return true;
+          }
+        }
+      } catch (err) {
+        // Silently fail if localStorage is not available
+        console.error("Error accessing localStorage:", err);
+      }
+      return false;
+    };
+    
+    // If cached logo loaded successfully, don't fetch again
+    if (!loadCachedLogo() && website) {
+      const domain = extractDomain(website);
+      if (domain) {
+        setTimeout(() => {
+          fetchLogo(domain);
+        }, 300);
+      }
+    }
+  }, [website]);
+
+  // Cache logo in localStorage
+  const cacheLogo = useCallback((domain: string, logo: string) => {
+    try {
+      const cacheKey = `${LOGO_CACHE_KEY}_${domain}`;
+      const timestampKey = `${LOGO_CACHE_TIMESTAMP_KEY}_${domain}`;
+      
+      localStorage.setItem(cacheKey, logo);
+      localStorage.setItem(timestampKey, Date.now().toString());
+    } catch (err) {
+      // Silently fail if localStorage is not available
+      console.error("Error writing to localStorage:", err);
+    }
+  }, []);
 
   // Fetch the logo
   const fetchLogo = useCallback(async (domain: string) => {
@@ -46,6 +108,8 @@ export const useBrandLogo = (website: string) => {
         setError("Failed to fetch company logo");
       } else if (response.data?.logoImage) {
         setLogoImage(response.data.logoImage);
+        // Cache the logo in localStorage
+        cacheLogo(domain, response.data.logoImage);
       } else {
         setError("No logo found");
       }
@@ -57,36 +121,7 @@ export const useBrandLogo = (website: string) => {
         setIsLoading(false);
       }
     }
-  }, []);
-
-  // Fetch logo when website changes
-  useEffect(() => {
-    if (!website) {
-      setLogoImage(null);
-      setError(null);
-      return;
-    }
-
-    const domain = extractDomain(website);
-    if (!domain) {
-      setError("Invalid URL");
-      return;
-    }
-    
-    // Add a small delay to prevent rapid consecutive requests
-    fetchTimeoutRef.current = window.setTimeout(() => {
-      fetchLogo(domain);
-    }, 300);
-    
-    return () => {
-      if (fetchTimeoutRef.current !== null) {
-        window.clearTimeout(fetchTimeoutRef.current);
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, [website, fetchLogo]);
+  }, [cacheLogo]);
 
   // Manual refresh function
   const refreshLogo = useCallback(() => {
@@ -94,6 +129,18 @@ export const useBrandLogo = (website: string) => {
     
     const domain = extractDomain(website);
     if (domain) {
+      // Clear the cache for this domain when manually refreshing
+      try {
+        const cacheKey = `${LOGO_CACHE_KEY}_${domain}`;
+        const timestampKey = `${LOGO_CACHE_TIMESTAMP_KEY}_${domain}`;
+        
+        localStorage.removeItem(cacheKey);
+        localStorage.removeItem(timestampKey);
+      } catch (err) {
+        // Silently fail if localStorage is not available
+        console.error("Error clearing localStorage:", err);
+      }
+      
       fetchLogo(domain);
     }
   }, [website, fetchLogo]);
