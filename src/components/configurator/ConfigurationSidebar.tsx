@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Cog, Users, Zap, BarChart3, ChevronRight } from 'lucide-react';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
@@ -25,13 +25,6 @@ export const ConfigurationSidebar = ({
   toggleMeterType,
   completedSteps
 }: ConfigurationSidebarProps) => {
-  // Initialize all sections as expanded by default
-  const [activeSection, setActiveSection] = useState<string | null>("customers");
-  
-  const handleSectionClick = (section: string) => {
-    setActiveSection(activeSection === section ? null : section);
-  };
-
   // Common props for all icons
   const iconProps = { strokeWidth: 1.5 };
 
@@ -48,86 +41,65 @@ export const ConfigurationSidebar = ({
         <div className="mb-6">
           <div className="text-gray-700 text-sm font-medium mb-3">Configure Your Offering</div>
           <div className="space-y-2">
-            <button 
-              onClick={() => handleSectionClick("customers")}
-              className={`w-full flex items-center justify-between p-3 rounded-md text-left ${
-                activeSection === "customers" ? "bg-gray-200" : "hover:bg-gray-100"
-              }`}
+            <div 
+              className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200"
             >
               <div className="flex items-center">
                 <Users className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                 <span className="text-gray-800">Customer Types</span>
               </div>
-              <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${
-                activeSection === "customers" ? "rotate-90" : ""
-              }`} {...iconProps} />
-            </button>
+              <ChevronRight className="h-4 w-4 text-gray-500 rotate-90" {...iconProps} />
+            </div>
             
-            {activeSection === "customers" && (
-              <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
-                {customerTypes.map(type => (
-                  <ConfigSidebarItem
-                    key={type.id}
-                    itemType={type}
-                    onToggle={() => toggleCustomerType(type.id)}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
+              {customerTypes.map(type => (
+                <ConfigSidebarItem
+                  key={type.id}
+                  itemType={type}
+                  onToggle={() => toggleCustomerType(type.id)}
+                />
+              ))}
+            </div>
             
-            <button 
-              onClick={() => handleSectionClick("assets")}
-              className={`w-full flex items-center justify-between p-3 rounded-md text-left ${
-                activeSection === "assets" ? "bg-gray-200" : "hover:bg-gray-100"
-              }`}
+            <div 
+              className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200"
             >
               <div className="flex items-center">
                 <Zap className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                 <span className="text-gray-800">Asset Types</span>
               </div>
-              <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${
-                activeSection === "assets" ? "rotate-90" : ""
-              }`} {...iconProps} />
-            </button>
+              <ChevronRight className="h-4 w-4 text-gray-500 rotate-90" {...iconProps} />
+            </div>
             
-            {activeSection === "assets" && (
-              <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
-                {assetTypes.map(type => (
-                  <ConfigSidebarItem
-                    key={type.id}
-                    itemType={type}
-                    onToggle={() => toggleAssetType(type.id)}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
+              {assetTypes.map(type => (
+                <ConfigSidebarItem
+                  key={type.id}
+                  itemType={type}
+                  onToggle={() => toggleAssetType(type.id)}
+                />
+              ))}
+            </div>
             
-            <button 
-              onClick={() => handleSectionClick("meters")}
-              className={`w-full flex items-center justify-between p-3 rounded-md text-left ${
-                activeSection === "meters" ? "bg-gray-200" : "hover:bg-gray-100"
-              }`}
+            <div 
+              className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200"
             >
               <div className="flex items-center">
                 <BarChart3 className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                 <span className="text-gray-800">Optimization</span>
               </div>
-              <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${
-                activeSection === "meters" ? "rotate-90" : ""
-              }`} {...iconProps} />
-            </button>
+              <ChevronRight className="h-4 w-4 text-gray-500 rotate-90" {...iconProps} />
+            </div>
             
-            {activeSection === "meters" && (
-              <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
-                {meterTypes.map(type => (
-                  <ConfigSidebarItem
-                    key={type.id}
-                    itemType={type}
-                    onToggle={() => toggleMeterType(type.id)}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
+              {meterTypes.map(type => (
+                <ConfigSidebarItem
+                  key={type.id}
+                  itemType={type}
+                  onToggle={() => toggleMeterType(type.id)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
