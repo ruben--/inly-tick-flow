@@ -3,7 +3,7 @@ import React from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-import { UserProfileFormValues } from "./ProfileRequiredForm"; 
+import { UserProfileFormValues } from "./types"; 
 
 interface ProfileFormFieldsProps {
   form: UseFormReturn<UserProfileFormValues>;
