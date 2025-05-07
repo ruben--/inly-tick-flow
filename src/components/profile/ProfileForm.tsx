@@ -27,7 +27,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
   const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
-  const [fetchAttempted, setFetchAttempted] = useState(!!initialLogoImage);
+  const [fetchAttempted, setFetchAttempted] = useState(true);
   
   console.log("ProfileForm initialized with:", { 
     initialLogoImage: !!initialLogoImage, 
@@ -85,14 +85,16 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         }
         
         if (data) {
-          // Always prioritize stored image
-          if (data.logo_image && !logoImage) {
+          console.log("Profile data fetched:", data);
+          
+          // Always prioritize stored image data
+          if (data.logo_image) {
             console.log("Setting logo image from profile data");
             setLogoImage(data.logo_image);
-            setFetchAttempted(true);
           }
           
-          if (data.logo_url && !logoUrl) {
+          if (data.logo_url) {
+            console.log("Setting logo URL from profile data");
             setLogoUrl(data.logo_url);
           }
           
@@ -105,6 +107,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             lastName: data.last_name || "",
             role: data.role || ""
           });
+        } else {
+          console.log("No profile data found");
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -119,7 +123,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     };
     
     fetchProfile();
-  }, [user, form, toast, logoImage, logoUrl]);
+  }, [user, form, toast]);
 
   const handleLogoFound = (foundLogoUrl: string | null, foundLogoImage: string | null) => {
     console.log("Logo found callback:", { foundLogoUrl, foundLogoImage: !!foundLogoImage });
@@ -128,9 +132,23 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     if (foundLogoImage) {
       setLogoImage(foundLogoImage);
     }
+    
     if (foundLogoUrl && !logoUrl) {
       setLogoUrl(foundLogoUrl);
     }
+  };
+  
+  // Handle manual logo upload
+  const handleLogoUpload = (imageData: string) => {
+    console.log("Logo manually uploaded");
+    setLogoImage(imageData);
+    // Clear the URL since we're using an uploaded image instead
+    setLogoUrl(null);
+    
+    toast({
+      title: "Logo uploaded",
+      description: "Your logo has been uploaded successfully. Don't forget to save your changes.",
+    });
   };
 
   const onSubmit = async (data: UserProfileFormValues) => {
@@ -198,11 +216,13 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <CompanyLogo 
             website={websiteValue} 
             companyName={companyNameValue}
-            className="h-16 w-16"
+            className="h-20 w-20"
             onLogoFound={handleLogoFound}
             logoUrl={!websiteChanged ? logoUrl : null}
-            logoImage={!websiteChanged ? logoImage : null}
-            fetchAttempted={fetchAttempted}
+            logoImage={logoImage} // Always use the current logo image
+            fetchAttempted={websiteChanged ? false : fetchAttempted}
+            onLogoUpload={handleLogoUpload}
+            showUploadButton={true}
           />
           
           <div className="flex-1 w-full">

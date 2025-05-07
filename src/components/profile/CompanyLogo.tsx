@@ -1,6 +1,8 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
+import { Upload, RefreshCw } from "lucide-react";
 import { fetchCompanyBranding, getBestLogo, extractDomain } from "@/utils/brandfetch";
 
 interface CompanyLogoProps {
@@ -11,6 +13,8 @@ interface CompanyLogoProps {
   logoUrl?: string | null;
   logoImage?: string | null;
   fetchAttempted?: boolean;
+  onLogoUpload?: (imageData: string) => void;
+  showUploadButton?: boolean;
 }
 
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({ 
@@ -20,7 +24,9 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   onLogoFound,
   logoUrl: initialLogoUrl,
   logoImage: initialLogoImage,
-  fetchAttempted: initialFetchAttempted = false
+  fetchAttempted: initialFetchAttempted = false,
+  onLogoUpload,
+  showUploadButton = false
 }) => {
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
@@ -28,11 +34,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
   const [fetchAttempted, setFetchAttempted] = useState(initialFetchAttempted);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  console.log("CompanyLogo initialized with:", { 
-    initialLogoImage: !!initialLogoImage, 
-    initialLogoUrl: !!initialLogoUrl, 
-    fetchAttempted: initialFetchAttempted 
+  console.log("CompanyLogo rendering with:", { 
+    hasLogoImage: !!logoImage, 
+    hasLogoUrl: !!logoUrl, 
+    fetchAttempted 
   });
 
   const initials = companyName
@@ -65,6 +72,34 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     }
   };
 
+  // Handle logo file upload
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setLogoImage(base64String);
+      
+      // Call the callback with the new image data
+      if (onLogoUpload) {
+        onLogoUpload(base64String);
+      }
+      
+      // Also call onLogoFound if provided
+      if (onLogoFound) {
+        onLogoFound(null, base64String);
+      }
+      
+      // Clear the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   // First priority: Use the provided logo image if available
   useEffect(() => {
     console.log("Logo image effect triggered", { 
@@ -73,7 +108,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     });
     
     if (initialLogoImage) {
-      console.log("Using provided logo image");
+      console.log("Using provided logo image from props");
       setLogoImage(initialLogoImage);
       
       // Only set the URL if provided and we don't have one already
@@ -181,9 +216,16 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     fetchLogo();
   }, [website, onLogoFound, initialLogoUrl, logoImage, lastFetchedDomain, fetchAttempted]);
 
+  const handleRetryFetch = async () => {
+    setFetchAttempted(false);
+    setLogoImage(null);
+    setLogoUrl(null);
+    setError(null);
+  };
+
   return (
-    <div className="flex flex-col items-center">
-      <div className={`border border-gray-200 overflow-hidden ${className}`}>
+    <div className="flex flex-col items-center space-y-2">
+      <div className={`border border-gray-200 overflow-hidden rounded-md ${className}`}>
         <AspectRatio ratio={1}>
           {!isLoading && logoImage ? (
             <img 
@@ -207,6 +249,10 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
                   }
                 }
               }}
+              onError={() => {
+                setError("Failed to load image");
+                setLogoUrl(null);
+              }}
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">
@@ -219,7 +265,41 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
           )}
         </AspectRatio>
       </div>
+      
       {error && <p className="text-xs text-destructive mt-1">{error}</p>}
+      
+      <div className="flex gap-2">
+        {showUploadButton && (
+          <>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="mr-1 h-4 w-4" /> Upload
+            </Button>
+          </>
+        )}
+        
+        {website && fetchAttempted && error && (
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRetryFetch}
+          >
+            <RefreshCw className="mr-1 h-4 w-4" /> Retry
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
