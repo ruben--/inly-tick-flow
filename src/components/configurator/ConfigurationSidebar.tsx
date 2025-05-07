@@ -5,6 +5,12 @@ import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
 import { MeterType } from './MeterTypeCard';
 import { ConfigSidebarItem } from './ConfigSidebarItem';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface ConfigurationSidebarProps {
   customerTypes: CustomerType[];
@@ -41,65 +47,67 @@ export const ConfigurationSidebar = ({
         <div className="mb-6">
           <div className="text-gray-700 text-sm font-medium mb-3">Configure Your Offering</div>
           <div className="space-y-2">
-            <div 
-              className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200"
-            >
-              <div className="flex items-center">
-                <Users className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
-                <span className="text-gray-800">Customer Types</span>
-              </div>
-              <ChevronRight className="h-4 w-4 text-gray-500 rotate-90" {...iconProps} />
-            </div>
-            
-            <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
-              {customerTypes.map(type => (
-                <ConfigSidebarItem
-                  key={type.id}
-                  itemType={type}
-                  onToggle={() => toggleCustomerType(type.id)}
-                />
-              ))}
-            </div>
-            
-            <div 
-              className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200"
-            >
-              <div className="flex items-center">
-                <Zap className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
-                <span className="text-gray-800">Asset Types</span>
-              </div>
-              <ChevronRight className="h-4 w-4 text-gray-500 rotate-90" {...iconProps} />
-            </div>
-            
-            <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
-              {assetTypes.map(type => (
-                <ConfigSidebarItem
-                  key={type.id}
-                  itemType={type}
-                  onToggle={() => toggleAssetType(type.id)}
-                />
-              ))}
-            </div>
-            
-            <div 
-              className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200"
-            >
-              <div className="flex items-center">
-                <BarChart3 className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
-                <span className="text-gray-800">Optimization</span>
-              </div>
-              <ChevronRight className="h-4 w-4 text-gray-500 rotate-90" {...iconProps} />
-            </div>
-            
-            <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
-              {meterTypes.map(type => (
-                <ConfigSidebarItem
-                  key={type.id}
-                  itemType={type}
-                  onToggle={() => toggleMeterType(type.id)}
-                />
-              ))}
-            </div>
+            <Accordion type="multiple" defaultValue={["customers", "assets", "optimization"]} className="space-y-2">
+              <AccordionItem value="customers" className="border-none">
+                <AccordionTrigger className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200 no-underline hover:no-underline">
+                  <div className="flex items-center">
+                    <Users className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
+                    <span className="text-gray-800">Customer Types</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-0">
+                  <div className="ml-4 space-y-3 bg-white p-3 rounded-md border border-gray-100">
+                    {customerTypes.map(type => (
+                      <ConfigSidebarItem
+                        key={type.id}
+                        itemType={type}
+                        onToggle={() => toggleCustomerType(type.id)}
+                      />
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="assets" className="border-none">
+                <AccordionTrigger className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200 no-underline hover:no-underline">
+                  <div className="flex items-center">
+                    <Zap className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
+                    <span className="text-gray-800">Asset Types</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-0">
+                  <div className="ml-4 space-y-3 bg-white p-3 rounded-md border border-gray-100">
+                    {assetTypes.map(type => (
+                      <ConfigSidebarItem
+                        key={type.id}
+                        itemType={type}
+                        onToggle={() => toggleAssetType(type.id)}
+                      />
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="optimization" className="border-none">
+                <AccordionTrigger className="w-full flex items-center justify-between p-3 rounded-md text-left bg-gray-200 no-underline hover:no-underline">
+                  <div className="flex items-center">
+                    <BarChart3 className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
+                    <span className="text-gray-800">Optimization</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-0">
+                  <div className="ml-4 space-y-3 bg-white p-3 rounded-md border border-gray-100">
+                    {meterTypes.map(type => (
+                      <ConfigSidebarItem
+                        key={type.id}
+                        itemType={type}
+                        onToggle={() => toggleMeterType(type.id)}
+                      />
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </div>
