@@ -36,10 +36,8 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
-  // Add cache-busting timestamp
-  const logoSrc = logoImage && !imageError ? 
-    `${logoImage}${logoImage.includes('?') ? '&' : '?'}t=${Date.now()}` : 
-    null;
+  // Use the logo directly without cache busting
+  const logoSrc = logoImage && !imageError ? logoImage : null;
 
   // Extract size classes
   const widthClass = className.match(/w-\d+/)?.at(0) || 'w-16';
