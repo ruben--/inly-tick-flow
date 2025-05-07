@@ -1,17 +1,18 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Check, Cog, User } from 'lucide-react';
 import { ProfileRequiredModal } from '@/components/ProfileRequiredModal';
 import { PageTransition } from '@/components/transitions/PageTransition';
+import { Dialog } from '@/components/ui/dialog';
 
 export function MainLayout() {
   const {
     user,
     logout
   } = useAuth();
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const location = useLocation();
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -19,8 +20,27 @@ export function MainLayout() {
 
   // Hide header and footer on index page
   const isIndexPage = location.pathname === '/';
+  React.useEffect(() => {
+    if (user && !isIndexPage) {
+      // Check if profile is complete
+      // This would typically be a check against user metadata or a profile table
+      setShowProfileModal(true);
+    }
+  }, [user, isIndexPage]);
+
+  const handleProfileComplete = () => {
+    setShowProfileModal(false);
+  };
+
   return <div className="min-h-screen flex flex-col">
-      {user && !isIndexPage && <ProfileRequiredModal />}
+      {user && !isIndexPage && showProfileModal && (
+        <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+          <ProfileRequiredModal 
+            userId={user.id} 
+            onSuccess={handleProfileComplete} 
+          />
+        </Dialog>
+      )}
       
       {!isIndexPage && <header className="bg-white border-b sticky top-0 z-10">
           <div className="container flex justify-between items-center h-16">

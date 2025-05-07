@@ -15,7 +15,7 @@ export function ProfileRequiredModal({ userId, onSuccess }: ProfileRequiredModal
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<'form' | 'loading'>('form');
   
-  const { submit, isLoading } = useProfileSubmit({
+  const { handleSubmit, isLoading } = useProfileSubmit({
     userId,
     onSuccess: () => {
       setStep('loading');
@@ -28,9 +28,9 @@ export function ProfileRequiredModal({ userId, onSuccess }: ProfileRequiredModal
     }
   });
 
-  async function handleSubmit(values: ProfileRequiredFormValues) {
+  async function handleFormSubmit(values: ProfileRequiredFormValues) {
     setError(null);
-    await submit(values);
+    await handleSubmit(values);
   }
 
   if (step === 'loading') {
@@ -62,7 +62,7 @@ export function ProfileRequiredModal({ userId, onSuccess }: ProfileRequiredModal
         </p>
         
         <ProfileRequiredForm 
-          onSubmit={handleSubmit}
+          onSubmit={handleFormSubmit}
           isLoading={isLoading}
         />
       </div>

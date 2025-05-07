@@ -5,16 +5,18 @@ import { useToast } from "@/hooks/use-toast";
 import { UserProfileFormValues } from "@/components/profile/types";
 import { useLogo } from "@/contexts/LogoContext";
 
-interface UseProfileSubmitProps {
+export interface UseProfileSubmitProps {
   userId: string;
-  initialWebsite: string | null;
+  initialWebsite?: string | null;
   onSuccess?: () => void;
+  onError?: (error: Error) => void;
 }
 
 export const useProfileSubmit = ({
   userId,
   initialWebsite,
-  onSuccess
+  onSuccess,
+  onError
 }: UseProfileSubmitProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -59,15 +61,20 @@ export const useProfileSubmit = ({
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update your profile",
-        variant: "destructive"
-      });
+      
+      if (onError && error instanceof Error) {
+        onError(error);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update your profile",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [userId, initialWebsite, logoImage, refreshLogo, toast, onSuccess]);
+  }, [userId, initialWebsite, logoImage, refreshLogo, toast, onSuccess, onError]);
 
   return {
     isLoading,

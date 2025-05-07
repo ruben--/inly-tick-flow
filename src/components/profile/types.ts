@@ -26,3 +26,11 @@ export interface ProfileFormFieldsProps {
   form: UseFormReturn<UserProfileFormValues>;
   onWebsiteBlur?: () => void;
 }
+
+export interface ProfileData {
+  companyName: string;
+  website: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}

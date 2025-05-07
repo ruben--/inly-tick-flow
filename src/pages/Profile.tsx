@@ -19,11 +19,16 @@ export default function Profile() {
     data: profileData, 
     isLoading: profileLoading, 
     isError: profileError, 
-    refetch: refetchProfile 
-  } = useProfileData(userId);
+    refetch: refetchProfile,
+    initialWebsite,
+    logoImage,
+    isLogoLoading,
+    refreshLogo
+  } = useProfileData({ userId });
 
-  const { submit, isLoading } = useProfileSubmit({
+  const { handleSubmit, isLoading } = useProfileSubmit({
     userId,
+    initialWebsite,
     onSuccess: () => {
       setError(null);
       refetchProfile();
@@ -33,10 +38,15 @@ export default function Profile() {
     }
   });
 
-  const handleSubmit = async (data: ProfileFormValues) => {
+  const handleFormSubmit = async (data: ProfileFormValues) => {
     if (!userId) return;
     setError(null);
-    await submit(data);
+    await handleSubmit({
+      ...data,
+      firstName: profileData?.firstName || "",
+      lastName: profileData?.lastName || "",
+      role: profileData?.role || ""
+    });
   };
 
   return (
@@ -70,7 +80,7 @@ export default function Profile() {
                 </div>
               ) : (
                 <ProfileForm 
-                  onSubmit={handleSubmit}
+                  onSubmit={handleFormSubmit}
                   isLoading={isLoading}
                   initialData={profileData}
                 />
@@ -79,7 +89,14 @@ export default function Profile() {
           </Card>
 
           {/* Company Logo */}
-          <LogoSection userId={userId} />
+          <LogoSection 
+            userId={userId}
+            websiteValue={profileData?.website}
+            companyNameValue={profileData?.companyName}
+            logoImage={logoImage}
+            isLogoLoading={isLogoLoading}
+            onRefreshLogo={() => profileData?.website && refreshLogo(profileData.website)}
+          />
         </div>
       </div>
     </PageTransition>
