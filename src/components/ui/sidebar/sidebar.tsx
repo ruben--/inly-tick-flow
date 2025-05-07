@@ -50,7 +50,7 @@ export const Sidebar = React.forwardRef<
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
-                "--sidebar-width": "18rem",
+                "--sidebar-width": "20rem",
               } as React.CSSProperties
             }
             side={side}

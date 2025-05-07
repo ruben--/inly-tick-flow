@@ -72,7 +72,7 @@ const Checklist = () => {
         </div>
         
         <div className="flex flex-col md:flex-row w-full flex-grow overflow-hidden">
-          <div className="md:w-72 lg:w-80 border-r border-gray-200 overflow-y-auto">
+          <div className="md:w-80 border-r border-gray-200 overflow-y-auto">
             <ConfigurationSidebar 
               customerTypes={customerTypes}
               assetTypes={assetTypes}
