@@ -1,11 +1,12 @@
 
-import { useState, useEffect } from 'react';
-import { Progress } from '@/components/ui/progress';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Check, Circle, UserRound, Briefcase, ChartBar, Settings, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useProgressBar } from './progress/useProgressBar';
+import { ProgressIndicator } from './progress/ProgressIndicator';
+import { SetupStepsList } from './progress/SetupStepsList';
+import { ProgressSummary } from './progress/ProgressSummary';
 
 interface ProgressBarProps {
   progress: number;
@@ -27,95 +28,12 @@ export const ProgressBar = ({
   onProfileStatusChange
 }: ProgressBarProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
-  const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
-  const [isPermanentlyHidden, setIsPermanentlyHidden] = useState<boolean>(false);
-
-  // Check if progress bar should be hidden based on localStorage
-  useEffect(() => {
-    const hiddenState = localStorage.getItem('progressBarHidden');
-    if (hiddenState === 'true') {
-      setIsPermanentlyHidden(true);
-    }
-  }, []);
-
-  // Check if profile is complete
-  useEffect(() => {
-    const checkProfileStatus = async () => {
-      if (!user?.id) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('company_name, first_name, last_name, role, website')
-          .eq('id', user.id)
-          .maybeSingle();
-          
-        if (error) {
-          console.error("Error checking profile:", error);
-          return;
-        }
-        
-        // Check if all required profile fields are filled
-        const profileComplete = data && 
-          data.company_name && 
-          data.first_name && 
-          data.last_name && 
-          data.role && 
-          data.website;
-        
-        setIsProfileComplete(!!profileComplete);
-        
-        // Call the callback with the profile status
-        if (onProfileStatusChange) {
-          onProfileStatusChange(!!profileComplete);
-        }
-      } catch (error) {
-        console.error("Error checking profile status:", error);
-      }
-    };
-    
-    checkProfileStatus();
-  }, [user, onProfileStatusChange]);
-
-  // Function to permanently hide the progress bar
-  const handlePermanentHide = () => {
-    localStorage.setItem('progressBarHidden', 'true');
-    setIsPermanentlyHidden(true);
-  };
+  const { isProfileComplete, isPermanentlyHidden, handlePermanentHide } = useProgressBar(onProfileStatusChange);
 
   // If permanently hidden, don't render anything
   if (isPermanentlyHidden) {
     return null;
   }
-
-  // Define the four main setup steps
-  const setupSteps = [
-    {
-      id: 'profile',
-      name: 'Setup Company Profile',
-      completed: isProfileComplete,
-      icon: <UserRound className="h-4 w-4" />
-    },
-    {
-      id: 'customer-types',
-      name: 'Choose Customer Types',
-      completed: customerTypes.some(type => type.selected),
-      icon: <Briefcase className="h-4 w-4" />
-    },
-    {
-      id: 'assets',
-      name: 'Choose Assets',
-      completed: assetTypes.some(type => type.selected),
-      icon: <Settings className="h-4 w-4" />
-    },
-    {
-      id: 'optimization',
-      name: 'Choose Optimisation Type',
-      completed: meterTypes.some(type => type.selected),
-      icon: <ChartBar className="h-4 w-4" />
-    }
-  ];
 
   return (
     <Collapsible 
@@ -151,58 +69,20 @@ export const ProgressBar = ({
       
       <CollapsibleContent>
         <div className="space-y-3">
-          <div className="flex justify-between text-xs">
-            <span>{progress}% Complete</span>
-            <span className="text-te-gray-600">
-              {completedTasks} of {totalTasks} tasks completed
-            </span>
-          </div>
-          <div className="w-full bg-te-gray-200 h-2 rounded-none overflow-hidden border border-black">
-            <div 
-              className="bg-te-orange h-full rounded-none transition-all duration-500 ease-in-out"
-              style={{
-                width: `${progress}%`
-              }}
-            ></div>
-          </div>
+          <ProgressIndicator 
+            progress={progress} 
+            completedTasks={completedTasks} 
+            totalTasks={totalTasks} 
+          />
           
-          <div className="mt-4 space-y-3">
-            <div className="text-xs font-bold uppercase tracking-wider">Setup Steps</div>
-            <div className="grid gap-2">
-              {setupSteps.map((step) => (
-                <div 
-                  key={step.id} 
-                  className="flex items-center gap-2 text-xs p-2 rounded-none border border-black hover:bg-te-gray-50"
-                >
-                  {step.completed ? (
-                    <div className="h-5 w-5 bg-te-orange flex items-center justify-center border border-black">
-                      <Check className="h-3 w-3 text-black" />
-                    </div>
-                  ) : (
-                    <div className="h-5 w-5 border border-black bg-white flex items-center justify-center">
-                      <Circle className="h-3 w-3 text-te-gray-400" />
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    {step.icon}
-                    <span className={step.completed ? "text-black font-bold" : "text-te-gray-600"}>
-                      {step.name}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <SetupStepsList 
+            isProfileComplete={isProfileComplete} 
+            customerTypes={customerTypes} 
+            assetTypes={assetTypes} 
+            meterTypes={meterTypes} 
+          />
           
-          {progress === 100 ? (
-            <div className="mt-2 text-xs text-black bg-te-orange p-2 border border-black">
-              All steps completed! Your VPP is fully configured.
-            </div>
-          ) : (
-            <div className="mt-2 text-xs text-te-gray-600">
-              Complete all steps to finalize your VPP configuration.
-            </div>
-          )}
+          <ProgressSummary progress={progress} />
         </div>
       </CollapsibleContent>
     </Collapsible>
