@@ -15,6 +15,10 @@ export const PreviewHeader = ({
   logoImage,
   logoLoading = false
 }: PreviewHeaderProps) => {
+  // Add debugging
+  console.log("PreviewHeader logoImage:", logoImage ? "exists" : "null");
+  console.log("PreviewHeader logoLoading:", logoLoading);
+  
   return (
     <div className="flex flex-col items-center mb-6 bg-white p-3 rounded-none border-2 border-black">
       <div className="h-12 w-12 mb-3 flex items-center justify-center overflow-hidden bg-white">

@@ -22,6 +22,10 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
   onRefreshLogo,
   children
 }) => {
+  // Add logging to help debug logo issues
+  console.log("ProfileFormSubmit logoImage:", logoImage ? "exists" : "null");
+  console.log("ProfileFormSubmit isLogoLoading:", isLogoLoading);
+
   return (
     <>
       <div className="flex flex-col md:flex-row gap-6 items-start">

@@ -22,6 +22,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   
+  // Add debugging
+  useEffect(() => {
+    console.log("CompanyLogo render with logoImage:", logoImage ? "exists" : "null");
+    console.log("CompanyLogo isLoading:", isLoading);
+  }, [logoImage, isLoading]);
+  
   // Reset states when logo changes
   useEffect(() => {
     setImageError(false);
@@ -77,8 +83,14 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
               )}
               loading="lazy"
               decoding="async"
-              onLoad={() => setImageLoaded(true)}
-              onError={() => setImageError(true)}
+              onLoad={() => {
+                console.log("Logo image loaded successfully");
+                setImageLoaded(true);
+              }}
+              onError={(e) => {
+                console.error("Logo image failed to load:", e);
+                setImageError(true);
+              }}
             />
           </>
         ) : (
