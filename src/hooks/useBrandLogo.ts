@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { fetchCompanyBranding, getBestLogo, extractDomain } from "@/utils/brandfetch";
 
 export const useBrandLogo = (website: string) => {
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoImage, setLogoImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -12,7 +11,6 @@ export const useBrandLogo = (website: string) => {
   useEffect(() => {
     // Skip if no website
     if (!website) {
-      setLogoUrl(null);
       setLogoImage(null);
       return;
     }
@@ -33,13 +31,12 @@ export const useBrandLogo = (website: string) => {
       try {
         // Fetch branding data
         const brandingData = await fetchCompanyBranding(website);
-        const logo = getBestLogo(brandingData);
-        setLogoUrl(logo);
+        const logoUrl = getBestLogo(brandingData);
         
         // If we found a logo URL, fetch the actual image data
-        if (logo) {
+        if (logoUrl) {
           try {
-            const response = await fetch(logo);
+            const response = await fetch(logoUrl);
             const blob = await response.blob();
             
             // Convert blob to base64
@@ -59,7 +56,6 @@ export const useBrandLogo = (website: string) => {
       } catch (err) {
         console.error("Error fetching logo:", err);
         setError("Failed to fetch company logo");
-        setLogoUrl(null);
         setLogoImage(null);
       } finally {
         setIsLoading(false);
@@ -70,7 +66,6 @@ export const useBrandLogo = (website: string) => {
   }, [website, lastFetchedDomain]);
 
   return {
-    logoUrl,
     logoImage,
     isLoading,
     error
