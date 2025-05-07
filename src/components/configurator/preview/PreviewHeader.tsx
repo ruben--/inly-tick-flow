@@ -9,8 +9,8 @@ interface PreviewHeaderProps {
 
 export const PreviewHeader = ({ companyName, website, logoImage }: PreviewHeaderProps) => {
   return (
-    <div className="flex items-center gap-3 mb-6 bg-te-gray-50 p-3 rounded-none border-2 border-black">
-      <div className="h-10 w-10 flex-shrink-0 flex items-center justify-center border-2 border-black rounded-none overflow-hidden bg-white p-1">
+    <div className="flex flex-col items-center mb-6 bg-te-gray-50 p-3 rounded-none border-2 border-black">
+      <div className="h-12 w-12 mb-3 flex items-center justify-center border-2 border-black rounded-none overflow-hidden bg-white p-1">
         <CompanyLogo 
           website={website || ''} 
           companyName={companyName || 'Company'} 
