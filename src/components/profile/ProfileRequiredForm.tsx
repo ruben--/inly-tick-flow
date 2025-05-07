@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
 import { CompanyLogo } from "./CompanyLogo";
 import { useProfileLogo } from "@/hooks/useProfileLogo";
+import { RefreshCcw } from "lucide-react";
 
 // Create validation schema
 const profileSchema = z.object({

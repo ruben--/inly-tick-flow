@@ -19,7 +19,7 @@ export const useProfileLogo = ({
   );
   
   // Use the useBrandLogo hook to fetch logo when website changes
-  const { logoImage: fetchedLogoImage, isLoading, refreshLogo } = useBrandLogo(
+  const { logoImage: fetchedLogoImage, isLoading, refreshLogo: brandRefreshLogo } = useBrandLogo(
     currentWebsite && currentWebsite !== initialWebsite ? currentWebsite : ''
   );
   
@@ -43,6 +43,7 @@ export const useProfileLogo = ({
   // Provide a refresh function that resets the lastFetchedDomain and triggers a new fetch
   const refreshLogo = () => {
     setLastFetchedDomain(null);
+    brandRefreshLogo(); // Also call the brand refresh function
   };
 
   return {
