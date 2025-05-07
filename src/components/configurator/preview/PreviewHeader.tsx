@@ -1,19 +1,17 @@
 
 import { CompanyLogo } from '@/components/profile/CompanyLogo';
-import { RefreshLogoButton } from '@/components/profile/RefreshLogoButton';
 
 interface PreviewHeaderProps {
   companyName: string | null;
   website: string | null;
   logoImage?: string | null;
-  onRefreshLogo?: () => void;
+  onRefreshLogo?: () => void; // Keeping prop for compatibility but not using it
 }
 
 export const PreviewHeader = ({ 
   companyName, 
   website, 
-  logoImage,
-  onRefreshLogo
+  logoImage
 }: PreviewHeaderProps) => {
   return (
     <div className="flex flex-col items-center mb-6 bg-te-gray-50 p-3 rounded-none border-2 border-black">
@@ -26,15 +24,7 @@ export const PreviewHeader = ({
           isLoading={false}
         />
       </div>
-      <div className="flex items-center gap-2">
-        <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
-        {website && onRefreshLogo && (
-          <RefreshLogoButton 
-            onRefresh={onRefreshLogo} 
-            isDisabled={false} 
-          />
-        )}
-      </div>
+      <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
     </div>
   );
 };
