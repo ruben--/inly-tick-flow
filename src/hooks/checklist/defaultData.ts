@@ -34,7 +34,7 @@ export const defaultAssetTypes: AssetType[] = [
     id: 'ev',
     name: 'EV',
     description: 'Such as data centres, solar parks, wind farms.',
-    image: '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png',
+    image: '/lovable-uploads/2d53f933-1dd1-42c5-8b78-c70e136a2d06.png',
     selected: true,
   },
   {
