@@ -32,6 +32,7 @@ export const MainContent = ({
         <PreviewHeader 
           companyName={profileData?.company_name}
           website={profileData?.website || selectedCustomer?.website}
+          logoImage={profileData?.logo_image}
         />
         
         <HeroSection 

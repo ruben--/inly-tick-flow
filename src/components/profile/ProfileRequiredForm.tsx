@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
 import { CompanyLogo } from "./CompanyLogo";
+import { useBrandLogo } from "@/hooks/useBrandLogo";
 
 // Create validation schema
 const profileSchema = z.object({
@@ -39,6 +40,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
+  const [logoImage, setLogoImage] = useState<string | null>(null);
   
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -71,6 +73,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         // Set form default values if profile exists but is incomplete
         if (data) {
           setCurrentWebsite(data.website || null);
+          setLogoImage(data.logo_image || null);
           
           form.reset({
             companyName: data.company_name || "",
@@ -93,6 +96,23 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     fetchProfile();
   }, [userId, form, toast]);
 
+  // Watch for website changes
+  const websiteValue = form.watch("website");
+  const companyNameValue = form.watch("companyName");
+  
+  // Fetch logo when website changes and it's different from current website
+  const { logoImage: fetchedLogoImage } = useBrandLogo(
+    websiteValue && websiteValue !== currentWebsite ? websiteValue : ''
+  );
+  
+  // Update logo image when fetched
+  useEffect(() => {
+    if (fetchedLogoImage && websiteValue !== currentWebsite) {
+      setLogoImage(fetchedLogoImage);
+      setCurrentWebsite(websiteValue);
+    }
+  }, [fetchedLogoImage, websiteValue, currentWebsite]);
+
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!userId) return;
     
@@ -113,6 +133,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
+          logo_image: logoImage,
           updated_at: new Date().toISOString()
         });
         
@@ -140,10 +161,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     }
   };
 
-  // Get current website value for logo display
-  const websiteValue = form.watch("website");
-  const companyNameValue = form.watch("companyName");
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -151,6 +168,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           <CompanyLogo 
             website={websiteValue} 
             companyName={companyNameValue}
+            logoImage={logoImage}
             className="h-16 w-16"
           />
         </div>

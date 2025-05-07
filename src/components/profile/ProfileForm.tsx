@@ -11,6 +11,7 @@ import { ProfileFormFields } from "./ProfileFormFields";
 import { UserProfileFormValues } from "./ProfileRequiredForm";
 import { useProfileLogo } from "@/hooks/useProfileLogo";
 import { ProfileFormSubmit } from "./ProfileFormSubmit";
+import { useBrandLogo } from "@/hooks/useBrandLogo";
 
 export const ProfileForm: React.FC = () => {
   const { user } = useAuth();
@@ -21,6 +22,8 @@ export const ProfileForm: React.FC = () => {
   const {
     currentWebsite,
     setCurrentWebsite,
+    logoImage,
+    setLogoImage,
     isWebsiteChanged
   } = useProfileLogo();
   
@@ -54,6 +57,22 @@ export const ProfileForm: React.FC = () => {
     mode: "onChange" // Validate on change for better user experience
   });
 
+  // Watch for website changes to update logo
+  const websiteValue = form.watch("website");
+  
+  // Fetch logo when website changes
+  const { logoImage: fetchedLogoImage, isLoading: isLogoLoading } = useBrandLogo(
+    isWebsiteChanged(websiteValue) ? websiteValue : ''
+  );
+  
+  // Update logo image when fetched
+  useEffect(() => {
+    if (fetchedLogoImage && isWebsiteChanged(websiteValue)) {
+      setLogoImage(fetchedLogoImage);
+      setCurrentWebsite(websiteValue);
+    }
+  }, [fetchedLogoImage, websiteValue, setLogoImage, setCurrentWebsite, isWebsiteChanged]);
+
   // Fetch existing profile data if available
   useEffect(() => {
     const fetchProfile = async () => {
@@ -76,6 +95,7 @@ export const ProfileForm: React.FC = () => {
         if (data) {
           console.log("Profile data fetched:", data);
           setCurrentWebsite(data.website || null);
+          setLogoImage(data.logo_image || null);
           
           form.reset({
             companyName: data.company_name || "",
@@ -100,7 +120,7 @@ export const ProfileForm: React.FC = () => {
     };
     
     fetchProfile();
-  }, [user, form, toast, setCurrentWebsite]);
+  }, [user, form, toast, setCurrentWebsite, setLogoImage]);
 
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!user?.id) return;
@@ -122,12 +142,13 @@ export const ProfileForm: React.FC = () => {
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
+          logo_image: logoImage,
           updated_at: new Date().toISOString()
         });
         
       if (error) throw error;
       
-      // Update the current website to prevent unnecessary API calls
+      // Update the current website
       setCurrentWebsite(normalizedWebsite);
       
       toast({
@@ -146,8 +167,6 @@ export const ProfileForm: React.FC = () => {
     }
   };
 
-  // Get current website value for logo display
-  const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
 
   return (
@@ -157,6 +176,7 @@ export const ProfileForm: React.FC = () => {
           isLoading={isLoading}
           websiteValue={websiteValue}
           companyNameValue={companyNameValue}
+          logoImage={logoImage}
         >
           <ProfileFormFields form={form} />
         </ProfileFormSubmit>

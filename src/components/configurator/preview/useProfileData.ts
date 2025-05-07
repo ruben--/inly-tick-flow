@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface ProfileData {
   company_name: string | null;
   website: string | null;
+  logo_image: string | null;
 }
 
 export const useProfileData = (userId: string | undefined) => {
@@ -28,7 +29,7 @@ export const useProfileData = (userId: string | undefined) => {
         setLoading(true);
         const { data, error } = await supabase
           .from('profiles')
-          .select('company_name, website')
+          .select('company_name, website, logo_image')
           .eq('id', userId)
           .maybeSingle();
           

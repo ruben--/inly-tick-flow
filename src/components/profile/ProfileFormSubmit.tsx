@@ -7,6 +7,7 @@ interface ProfileFormSubmitProps {
   isLoading: boolean;
   websiteValue: string;
   companyNameValue: string;
+  logoImage?: string | null;
   children: React.ReactNode;
 }
 
@@ -14,6 +15,7 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
   isLoading,
   websiteValue,
   companyNameValue,
+  logoImage,
   children
 }) => {
   return (
@@ -22,6 +24,7 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
         <CompanyLogo 
           website={websiteValue}
           companyName={companyNameValue}
+          logoImage={logoImage}
           className="h-20 w-20"
         />
         
