@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -114,7 +115,7 @@ export const SidebarProvider = React.forwardRef<
         <div
           style={
             {
-              "--sidebar-width": "16rem",
+              "--sidebar-width": "18rem",
               "--sidebar-width-icon": "3rem",
               ...style,
             } as React.CSSProperties

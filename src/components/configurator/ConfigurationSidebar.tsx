@@ -39,7 +39,7 @@ export const ConfigurationSidebar = ({
   const progressPercentage = Math.round((completedSteps.filter(Boolean).length / completedSteps.length) * 100);
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
+    <div className="h-full flex flex-col bg-gray-50 w-full">
       <div className="flex justify-between items-center py-4 border-b border-gray-200 px-4">
         <h3 className="font-medium text-gray-800 text-sm">Configuration</h3>
       </div>
