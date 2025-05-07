@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { LogoPlaceholder } from "./LogoPlaceholder";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,11 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   isLoading = false
 }) => {
   const [imageError, setImageError] = useState(false);
+  
+  // Reset error state when logo image changes
+  useEffect(() => {
+    setImageError(false);
+  }, [logoImage]);
   
   // Extract initials for the placeholder
   const initials = companyName
