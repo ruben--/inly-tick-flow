@@ -39,6 +39,7 @@ export const ConfigurationSidebar = ({
   toggleMeterType,
   completedSteps
 }: ConfigurationSidebarProps) => {
+  // Initialize all sections as expanded by default
   const [activeSection, setActiveSection] = useState<string | null>("customers");
   
   const handleSectionClick = (section: string) => {
@@ -60,7 +61,7 @@ export const ConfigurationSidebar = ({
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Configure Your Offering</SidebarGroupLabel>
-            <SidebarGroupContent>
+            <SidebarGroupContent className="overflow-hidden">
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
@@ -69,8 +70,8 @@ export const ConfigurationSidebar = ({
                     tooltip="Customer Types"
                   >
                     <Users className="h-5 w-5" {...iconProps} />
-                    <span>Customer Types</span>
-                    <ChevronRight className={`ml-auto h-4 w-4 transition-transform ${
+                    <span className="truncate">Customer Types</span>
+                    <ChevronRight className={`ml-auto h-4 w-4 shrink-0 transition-transform ${
                       activeSection === "customers" ? "rotate-90" : ""
                     }`} {...iconProps} />
                   </SidebarMenuButton>
@@ -95,8 +96,8 @@ export const ConfigurationSidebar = ({
                     tooltip="Asset Types"
                   >
                     <Zap className="h-5 w-5" {...iconProps} />
-                    <span>Asset Types</span>
-                    <ChevronRight className={`ml-auto h-4 w-4 transition-transform ${
+                    <span className="truncate">Asset Types</span>
+                    <ChevronRight className={`ml-auto h-4 w-4 shrink-0 transition-transform ${
                       activeSection === "assets" ? "rotate-90" : ""
                     }`} {...iconProps} />
                   </SidebarMenuButton>
@@ -121,8 +122,8 @@ export const ConfigurationSidebar = ({
                     tooltip="Optimization Types"
                   >
                     <BarChart3 className="h-5 w-5" {...iconProps} />
-                    <span>Optimization</span>
-                    <ChevronRight className={`ml-auto h-4 w-4 transition-transform ${
+                    <span className="truncate">Optimization</span>
+                    <ChevronRight className={`ml-auto h-4 w-4 shrink-0 transition-transform ${
                       activeSection === "meters" ? "rotate-90" : ""
                     }`} {...iconProps} />
                   </SidebarMenuButton>

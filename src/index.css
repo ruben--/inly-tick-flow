@@ -134,3 +134,25 @@
   background-color: hsl(var(--sidebar-accent));
   transition: all 0.2s ease-in-out;
 }
+
+/* Ensure text truncates properly when sidebar collapses */
+.group-data-\[collapsible\=icon\] .truncate {
+  display: none;
+}
+
+/* Fix sidebar trigger positioning */
+[data-sidebar="header"] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Icon-only mode styling for collapsed sidebar */
+.group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] {
+  justify-content: center;
+}
+
+/* Ensure icons are visible in collapsed mode */
+.group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] > svg:first-child {
+  margin-right: 0;
+}
