@@ -17,6 +17,23 @@ export const RefreshLogoButton: React.FC<RefreshLogoButtonProps> = ({
   
   const handleRefresh = () => {
     setIsRefreshing(true);
+    
+    // Clear any localStorage cache related to logo
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('brand-logo-cache-') || key.startsWith('logo_cache_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    } catch (e) {
+      console.error("Error clearing logo cache:", e);
+    }
+    
+    // Call the refresh function passed as prop
     onRefresh();
     
     toast.success("Logo refresh initiated", {

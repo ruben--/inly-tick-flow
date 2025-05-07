@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { LogoPlaceholder } from "./LogoPlaceholder";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,8 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   className = "h-16 w-16",
   isLoading = false
 }) => {
+  const [imageError, setImageError] = useState(false);
+  
   // Extract initials for the placeholder
   const initials = companyName
     ? companyName
@@ -30,7 +32,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     : 'CO';
 
   // Add timestamp to logo URL to prevent caching
-  const logoSrc = logoImage ? 
+  const logoSrc = logoImage && !imageError ? 
     (logoImage.includes('?') ? 
       `${logoImage}&t=${Date.now()}` : 
       `${logoImage}?t=${Date.now()}`) : 
@@ -52,13 +54,14 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       role="img"
     >
       <AspectRatio ratio={1}>
-        {logoSrc && !isLoading ? (
+        {logoSrc && !isLoading && !imageError ? (
           <img 
             src={logoSrc} 
             alt={companyName || "Company logo"} 
             className="object-contain p-1 w-full h-full"
             onError={(e) => {
-              console.error("Failed to load logo image");
+              console.error("Failed to load logo image", logoSrc);
+              setImageError(true);
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
