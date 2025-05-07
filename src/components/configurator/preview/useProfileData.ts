@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useBrandLogo } from '@/hooks/useBrandLogo';
 
 interface ProfileData {
   company_name: string | null;
@@ -16,6 +17,9 @@ export const useProfileData = (userId: string | undefined) => {
   const companyDomain = profileData?.website 
     ? new URL(!/^https?:\/\//i.test(profileData.website) ? `https://${profileData.website}` : profileData.website).hostname 
     : 'yourcompany.com';
+    
+  // Use the brandLogo hook to ensure consistent logo fetching
+  const { logoImage } = useBrandLogo(profileData?.website || '');
 
   // Fetch user profile data
   useEffect(() => {
@@ -49,5 +53,11 @@ export const useProfileData = (userId: string | undefined) => {
     fetchProfileData();
   }, [userId]);
 
-  return { profileData, companyDomain, loading };
+  return { 
+    profileData, 
+    companyDomain, 
+    loading,
+    // Return the logo from the brand logo hook
+    logoImage: logoImage || profileData?.logo_image
+  };
 };

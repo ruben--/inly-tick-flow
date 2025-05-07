@@ -16,6 +16,7 @@ export const PreviewHeader = ({ companyName, website, logoImage }: PreviewHeader
           companyName={companyName || 'Company'} 
           logoImage={logoImage}
           className="h-full w-full" 
+          isLoading={false}
         />
       </div>
       <h2 className="text-xl font-bold uppercase tracking-wider text-black sidebar-heading-content">Products Preview</h2>
