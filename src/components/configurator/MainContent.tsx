@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerType } from './CustomerTypeCard';
 import { AssetType } from './AssetTypeCard';
@@ -119,7 +118,9 @@ export const MainContent = ({
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-8">
               <h1 className="font-medium text-white mb-2 text-2xl">
-                {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : 'Choose customers'}
+                {isAllCustomersSelected ? 'All customers' : selectedCustomer ? `Welcome ${selectedCustomer.name}` : (
+                  <span className="text-[42px]">Choose customers</span>
+                )}
               </h1>
               <p className="text-white/90 text-lg">This is your product offering towards customers. </p>
             </div>
@@ -189,4 +190,3 @@ export const MainContent = ({
       </div>
     </div>;
 };
-
