@@ -8,9 +8,9 @@ interface BrowserChromeProps {
 
 export const BrowserChrome = ({ companyDomain, children }: BrowserChromeProps) => {
   return (
-    <div className="border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] overflow-hidden bg-white h-full rounded-none">
+    <div className="border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] overflow-hidden bg-white h-full rounded-none flex flex-col">
       {/* TE-style Browser Chrome */}
-      <div className="bg-te-gray-100 p-3 border-b-2 border-black flex items-center">
+      <div className="bg-te-gray-100 p-3 border-b-2 border-black flex items-center flex-shrink-0">
         <div className="flex space-x-2 mr-4">
           <div className="w-3 h-3 rounded-full bg-te-red"></div>
           <div className="w-3 h-3 rounded-full bg-te-yellow"></div>
@@ -22,7 +22,7 @@ export const BrowserChrome = ({ companyDomain, children }: BrowserChromeProps) =
       </div>
       
       {/* Browser Content */}
-      <div className="p-4 overflow-y-auto" style={{ maxHeight: "calc(100vh - 180px)" }}>
+      <div className="p-4 overflow-y-auto flex-1">
         {children}
       </div>
     </div>
