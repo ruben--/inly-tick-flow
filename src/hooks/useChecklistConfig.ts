@@ -4,7 +4,8 @@ import { UseChecklistConfigResult } from './checklist/types';
 import { useConfigLoader } from './checklist/useConfigLoader';
 import { useConfigPersistence } from './checklist/useConfigPersistence';
 
-export { ConfigData, UseChecklistConfigResult } from './checklist/types';
+// Fix the re-export to use explicit 'export type'
+export type { ConfigData, UseChecklistConfigResult } from './checklist/types';
 
 export const useChecklistConfig = (userId: string | undefined): UseChecklistConfigResult => {
   const {
