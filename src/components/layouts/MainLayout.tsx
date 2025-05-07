@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Check, Cog, User } from 'lucide-react';
 import { ProfileRequiredModal } from '@/components/ProfileRequiredModal';
 import { PageTransition } from '@/components/transitions/PageTransition';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export function MainLayout() {
   const {
@@ -34,6 +35,7 @@ export function MainLayout() {
                   <Link to="/profile" className={`font-medium ${isActive('/profile') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
                     Profile
                   </Link>
+                  <ThemeToggle />
                 </> : <>
                   <Link to="/about" className={`font-medium ${isActive('/about') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
                     About
@@ -41,6 +43,7 @@ export function MainLayout() {
                   <Link to="/features" className={`font-medium ${isActive('/features') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
                     Features
                   </Link>
+                  <ThemeToggle />
                 </>}
             </nav>
             
@@ -75,6 +78,9 @@ export function MainLayout() {
               <User size={18} />
               <span className="text-xs">Profile</span>
             </Link>
+            <div className="flex flex-col items-center p-1">
+              <ThemeToggle />
+            </div>
           </div>
         </div>}
 
