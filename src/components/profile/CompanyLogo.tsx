@@ -36,11 +36,9 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
-  // Add timestamp to logo URL to prevent caching
+  // Add a unique timestamp to prevent caching issues
   const logoSrc = logoImage && !imageError ? 
-    (logoImage.includes('?') ? 
-      `${logoImage}&t=${Date.now()}` : 
-      `${logoImage}?t=${Date.now()}`) : 
+    `${logoImage}${logoImage.includes('?') ? '&' : '?'}t=${Date.now()}` : 
     null;
 
   // Extract size classes from className
@@ -50,7 +48,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   return (
     <div 
       className={cn(
-        "overflow-hidden rounded-md flex items-center justify-center",
+        "overflow-hidden rounded-md flex items-center justify-center bg-white",
         widthClass,
         heightClass,
         isLoading && "animate-pulse bg-gray-100"
@@ -64,10 +62,9 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
             src={logoSrc} 
             alt={companyName || "Company logo"} 
             className="object-contain p-1 w-full h-full"
-            onError={(e) => {
-              console.error("Failed to load logo image", logoSrc);
+            onError={() => {
+              console.error("Failed to load logo image:", logoSrc);
               setImageError(true);
-              (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
         ) : (

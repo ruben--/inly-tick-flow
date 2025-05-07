@@ -1,7 +1,7 @@
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useBrandLogo } from "./useBrandLogo";
-import { extractDomain } from "@/utils/brandfetch";
+import { extractDomain, isValidUrl } from "@/utils/brandfetch";
 
 interface UseProfileLogoProps {
   initialWebsite?: string | null;
@@ -14,90 +14,52 @@ export const useProfileLogo = ({
 }: UseProfileLogoProps = {}) => {
   const [currentWebsite, setCurrentWebsite] = useState<string | null>(initialWebsite);
   const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage);
-  const [error, setError] = useState<string | null>(null);
-  const [isManualRefresh, setIsManualRefresh] = useState(false);
-  const websiteDebounceRef = useRef<number | null>(null);
+  const [manualFetch, setManualFetch] = useState(false);
   
-  // We use an empty string for the useBrandLogo hook to prevent automatic fetching
-  // and only trigger fetches manually
+  // Use the brand logo hook for consistent logo fetching
   const { 
     logoImage: fetchedLogoImage, 
     isLoading, 
-    error: brandError,
-    refreshLogo: brandRefreshLogo 
-  } = useBrandLogo('');
+    error,
+    refreshLogo 
+  } = useBrandLogo(currentWebsite || '');
   
-  // Update the logo image when a new one is successfully fetched
+  // Update local state when fetched logo changes
   useEffect(() => {
     if (fetchedLogoImage) {
       setLogoImage(fetchedLogoImage);
-      setError(null);
     }
   }, [fetchedLogoImage]);
-  
-  // Update error state when brand hook reports an error
-  useEffect(() => {
-    if (brandError) {
-      setError(brandError);
-    }
-  }, [brandError]);
 
-  // Normalize website URL when it's set, with debouncing
+  // Handle website URL normalization
   const setNormalizedWebsite = useCallback((website: string | null) => {
-    // Clear existing debounce timer
-    if (websiteDebounceRef.current) {
-      window.clearTimeout(websiteDebounceRef.current);
-    }
-    
     if (!website) {
       setCurrentWebsite(null);
       return;
     }
     
-    // Debounce website updates to avoid rapid state changes
-    websiteDebounceRef.current = window.setTimeout(() => {
-      // Ensure website has http/https prefix
-      const normalizedWebsite = !/^https?:\/\//i.test(website) 
-        ? `https://${website}` 
-        : website;
-        
-      setCurrentWebsite(normalizedWebsite);
-      websiteDebounceRef.current = null;
-    }, 300);
+    // Ensure website has http/https prefix
+    const normalizedWebsite = !/^https?:\/\//i.test(website) 
+      ? `https://${website}` 
+      : website;
+      
+    setCurrentWebsite(normalizedWebsite);
   }, []);
 
-  // Clean up any timers when unmounting
-  useEffect(() => {
-    return () => {
-      if (websiteDebounceRef.current) {
-        window.clearTimeout(websiteDebounceRef.current);
-      }
-    };
-  }, []);
-
-  // Provide a manual refresh function that triggers logo fetch with the current website
-  const refreshLogo = useCallback(() => {
-    if (currentWebsite) {
-      setError(null); // Clear any previous errors
-      setIsManualRefresh(true);
-      brandRefreshLogo(currentWebsite);
-    } else {
-      setError("No website provided");
-    }
-  }, [currentWebsite, brandRefreshLogo]);
-
-  // Automatic logo fetch on initial load or website change, but only if not blank
-  useEffect(() => {
-    if (currentWebsite && !logoImage && !isManualRefresh) {
-      // Only trigger auto-fetch on first load or when logo image is null
-      brandRefreshLogo(currentWebsite);
-    }
+  // Manual refresh function that uses the brand logo hook
+  const handleRefreshLogo = useCallback(() => {
+    if (!currentWebsite) return;
     
-    // Reset the manual refresh flag
-    if (isManualRefresh) {
-      setIsManualRefresh(false);
+    setManualFetch(true);
+    refreshLogo();
+  }, [currentWebsite, refreshLogo]);
+
+  // Auto-fetch logo on initial load if we have a website but no logo
+  useEffect(() => {
+    if (currentWebsite && !logoImage && !manualFetch) {
+      refreshLogo();
     }
-  }, [currentWebsite, logoImage, brandRefreshLogo, isManualRefresh]);
+  }, [currentWebsite, logoImage, refreshLogo, manualFetch]);
 
   return {
     currentWebsite,
@@ -106,6 +68,6 @@ export const useProfileLogo = ({
     setLogoImage,
     isLogoLoading: isLoading,
     error,
-    refreshLogo
+    refreshLogo: handleRefreshLogo
   };
 };

@@ -3,25 +3,25 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { extractDomain } from "@/utils/brandfetch";
 import { supabase } from "@/integrations/supabase/client";
 
-// Add local storage caching for logos
-const LOGO_CACHE_PREFIX = 'brand-logo-cache-';
-const LOGO_CACHE_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 days
+// Define cache constants
+const LOGO_CACHE_PREFIX = 'brand-logo-';
+const LOGO_CACHE_EXPIRATION = 1000 * 60 * 60 * 24; // 1 day
 
 export const useBrandLogo = (website: string) => {
   const [logoImage, setLogoImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
   
-  // Check local storage cache for logo
+  // Get cached logo, if available
   const getFromCache = useCallback((domain: string): string | null => {
     try {
       const cachedData = localStorage.getItem(`${LOGO_CACHE_PREFIX}${domain}`);
       if (!cachedData) return null;
       
       const { logo, timestamp } = JSON.parse(cachedData);
-      const now = new Date().getTime();
+      const now = Date.now();
       
       // Check if cache is expired
       if (now - timestamp > LOGO_CACHE_EXPIRATION) {
@@ -36,152 +36,136 @@ export const useBrandLogo = (website: string) => {
     }
   }, []);
   
-  // Save logo to local storage cache
+  // Save to cache
   const saveToCache = useCallback((domain: string, logoData: string) => {
+    if (!domain || !logoData) return;
+    
     try {
       const cacheData = {
         logo: logoData,
-        timestamp: new Date().getTime()
+        timestamp: Date.now()
       };
       localStorage.setItem(`${LOGO_CACHE_PREFIX}${domain}`, JSON.stringify(cacheData));
     } catch (e) {
       console.error("Error saving to cache:", e);
     }
   }, []);
-  
-  // Clear cache for a specific domain
-  const clearCacheForDomain = useCallback((domain: string) => {
-    try {
-      localStorage.removeItem(`${LOGO_CACHE_PREFIX}${domain}`);
-      console.log(`Cache cleared for domain: ${domain}`);
-    } catch (e) {
-      console.error("Error clearing cache:", e);
+
+  // Fetch the logo
+  const fetchLogo = useCallback(async (domainToFetch: string) => {
+    if (!domainToFetch) {
+      setError("No domain provided");
+      return;
     }
-  }, []);
-  
-  // Memoize the fetch logo function to avoid recreation on each render
-  const fetchLogo = useCallback(async (domainToFetch: string, forceRefresh = false) => {
-    if (!domainToFetch) return;
+    
+    // Prevent multiple fetches within a short timeframe (500ms)
+    const now = Date.now();
+    if (now - lastFetchTime < 500) {
+      console.log("Throttling logo fetch requests");
+      return;
+    }
+    setLastFetchTime(now);
     
     // Cancel any in-flight requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
+      abortControllerRef.current = null;
     }
     
-    // Create a new abort controller for this request
-    abortControllerRef.current = new AbortController();
-    const requestId = Date.now().toString();
+    // Create new controller
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     
-    console.log("Fetching logo for domain:", domainToFetch, "requestId:", requestId, "forceRefresh:", forceRefresh);
+    console.log("Fetching logo for domain:", domainToFetch);
     setIsLoading(true);
     setError(null);
     
     try {
-      // Check the cache only if we're not forcing a refresh
-      if (!forceRefresh) {
-        const cachedLogo = getFromCache(domainToFetch);
-        if (cachedLogo) {
-          console.log("Using cached logo for:", domainToFetch);
-          setLogoImage(cachedLogo);
-          setLastFetchedDomain(domainToFetch);
-          setIsLoading(false);
-          return;
-        }
-      } else {
-        // Clear the cache if we're forcing a refresh
-        clearCacheForDomain(domainToFetch);
+      // Check cache first
+      const cachedLogo = getFromCache(domainToFetch);
+      if (cachedLogo) {
+        console.log("Using cached logo for:", domainToFetch);
+        setLogoImage(cachedLogo);
+        setIsLoading(false);
+        return;
       }
       
-      // If no cached logo or forcing refresh, fetch from edge function
+      // Fetch from edge function
       const response = await supabase.functions.invoke('fetch-brand-logo', {
-        body: { website: domainToFetch },
+        body: { website: domainToFetch }
       });
       
-      // Check if this request has been aborted or superseded
-      if (abortControllerRef.current?.signal.aborted) {
-        console.log("Request aborted for:", domainToFetch);
+      // Check if this request was aborted
+      if (controller.signal.aborted) {
+        console.log("Request was aborted");
         return;
       }
       
       if (response.error) {
         console.error("Logo fetch error:", response.error);
-        
-        // Provide more specific error messages based on error status
-        if (response.error.toString().includes("403")) {
-          setError("API authorization failed. Please try again later.");
-        } else if (response.error.toString().includes("404")) {
-          setError("No logo found for this website");
-        } else {
-          setError("Failed to fetch logo. Please try again later.");
-        }
-        
-        setLogoImage(null);
+        setError("Failed to fetch company logo");
       } else if (response.data?.logoImage) {
-        const logoWithTimestamp = response.data.logoImage + (response.data.logoImage.includes('?') ? '&' : '?') + `t=${Date.now()}`;
-        setLogoImage(logoWithTimestamp);
-        saveToCache(domainToFetch, response.data.logoImage);
-        setLastFetchedDomain(domainToFetch);
+        // Add timestamp to prevent browser caching
+        const responseImage = response.data.logoImage;
+        setLogoImage(responseImage);
+        saveToCache(domainToFetch, responseImage);
       } else {
-        setLogoImage(null);
-        setError(response.data?.error || "No logo found for this website");
+        setError("No logo found for this website");
       }
     } catch (err: any) {
-      // Ignore aborted request errors
-      if (err.name === 'AbortError') {
-        console.log("Request was aborted:", domainToFetch);
-        return;
-      }
+      if (controller.signal.aborted) return;
       
-      console.error("Error in logo fetch process:", err);
-      setError("Failed to fetch company logo. Please try again later.");
-      setLogoImage(null);
+      console.error("Error fetching logo:", err);
+      setError(err.message || "Failed to fetch logo");
     } finally {
-      // Only update loading state if this is the latest request
-      if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
+      if (!controller.signal.aborted) {
         setIsLoading(false);
       }
     }
-  }, [getFromCache, saveToCache, clearCacheForDomain]);
+  }, [getFromCache, saveToCache, lastFetchTime]);
 
-  // Handle automatic fetching based on website prop
+  // Fetch logo automatically when website changes
   useEffect(() => {
-    // Skip if no website
     if (!website) {
+      setLogoImage(null);
+      setError(null);
       return;
     }
 
     const domain = extractDomain(website);
-    
-    // Skip if domain is invalid or unchanged
-    if (!domain || domain === lastFetchedDomain) {
+    if (!domain) {
+      setError("Invalid website URL");
       return;
     }
     
     fetchLogo(domain);
     
-    // Clean up function to abort any in-flight requests when the component unmounts
+    // Clean up on unmount
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
-  }, [website, lastFetchedDomain, fetchLogo]);
+  }, [website, fetchLogo]);
 
-  // Add a manual refresh function that can accept a specific website URL and force refresh
-  const refreshLogo = useCallback((specificWebsite?: string) => {
-    if (specificWebsite) {
-      const domain = extractDomain(specificWebsite);
-      if (domain) {
-        // Force refresh by passing true as second parameter
-        fetchLogo(domain, true);
+  // Manual refresh function
+  const refreshLogo = useCallback(() => {
+    if (!website) {
+      setError("No website provided");
+      return;
+    }
+    
+    const domain = extractDomain(website);
+    if (domain) {
+      // Clear the cache for this domain
+      try {
+        localStorage.removeItem(`${LOGO_CACHE_PREFIX}${domain}`);
+      } catch (e) {
+        console.error("Error clearing cache:", e);
       }
-    } else if (website) {
-      // Refresh with current website
-      const domain = extractDomain(website);
-      if (domain) {
-        // Force refresh by passing true as second parameter
-        fetchLogo(domain, true);
-      }
+      
+      // Fetch fresh logo
+      fetchLogo(domain);
     }
   }, [website, fetchLogo]);
 

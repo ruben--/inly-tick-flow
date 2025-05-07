@@ -7,7 +7,6 @@ interface LogoSectionProps {
   companyNameValue: string;
   logoImage?: string | null;
   isLogoLoading?: boolean;
-  onRefreshLogo?: () => void; // Keeping prop for compatibility but not using it
 }
 
 export const LogoSection: React.FC<LogoSectionProps> = ({
@@ -25,6 +24,7 @@ export const LogoSection: React.FC<LogoSectionProps> = ({
         className="h-20 w-20"
         isLoading={isLogoLoading}
       />
+      <span className="text-sm text-muted-foreground">{companyNameValue}</span>
     </div>
   );
 };

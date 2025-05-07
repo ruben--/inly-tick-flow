@@ -28,7 +28,8 @@ export const useProfileData = ({ userId }: UseProfileDataProps) => {
     mode: "onChange"
   });
 
-  // Use the custom hook for logo handling
+  // Use the custom hook for logo handling with empty initial values
+  // We'll populate these from the database fetch
   const {
     currentWebsite,
     setCurrentWebsite,
@@ -56,13 +57,18 @@ export const useProfileData = ({ userId }: UseProfileDataProps) => {
           throw error;
         }
         
-        // Set form default values if profile exists but is incomplete
         if (data) {
-          setCurrentWebsite(data.website || null);
+          // Set logo data first to prevent unnecessary API calls
           setLogoImage(data.logo_image || null);
-          // Store initial website value for comparison later
-          setInitialWebsite(data.website || null);
           
+          // Then update the website after a short delay
+          // to ensure the logo is set first
+          setTimeout(() => {
+            setCurrentWebsite(data.website || null);
+            setInitialWebsite(data.website || null);
+          }, 100);
+          
+          // Update form values
           form.reset({
             companyName: data.company_name || "",
             website: data.website || "",
