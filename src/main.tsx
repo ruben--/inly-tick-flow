@@ -4,8 +4,16 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Add code splitting for performance
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+
+// Use React.StrictMode in development only
+if (process.env.NODE_ENV === 'development') {
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+} else {
+  root.render(<App />);
+}

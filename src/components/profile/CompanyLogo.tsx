@@ -20,10 +20,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   isLoading = false
 }) => {
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   
   // Reset error state when logo changes
   useEffect(() => {
     setImageError(false);
+    setImageLoaded(false);
   }, [logoImage]);
   
   // Extract initials for placeholder
@@ -56,12 +58,28 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     >
       <AspectRatio ratio={1}>
         {logoSrc && !isLoading && !imageError ? (
-          <img 
-            src={logoSrc} 
-            alt={companyName || "Company logo"} 
-            className="object-contain p-1 w-full h-full"
-            onError={() => setImageError(true)}
-          />
+          <>
+            {/* Show placeholder until image is loaded */}
+            {!imageLoaded && (
+              <LogoPlaceholder 
+                initials={initials}
+                isLoading={true} 
+              />
+            )}
+            <img 
+              src={logoSrc} 
+              alt={companyName || "Company logo"} 
+              className={cn(
+                "object-contain p-1 w-full h-full",
+                !imageLoaded && "opacity-0",
+                imageLoaded && "opacity-100 transition-opacity duration-300"
+              )}
+              loading="lazy"
+              decoding="async"
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+            />
+          </>
         ) : (
           <LogoPlaceholder 
             initials={initials} 

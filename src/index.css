@@ -3,7 +3,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+/* Load font with better performance */
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap; /* Use swap for better perceived performance */
+  src: url('https://fonts.gstatic.com/s/spacemono/v13/i7dPIFZifjKcF5UAWdDRYEJ.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/spacemono/v13/i7dMIFZifjKcF5UAWdDRaPpZUFWaHg.woff2') format('woff2');
+}
 
 @layer base {
   /* Teenage Engineering theme (now the main theme) */
@@ -85,68 +100,83 @@
   }
 }
 
-/* TE-inspired styles */
-.te-container {
-  @apply border border-te-gray-200 bg-white rounded-none;
+/* Group common styles together to avoid redundancy */
+@layer components {
+  /* TE-inspired styles */
+  .te-container {
+    @apply border border-te-gray-200 bg-white rounded-none;
+  }
+
+  .te-header {
+    @apply bg-te-gray-100 border-b border-te-gray-200 text-te-gray-900 font-mono uppercase text-xs tracking-wider font-bold py-3 px-4;
+  }
+
+  .te-section {
+    @apply border border-te-gray-200 mb-6;
+  }
+
+  /* TE-style buttons */
+  .te-button,
+  .btn-te {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-bold uppercase tracking-wider
+    bg-te-orange text-black border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)]
+    hover:translate-y-[-1px] hover:translate-x-[-1px] hover:shadow-[4px_4px_0px_rgba(0,0,0,1)]
+    active:translate-y-[1px] active:translate-x-[1px] active:shadow-[1px_1px_0px_rgba(0,0,0,1)]
+    transition-all duration-100;
+  }
+
+  .te-button-secondary {
+    @apply bg-te-gray-200 hover:bg-te-gray-300 text-black text-xs uppercase tracking-wider font-bold py-2 px-4 rounded-none border border-black;
+  }
+
+  .te-input {
+    @apply bg-te-gray-100 border border-te-gray-300 rounded-none py-2 px-3 font-mono text-sm;
+  }
+
+  /* TE-style browser chrome */
+  .te-browser {
+    @apply border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)];
+    border-radius: 0;
+  }
+
+  .te-browser-chrome {
+    @apply bg-te-gray-100 p-2 border-b-2 border-black;
+  }
+
+  .te-browser-button {
+    @apply w-3 h-3 rounded-full;
+  }
+
+  .te-browser-address {
+    @apply bg-white px-4 py-1 text-xs text-te-gray-600 text-center font-mono border border-black;
+  }
+
+  /* TE-style progress components */
+  .te-progress {
+    @apply h-2 bg-te-gray-200;
+  }
+
+  .te-progress-bar {
+    @apply bg-te-orange h-full;
+  }
+
+  /* Button variants */
+  .btn-te-secondary {
+    @apply bg-white;
+  }
+
+  .btn-te-red {
+    @apply bg-te-red text-white;
+  }
+
+  /* Cards */
+  .card {
+    @apply border border-te-gray-200 transition-all duration-200 rounded-none;
+    @apply hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_rgba(0,0,0,1)];
+  }
 }
 
-.te-header {
-  @apply bg-te-gray-100 border-b border-te-gray-200 text-te-gray-900 font-mono uppercase text-xs tracking-wider font-bold py-3 px-4;
-}
-
-.te-section {
-  @apply border border-te-gray-200 mb-6;
-}
-
-.te-button,
-.btn-te {
-  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-bold uppercase tracking-wider;
-  @apply bg-te-orange text-black border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)];
-  @apply hover:translate-y-[-1px] hover:translate-x-[-1px] hover:shadow-[4px_4px_0px_rgba(0,0,0,1)];
-  @apply active:translate-y-[1px] active:translate-x-[1px] active:shadow-[1px_1px_0px_rgba(0,0,0,1)];
-  @apply transition-all duration-100;
-}
-
-.te-button-secondary {
-  @apply bg-te-gray-200 hover:bg-te-gray-300 text-black text-xs uppercase tracking-wider font-bold py-2 px-4 rounded-none border border-black;
-}
-
-.te-input {
-  @apply bg-te-gray-100 border border-te-gray-300 rounded-none py-2 px-3 font-mono text-sm;
-}
-
-.te-browser {
-  @apply border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)];
-  border-radius: 0;
-}
-
-.te-browser-chrome {
-  @apply bg-te-gray-100 p-2 border-b-2 border-black;
-}
-
-.te-browser-button {
-  @apply w-3 h-3 rounded-full;
-}
-
-.te-browser-address {
-  @apply bg-white px-4 py-1 text-xs text-te-gray-600 text-center font-mono border border-black;
-}
-
-.te-progress {
-  @apply h-2 bg-te-gray-200;
-}
-
-.te-progress-bar {
-  @apply bg-te-orange h-full;
-}
-
-/* Simple page content styling with no transitions */
-.page-content {
-  width: 100%;
-  min-height: 50vh;
-}
-
-/* TE-style config sidebar animations */
+/* Animation utilities */
 .config-sidebar-expand {
   animation: expandSection 0.2s ease-out forwards;
 }
@@ -165,25 +195,22 @@
   100% { max-height: 0; opacity: 0; }
 }
 
-/* Add a subtle border to the sidebar for more TE-like styling */
+/* Sidebar Styling */
 [data-sidebar="sidebar"] {
   border-right: 1px solid hsl(var(--sidebar-border));
   background-color: #F9F9F9;
 }
 
-/* Enhance sidebar menu item hover effects */
 [data-sidebar="menu-button"]:hover {
   background-color: #FF9300;
   color: #000000;
   transition: all 0.15s ease-in-out;
 }
 
-/* Ensure text truncates properly when sidebar collapses */
 .group-data-\[collapsible\=icon\] .truncate {
   display: none;
 }
 
-/* Fix sidebar trigger positioning */
 [data-sidebar="header"] {
   display: flex;
   justify-content: space-between;
@@ -192,72 +219,16 @@
   border-bottom: 1px solid #E1E1E1;
 }
 
-/* Icon-only mode styling for collapsed sidebar */
 .group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] {
   justify-content: center;
 }
 
-/* Ensure icons are visible in collapsed mode */
 .group-data-\[collapsible\=icon\] [data-sidebar="menu-button"] > svg:first-child {
   margin-right: 0;
 }
 
-/* TE-style browser chrome */
-.te-browser {
-  @apply border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)];
-  border-radius: 0;
-}
-
-.te-browser-chrome {
-  @apply bg-te-gray-100 p-2 border-b-2 border-black;
-}
-
-.te-browser-button {
-  @apply w-3 h-3 rounded-full;
-}
-
-.te-browser-address {
-  @apply bg-white px-4 py-1 text-xs text-te-gray-600 text-center font-mono border border-black;
-}
-
-.te-progress {
-  @apply h-2 bg-te-gray-200;
-}
-
-.te-progress-bar {
-  @apply bg-te-orange h-full;
-}
-
-/* TE-style buttons */
-.btn-te {
-  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-bold uppercase tracking-wider;
-  @apply bg-te-orange text-black border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)];
-  @apply hover:translate-y-[-1px] hover:translate-x-[-1px] hover:shadow-[4px_4px_0px_rgba(0,0,0,1)];
-  @apply active:translate-y-[1px] active:translate-x-[1px] active:shadow-[1px_1px_0px_rgba(0,0,0,1)];
-  @apply transition-all duration-100;
-}
-
-.btn-te-secondary {
-  @apply bg-white;
-}
-
-.btn-te-red {
-  @apply bg-te-red text-white;
-}
-
-/* Apply font family */
-body {
-  font-family: 'Space Mono', monospace, sans-serif;
-}
-
-/* Apply card styles */
-.card {
-  border: 1px solid #E1E1E1 !important;
-  transition: all 0.2s ease-in-out;
-  border-radius: 0 !important;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+/* Simple page content styling with no transitions */
+.page-content {
+  width: 100%;
+  min-height: 50vh;
 }
