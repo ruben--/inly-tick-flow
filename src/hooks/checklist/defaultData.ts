@@ -27,7 +27,7 @@ export const defaultAssetTypes: AssetType[] = [
     id: 'bess',
     name: 'BESS',
     description: 'Such as data centres, solar parks, wind farms.',
-    image: '/lovable-uploads/388cb3ae-5232-42dd-a7f2-c79ef33ba59d.png',
+    image: '/lovable-uploads/6fa399e2-0010-4f79-a4f1-c7017f756e8e.png',
     selected: true,
   },
   {
