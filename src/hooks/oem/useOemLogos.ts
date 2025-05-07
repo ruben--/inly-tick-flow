@@ -1,15 +1,17 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { OemType } from './types';
 import { defaultOemData } from './defaultOemData';
+import { loadOemLogoData, saveOemLogoData } from './api/oemLogosApi';
+import { useOemLogoPrefetch } from './useOemLogoPrefetch';
 
 export function useOemLogos(userId: string | undefined) {
   const [oemLogos, setOemLogos] = useState<OemType[]>(defaultOemData);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const { prefetchAllLogos } = useOemLogoPrefetch();
 
   // Load OEM data from database
   useEffect(() => {
@@ -22,14 +24,7 @@ export function useOemLogos(userId: string | undefined) {
       try {
         setLoading(true);
         
-        const { data, error } = await supabase
-          .from('user_configs')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('config_type', 'oem_logos')
-          .maybeSingle();
-
-        if (error) throw error;
+        const data = await loadOemLogoData(userId);
 
         if (data) {
           // Merge saved data with defaults to ensure we have all the latest OEMs
@@ -51,7 +46,7 @@ export function useOemLogos(userId: string | undefined) {
           }
         } else {
           // If no data exists yet, prefetch the logos
-          prefetchAllLogos();
+          updateOemLogo();
         }
       } catch (error: any) {
         console.error('Error loading OEM data:', error.message);
@@ -63,6 +58,26 @@ export function useOemLogos(userId: string | undefined) {
     loadOemData();
   }, [userId]);
 
+  // Update a single OEM logo
+  const updateOemLogo = useCallback((updatedOem?: OemType, index?: number) => {
+    if (updatedOem && typeof index === 'number') {
+      setOemLogos(prevState => {
+        const newState = [...prevState];
+        newState[index] = updatedOem;
+        return newState;
+      });
+    } else {
+      // Start prefetching all logos if no specific OEM is provided
+      prefetchAllLogos(oemLogos, (updatedOem, index) => {
+        setOemLogos(prevState => {
+          const newState = [...prevState];
+          newState[index] = updatedOem;
+          return newState;
+        });
+      });
+    }
+  }, [oemLogos, prefetchAllLogos]);
+
   // Save OEM data to database
   const saveOemData = async () => {
     if (!userId) return;
@@ -70,40 +85,7 @@ export function useOemLogos(userId: string | undefined) {
     try {
       setSaving(true);
       
-      const { data, error } = await supabase
-        .from('user_configs')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('config_type', 'oem_logos')
-        .maybeSingle();
-      
-      let saveError;
-      
-      if (data) {
-        // Update existing config
-        const { error: updateError } = await supabase
-          .from('user_configs')
-          .update({ 
-            config_data: { oemLogos },
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', data.id);
-          
-        saveError = updateError;
-      } else {
-        // Insert new config
-        const { error: insertError } = await supabase
-          .from('user_configs')
-          .insert({
-            user_id: userId,
-            config_type: 'oem_logos',
-            config_data: { oemLogos }
-          });
-          
-        saveError = insertError;
-      }
-      
-      if (saveError) throw saveError;
+      await saveOemLogoData(userId, oemLogos);
       
       const now = new Date();
       setLastSaved(now);
@@ -127,59 +109,6 @@ export function useOemLogos(userId: string | undefined) {
     );
   }, []);
 
-  // Prefetch logos for a single OEM
-  const prefetchLogo = useCallback(async (oem: OemType): Promise<OemType> => {
-    try {
-      // Skip if logo already exists
-      if (oem.logo) return oem;
-      
-      const response = await supabase.functions.invoke('fetch-brand-logo', {
-        body: { website: oem.domain }
-      });
-      
-      if (response.error) throw response.error;
-      
-      if (response.data?.logoImage) {
-        return { ...oem, logo: response.data.logoImage };
-      }
-      
-      return oem;
-    } catch (error) {
-      console.error(`Error fetching logo for ${oem.name}:`, error);
-      return oem;
-    }
-  }, []);
-
-  // Prefetch all logos
-  const prefetchAllLogos = useCallback(async () => {
-    // Process in batches to avoid overwhelming the API
-    const processBatch = async (startIndex: number, batchSize: number) => {
-      if (startIndex >= oemLogos.length) {
-        return;
-      }
-      
-      const batch = oemLogos.slice(startIndex, startIndex + batchSize);
-      const updatedBatch = await Promise.all(batch.map(prefetchLogo));
-      
-      // Update state with the fetched logos
-      setOemLogos(prevLogos => {
-        const newLogos = [...prevLogos];
-        for (let i = 0; i < updatedBatch.length; i++) {
-          newLogos[startIndex + i] = updatedBatch[i];
-        }
-        return newLogos;
-      });
-      
-      // Process next batch
-      setTimeout(() => {
-        processBatch(startIndex + batchSize, batchSize);
-      }, 1000); // 1 second delay between batches
-    };
-    
-    // Start with first batch
-    processBatch(0, 5);
-  }, [oemLogos, prefetchLogo]);
-
   // Save OEM data when it changes (with debounce)
   useEffect(() => {
     if (!userId || loading) return;
@@ -197,6 +126,6 @@ export function useOemLogos(userId: string | undefined) {
     saving,
     lastSaved,
     toggleOem,
-    prefetchAllLogos
+    prefetchAllLogos: updateOemLogo
   };
 }
