@@ -27,7 +27,7 @@ export const MainContent = ({
   const { profileData, companyDomain } = useProfileData(user?.id);
 
   return (
-    <div className="w-full h-full pt-0">
+    <div className="w-full h-full flex flex-col pt-0 -mt-4">
       <BrowserChrome companyDomain={companyDomain}>
         <PreviewHeader 
           companyName={profileData?.company_name}
