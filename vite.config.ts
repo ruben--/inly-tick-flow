@@ -25,10 +25,17 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        // Optimize asset chunking
+        // Optimize asset chunking with specific component imports instead of directory imports
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@/components/ui'],  // Fix incorrect path reference here
+          // Don't use directory imports - specify individual component files
+          ui: [
+            '@/components/ui/button',
+            '@/components/ui/card',
+            '@/components/ui/avatar',
+            '@/components/ui/label'
+            // Add other specific component imports as needed
+          ],
         },
       },
     },
