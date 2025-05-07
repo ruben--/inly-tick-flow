@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useBrandLogo } from "./useBrandLogo";
 import { extractDomain } from "@/utils/brandfetch";
 
@@ -12,39 +12,65 @@ export const useProfileLogo = ({
   initialWebsite = null,
   initialLogoImage = null
 }: UseProfileLogoProps = {}) => {
-  const [currentWebsite, setCurrentWebsite] = useState<string | null>(initialWebsite || null);
-  const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
-  const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(
-    initialWebsite ? extractDomain(initialWebsite) : null
-  );
+  const [currentWebsite, setCurrentWebsite] = useState<string | null>(initialWebsite);
+  const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage);
+  const [error, setError] = useState<string | null>(null);
   
-  // Use the useBrandLogo hook but don't automatically trigger updates based on website changes
-  // Only pass website when manually triggering a refresh
-  const { logoImage: fetchedLogoImage, isLoading, refreshLogo: brandRefreshLogo } = useBrandLogo(
-    '' // Empty string means no automatic fetching
-  );
+  // We use an empty string for the useBrandLogo hook to prevent automatic fetching
+  // and only trigger fetches manually
+  const { 
+    logoImage: fetchedLogoImage, 
+    isLoading, 
+    error: brandError,
+    refreshLogo: brandRefreshLogo 
+  } = useBrandLogo('');
   
-  // Update the logo image when a new one is fetched
+  // Update the logo image when a new one is successfully fetched
   useEffect(() => {
     if (fetchedLogoImage) {
       setLogoImage(fetchedLogoImage);
+      setError(null);
     }
   }, [fetchedLogoImage]);
+  
+  // Update error state when brand hook reports an error
+  useEffect(() => {
+    if (brandError) {
+      setError(brandError);
+    }
+  }, [brandError]);
+
+  // Normalize website URL when it's set
+  const setNormalizedWebsite = useCallback((website: string | null) => {
+    if (!website) {
+      setCurrentWebsite(null);
+      return;
+    }
+    
+    // Ensure website has http/https prefix
+    const normalizedWebsite = !/^https?:\/\//i.test(website) 
+      ? `https://${website}` 
+      : website;
+      
+    setCurrentWebsite(normalizedWebsite);
+  }, []);
 
   // Provide a manual refresh function that triggers logo fetch with the current website
-  const refreshLogo = () => {
+  const refreshLogo = useCallback(() => {
     if (currentWebsite) {
-      // This will manually trigger a fetch with the current website
       brandRefreshLogo(currentWebsite);
+    } else {
+      setError("No website provided");
     }
-  };
+  }, [currentWebsite, brandRefreshLogo]);
 
   return {
     currentWebsite,
-    setCurrentWebsite,
+    setCurrentWebsite: setNormalizedWebsite,
     logoImage,
     setLogoImage,
     isLogoLoading: isLoading,
+    error,
     refreshLogo
   };
 };

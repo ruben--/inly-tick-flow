@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,7 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
 import { CompanyLogo } from "./CompanyLogo";
 import { useProfileLogo } from "@/hooks/useProfileLogo";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Create validation schema
 const profileSchema = z.object({
@@ -39,6 +41,7 @@ interface ProfileRequiredFormProps {
 export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId, onSuccess }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
   
   const {
     currentWebsite,
@@ -46,6 +49,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     logoImage,
     setLogoImage,
     isLogoLoading,
+    error: logoError,
     refreshLogo
   } = useProfileLogo();
   
@@ -67,6 +71,7 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
       if (!userId) return;
       
       try {
+        setProfileLoading(true);
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -97,19 +102,24 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
           description: "Could not load your profile data",
           variant: "destructive"
         });
+      } finally {
+        setProfileLoading(false);
       }
     };
     
     fetchProfile();
   }, [userId, form, toast, setCurrentWebsite, setLogoImage]);
 
-  // Watch for website changes
+  // Watch for website changes - but don't set currentWebsite immediately 
+  // to avoid unnecessary logo fetches
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
   
-  // Update current website when form website value changes
+  // Update the website in the logo hook but only on form submission
+  // This avoids constant logo fetching while the user is typing
   useEffect(() => {
-    if (websiteValue && websiteValue !== currentWebsite) {
+    if (websiteValue && !currentWebsite) {
+      // If we have a website value but no currentWebsite, set it once
       setCurrentWebsite(websiteValue);
     }
   }, [websiteValue, currentWebsite, setCurrentWebsite]);
@@ -125,6 +135,9 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
       : data.website;
     
     try {
+      // Update the current website
+      setCurrentWebsite(normalizedWebsite);
+      
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -139,9 +152,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
         });
         
       if (error) throw error;
-      
-      // Update the current website
-      setCurrentWebsite(normalizedWebsite);
       
       toast({
         title: "Success!",
@@ -161,6 +171,18 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
       setIsLoading(false);
     }
   };
+  
+  const isSubmitDisabled = isLoading || isLogoLoading;
+
+  if (profileLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 space-y-4">
+        <div className="animate-pulse h-20 w-20 bg-gray-200 rounded-full"></div>
+        <div className="animate-pulse h-4 w-48 bg-gray-200 rounded"></div>
+        <div className="animate-pulse h-4 w-36 bg-gray-200 rounded"></div>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -173,6 +195,13 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
             className="h-16 w-16"
           />
           
+          {logoError && (
+            <Alert variant="destructive" className="mt-3 py-2">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <AlertDescription className="text-sm">{logoError}</AlertDescription>
+            </Alert>
+          )}
+          
           {websiteValue && (
             <Button 
               type="button"
@@ -183,18 +212,18 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
                 e.preventDefault();
                 refreshLogo();
               }}
-              disabled={isLoading || isLogoLoading}
+              disabled={isSubmitDisabled}
             >
-              <RefreshCcw className="h-3 w-3 mr-1" />
-              Refresh logo
+              <RefreshCcw className={`h-3 w-3 mr-1 ${isLogoLoading ? 'animate-spin' : ''}`} />
+              {isLogoLoading ? 'Loading...' : 'Refresh logo'}
             </Button>
           )}
         </div>
 
         <ProfileFormFields form={form} />
         
-        <Button type="submit" disabled={isLoading || isLogoLoading} className="w-full">
-          {isLoading || isLogoLoading ? "Saving..." : "Save Profile"}
+        <Button type="submit" disabled={isSubmitDisabled} className="w-full">
+          {isLoading ? "Saving..." : "Save Profile"}
         </Button>
       </form>
     </Form>

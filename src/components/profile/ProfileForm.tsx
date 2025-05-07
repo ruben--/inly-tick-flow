@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,11 +11,14 @@ import { ProfileFormFields } from "./ProfileFormFields";
 import { UserProfileFormValues } from "./ProfileRequiredForm";
 import { useProfileLogo } from "@/hooks/useProfileLogo";
 import { ProfileFormSubmit } from "./ProfileFormSubmit";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export const ProfileForm: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
   
   // Define profile schema
   const profileSchema = z.object({
@@ -48,22 +51,23 @@ export const ProfileForm: React.FC = () => {
   });
 
   // Use the custom hook for logo handling with empty initial values
-  // These will be populated once we fetch the profile data
   const {
     currentWebsite,
     setCurrentWebsite,
     logoImage,
     setLogoImage,
     isLogoLoading,
+    error: logoError,
     refreshLogo
   } = useProfileLogo();
   
   // Watch for website changes in the form
   const websiteValue = form.watch("website");
+  const companyNameValue = form.watch("companyName");
   
-  // Update current website when form website value changes
+  // Set website value once on initial load, but not during typing
   useEffect(() => {
-    if (websiteValue && websiteValue !== currentWebsite) {
+    if (websiteValue && !currentWebsite) {
       setCurrentWebsite(websiteValue);
     }
   }, [websiteValue, currentWebsite, setCurrentWebsite]);
@@ -73,7 +77,7 @@ export const ProfileForm: React.FC = () => {
     const fetchProfile = async () => {
       if (!user?.id) return;
       
-      setIsLoading(true);
+      setProfileLoading(true);
       
       try {
         console.log("Fetching profile data in form");
@@ -110,7 +114,7 @@ export const ProfileForm: React.FC = () => {
           variant: "destructive"
         });
       } finally {
-        setIsLoading(false);
+        setProfileLoading(false);
       }
     };
     
@@ -128,6 +132,9 @@ export const ProfileForm: React.FC = () => {
       : data.website;
     
     try {
+      // Set the current website before saving
+      setCurrentWebsite(normalizedWebsite);
+      
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -142,9 +149,6 @@ export const ProfileForm: React.FC = () => {
         });
         
       if (error) throw error;
-      
-      // Update the current website
-      setCurrentWebsite(normalizedWebsite);
       
       toast({
         title: "Success!",
@@ -162,16 +166,32 @@ export const ProfileForm: React.FC = () => {
     }
   };
 
-  const companyNameValue = form.watch("companyName");
+  if (profileLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 space-y-4">
+        <div className="animate-pulse h-20 w-20 bg-gray-200 rounded-full"></div>
+        <div className="animate-pulse h-4 w-48 bg-gray-200 rounded"></div>
+        <div className="animate-pulse h-4 w-36 bg-gray-200 rounded"></div>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {logoError && (
+          <Alert variant="destructive" className="py-2">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            <AlertDescription className="text-sm">{logoError}</AlertDescription>
+          </Alert>
+        )}
+        
         <ProfileFormSubmit 
           isLoading={isLoading || isLogoLoading}
           websiteValue={websiteValue}
           companyNameValue={companyNameValue}
           logoImage={logoImage}
+          isLogoLoading={isLogoLoading}
           onRefreshLogo={refreshLogo}
         >
           <ProfileFormFields form={form} />

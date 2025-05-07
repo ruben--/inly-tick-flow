@@ -10,6 +10,7 @@ interface ProfileFormSubmitProps {
   websiteValue: string;
   companyNameValue: string;
   logoImage?: string | null;
+  isLogoLoading?: boolean;
   onRefreshLogo?: () => void;
   children: React.ReactNode;
 }
@@ -19,6 +20,7 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
   websiteValue,
   companyNameValue,
   logoImage,
+  isLogoLoading = false,
   onRefreshLogo,
   children
 }) => {
@@ -48,11 +50,11 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
                     }}
                     disabled={isLoading}
                   >
-                    <RefreshCcw className="h-4 w-4" />
+                    <RefreshCcw className={`h-4 w-4 ${isLogoLoading ? 'animate-spin' : ''}`} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Refresh logo</p>
+                  <p>{isLogoLoading ? 'Loading...' : 'Refresh logo'}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
