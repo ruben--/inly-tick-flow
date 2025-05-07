@@ -52,7 +52,7 @@ export const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
                     disabled={isLoading || isLogoLoading}
                     aria-label="Refresh logo"
                   >
-                    <RefreshCcw className={`h-4 w-4 ${isLogoLoading ? 'animate-spin' : ''}`} />
+                    <RefreshCcw className="h-4 w-4" />
                     <span className="sr-only">Refresh logo</span>
                   </Button>
                 </TooltipTrigger>
