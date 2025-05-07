@@ -138,7 +138,7 @@ export const MainContent = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {ftmMeter?.selected && <Card className="overflow-hidden border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="h-40 bg-gray-50 relative">
-                      <img src="/lovable-uploads/2c050251-ea30-49f9-b719-a85e8c8c54e4.png" alt="Front of the Meter" className="w-full h-full object-cover opacity-100" />
+                      <img alt="Front of the Meter" className="w-full h-full object-cover opacity-100" src="/lovable-uploads/616fa917-ece9-48e6-8cc4-0a26ec334eb9.png" />
                       <div className="absolute top-2 right-2 bg-gray-600 text-white px-2 py-1 rounded-md text-xs">Active</div>
                     </div>
                     <CardContent className="p-4 bg-gradient-to-b from-white to-gray-50">
