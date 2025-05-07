@@ -11,6 +11,7 @@ interface CompanyLogoProps {
   onLogoFound?: (logoUrl: string | null, imageData?: string | null) => void;
   logoUrl?: string | null;
   logoImage?: string | null;
+  fetchAttempted?: boolean;
 }
 
 export const CompanyLogo: React.FC<CompanyLogoProps> = ({ 
@@ -19,14 +20,15 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   className = "h-16 w-16",
   onLogoFound,
   logoUrl: initialLogoUrl,
-  logoImage: initialLogoImage
+  logoImage: initialLogoImage,
+  fetchAttempted: initialFetchAttempted = false
 }) => {
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
   const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
-  const [fetchAttempted, setFetchAttempted] = useState(false);
+  const [fetchAttempted, setFetchAttempted] = useState(initialFetchAttempted);
 
   const initials = companyName
     ? companyName

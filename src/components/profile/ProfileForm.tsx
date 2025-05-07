@@ -12,13 +12,18 @@ import { ProfileFormFields } from "./ProfileFormFields";
 import { UserProfileFormValues } from "./ProfileRequiredForm";
 import { CompanyLogo } from "./CompanyLogo";
 
-export const ProfileForm: React.FC = () => {
+interface ProfileFormProps {
+  initialLogoImage?: string | null;
+}
+
+export const ProfileForm: React.FC<ProfileFormProps> = ({ initialLogoImage }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [logoImage, setLogoImage] = useState<string | null>(null);
+  const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
   const [currentWebsite, setCurrentWebsite] = useState<string | null>(null);
+  const [fetchAttempted, setFetchAttempted] = useState(initialLogoImage ? true : false);
   
   // Use the same profile schema as in ProfileRequiredForm
   const profileSchema = z.object({
@@ -70,7 +75,10 @@ export const ProfileForm: React.FC = () => {
         
         if (data) {
           // Always prioritize stored image
-          setLogoImage(data.logo_image || null);
+          if (data.logo_image) {
+            setLogoImage(data.logo_image);
+            setFetchAttempted(true);
+          }
           setLogoUrl(data.logo_url || null);
           setCurrentWebsite(data.website || null);
           
@@ -171,6 +179,7 @@ export const ProfileForm: React.FC = () => {
             onLogoFound={handleLogoFound}
             logoUrl={!websiteChanged ? logoUrl : null}
             logoImage={!websiteChanged ? logoImage : null}
+            fetchAttempted={fetchAttempted}
           />
           
           <div className="flex-1 w-full">
@@ -184,4 +193,4 @@ export const ProfileForm: React.FC = () => {
       </form>
     </Form>
   );
-};
+}
