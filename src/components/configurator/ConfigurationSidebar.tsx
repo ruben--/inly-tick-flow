@@ -39,23 +39,23 @@ export const ConfigurationSidebar = ({
   const progressPercentage = Math.round((completedSteps.filter(Boolean).length / completedSteps.length) * 100);
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 w-full">
-      <div className="flex justify-between items-center py-4 border-b border-gray-200 px-4">
-        <h3 className="font-medium text-gray-800 text-sm">Configuration</h3>
+    <div className="h-full flex flex-col w-full">
+      <div className="flex justify-between items-center py-4 border-b border-gray-200 px-4 bg-white">
+        <h3 className="font-medium text-gray-800 text-lg">Configuration</h3>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-2">
-        <div className="mb-4">
-          <div className="text-gray-700 text-sm font-medium mb-2">Configure Your Offering</div>
-          <div className="space-y-1">
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="mb-6">
+          <div className="text-gray-700 text-sm font-medium mb-3">Configure Your Offering</div>
+          <div className="space-y-2">
             <button 
               onClick={() => handleSectionClick("customers")}
-              className={`w-full flex items-center justify-between p-2 rounded-md text-left ${
-                activeSection === "customers" ? "bg-gray-100" : "hover:bg-gray-100"
+              className={`w-full flex items-center justify-between p-3 rounded-md text-left ${
+                activeSection === "customers" ? "bg-gray-200" : "hover:bg-gray-100"
               }`}
             >
               <div className="flex items-center">
-                <Users className="h-5 w-5 text-gray-600 mr-2" {...iconProps} />
+                <Users className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                 <span className="text-gray-800">Customer Types</span>
               </div>
               <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${
@@ -64,7 +64,7 @@ export const ConfigurationSidebar = ({
             </button>
             
             {activeSection === "customers" && (
-              <div className="ml-4 mt-2 space-y-3 bg-gray-50 p-2 rounded-md">
+              <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
                 {customerTypes.map(type => (
                   <ConfigSidebarItem
                     key={type.id}
@@ -77,12 +77,12 @@ export const ConfigurationSidebar = ({
             
             <button 
               onClick={() => handleSectionClick("assets")}
-              className={`w-full flex items-center justify-between p-2 rounded-md text-left ${
-                activeSection === "assets" ? "bg-gray-100" : "hover:bg-gray-100"
+              className={`w-full flex items-center justify-between p-3 rounded-md text-left ${
+                activeSection === "assets" ? "bg-gray-200" : "hover:bg-gray-100"
               }`}
             >
               <div className="flex items-center">
-                <Zap className="h-5 w-5 text-gray-600 mr-2" {...iconProps} />
+                <Zap className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                 <span className="text-gray-800">Asset Types</span>
               </div>
               <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${
@@ -91,7 +91,7 @@ export const ConfigurationSidebar = ({
             </button>
             
             {activeSection === "assets" && (
-              <div className="ml-4 mt-2 space-y-3 bg-gray-50 p-2 rounded-md">
+              <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
                 {assetTypes.map(type => (
                   <ConfigSidebarItem
                     key={type.id}
@@ -104,12 +104,12 @@ export const ConfigurationSidebar = ({
             
             <button 
               onClick={() => handleSectionClick("meters")}
-              className={`w-full flex items-center justify-between p-2 rounded-md text-left ${
-                activeSection === "meters" ? "bg-gray-100" : "hover:bg-gray-100"
+              className={`w-full flex items-center justify-between p-3 rounded-md text-left ${
+                activeSection === "meters" ? "bg-gray-200" : "hover:bg-gray-100"
               }`}
             >
               <div className="flex items-center">
-                <BarChart3 className="h-5 w-5 text-gray-600 mr-2" {...iconProps} />
+                <BarChart3 className="h-5 w-5 text-gray-600 mr-3" {...iconProps} />
                 <span className="text-gray-800">Optimization</span>
               </div>
               <ChevronRight className={`h-4 w-4 text-gray-500 transition-transform ${
@@ -118,7 +118,7 @@ export const ConfigurationSidebar = ({
             </button>
             
             {activeSection === "meters" && (
-              <div className="ml-4 mt-2 space-y-3 bg-gray-50 p-2 rounded-md">
+              <div className="ml-4 mt-2 space-y-3 bg-white p-3 rounded-md border border-gray-100">
                 {meterTypes.map(type => (
                   <ConfigSidebarItem
                     key={type.id}
@@ -132,7 +132,7 @@ export const ConfigurationSidebar = ({
         </div>
       </div>
       
-      <div className="p-3 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 bg-white">
         <div className="text-xs text-gray-700 mb-2 font-medium">Configuration Progress</div>
         <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
           <div 
