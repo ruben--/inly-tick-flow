@@ -121,13 +121,13 @@ export const ProgressBar = ({
     <Collapsible 
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="relative w-full bg-white mb-6 rounded-lg p-4 border border-gray-200 text-gray-800 shadow-sm font-fever"
+      className="relative w-full bg-white mb-6 rounded-none p-4 border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] text-black font-mono"
     >
       {/* Close button */}
       <Button 
         variant="ghost" 
         size="sm" 
-        className="absolute right-1 top-1 h-6 w-6 p-0 hover:bg-gray-100 rounded-full" 
+        className="absolute right-1 top-1 h-6 w-6 p-0 hover:bg-te-red hover:text-white rounded-none" 
         onClick={handlePermanentHide}
         title="Hide progress bar permanently"
       >
@@ -135,11 +135,15 @@ export const ProgressBar = ({
       </Button>
       
       <div className="flex justify-between items-center mb-2">
-        <div className="font-medium">
+        <div className="font-bold uppercase tracking-wider text-xs">
           Setup Progress ({completedTasks}/{totalTasks})
         </div>
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0 text-black hover:text-black hover:bg-te-orange border border-black rounded-none"
+          >
             {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </CollapsibleTrigger>
@@ -147,30 +151,41 @@ export const ProgressBar = ({
       
       <CollapsibleContent>
         <div className="space-y-3">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs">
             <span>{progress}% Complete</span>
-            <span className="text-gray-500">
+            <span className="text-te-gray-600">
               {completedTasks} of {totalTasks} tasks completed
             </span>
           </div>
-          <Progress value={progress} className="h-2 bg-gray-100" />
+          <div className="w-full bg-te-gray-200 h-2 rounded-none overflow-hidden border border-black">
+            <div 
+              className="bg-te-orange h-full rounded-none transition-all duration-500 ease-in-out"
+              style={{
+                width: `${progress}%`
+              }}
+            ></div>
+          </div>
           
           <div className="mt-4 space-y-3">
-            <div className="text-sm font-medium">Setup Steps</div>
+            <div className="text-xs font-bold uppercase tracking-wider">Setup Steps</div>
             <div className="grid gap-2">
               {setupSteps.map((step) => (
                 <div 
                   key={step.id} 
-                  className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-gray-50"
+                  className="flex items-center gap-2 text-xs p-2 rounded-none border border-black hover:bg-te-gray-50"
                 >
                   {step.completed ? (
-                    <Check className="h-4 w-4 text-green-500 shrink-0" />
+                    <div className="h-5 w-5 bg-te-orange flex items-center justify-center border border-black">
+                      <Check className="h-3 w-3 text-black" />
+                    </div>
                   ) : (
-                    <Circle className="h-4 w-4 text-gray-400 shrink-0" />
+                    <div className="h-5 w-5 border border-black bg-white flex items-center justify-center">
+                      <Circle className="h-3 w-3 text-te-gray-400" />
+                    </div>
                   )}
                   <div className="flex items-center gap-2">
                     {step.icon}
-                    <span className={step.completed ? "text-gray-900" : "text-gray-500"}>
+                    <span className={step.completed ? "text-black font-bold" : "text-te-gray-600"}>
                       {step.name}
                     </span>
                   </div>
@@ -180,11 +195,11 @@ export const ProgressBar = ({
           </div>
           
           {progress === 100 ? (
-            <div className="mt-2 text-sm text-green-600">
+            <div className="mt-2 text-xs text-black bg-te-orange p-2 border border-black">
               All steps completed! Your VPP is fully configured.
             </div>
           ) : (
-            <div className="mt-2 text-sm text-gray-500">
+            <div className="mt-2 text-xs text-te-gray-600">
               Complete all steps to finalize your VPP configuration.
             </div>
           )}

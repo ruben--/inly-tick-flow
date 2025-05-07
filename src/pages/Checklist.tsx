@@ -46,9 +46,9 @@ const Checklist = () => {
   const progress = Math.round((completedCount / totalSteps) * 100);
 
   return (
-    <div className="flex h-svh">
-      {/* Sidebar fixed on the left side */}
-      <div className="w-80 border-r border-gray-200 flex-shrink-0 overflow-y-auto bg-white">
+    <div className="flex h-svh bg-te-gray-50">
+      {/* Sidebar fixed on the left side - TE style */}
+      <div className="w-80 border-r-2 border-black flex-shrink-0 overflow-y-auto bg-te-gray-100">
         <ConfigurationSidebar 
           customerTypes={customerTypes}
           assetTypes={assetTypes}
@@ -60,7 +60,7 @@ const Checklist = () => {
         />
       </div>
       
-      {/* Main Content Area */}
+      {/* Main Content Area - TE style */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="p-6 pb-0">
           <div className="flex items-center justify-between mb-4">

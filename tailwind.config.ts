@@ -20,7 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'fever': ['Fever Type', 'sans-serif'],
+				'fever': ['Space Mono', 'monospace', 'sans-serif'],
+				'mono': ['Space Mono', 'monospace'],
 			},
 			fontWeight: {
 				normal: '400',
@@ -71,11 +72,30 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				energy: {
-          blue: '#585858', // Changed from blue to gray
-          green: '#6e6e6e', // Keeping as gray
-          teal: '#4a4a4a', // Changed from teal to dark gray
-          light: '#f5f5f5', // Light gray
-          dark: '#1a1a1a' // Dark gray
+          blue: '#FF9300', // Teenage Engineering orange
+          green: '#252525', // Dark gray
+          teal: '#FF0000', // TE Red accent
+          light: '#F5F5F5', // Light gray/off-white
+          dark: '#1A1A1A'  // Dark gray/almost black
+				},
+				te: {
+					orange: '#FF9300',
+					red: '#FF0000',
+					yellow: '#FFC700',
+					black: '#000000',
+					white: '#FFFFFF',
+					gray: {
+						50: '#F9F9F9',
+						100: '#F1F1F1',
+						200: '#E1E1E1',
+						300: '#CCCCCC',
+						400: '#999999',
+						500: '#777777',
+						600: '#555555',
+						700: '#333333',
+						800: '#222222',
+						900: '#111111',
+					}
 				}
 			},
 			borderRadius: {
