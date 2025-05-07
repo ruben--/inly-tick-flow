@@ -19,7 +19,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   const initials = companyName
     ? companyName
         .split(' ')
-        .map(word => word[0])
+        .map(word => word?.[0] || '')
         .slice(0, 2)
         .join('')
         .toUpperCase()
@@ -33,8 +33,9 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
             src={logoImage} 
             alt={companyName || "Company logo"} 
             className="object-contain p-1 w-full h-full"
-            onError={() => {
+            onError={(e) => {
               console.error("Failed to load image");
+              (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
         ) : (

@@ -54,7 +54,8 @@ export const ProfileForm: React.FC = () => {
     setCurrentWebsite,
     logoImage,
     setLogoImage,
-    isLogoLoading
+    isLogoLoading,
+    refreshLogo
   } = useProfileLogo();
   
   // Watch for website changes in the form
@@ -171,6 +172,7 @@ export const ProfileForm: React.FC = () => {
           websiteValue={websiteValue}
           companyNameValue={companyNameValue}
           logoImage={logoImage}
+          onRefreshLogo={refreshLogo}
         >
           <ProfileFormFields form={form} />
         </ProfileFormSubmit>

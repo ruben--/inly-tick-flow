@@ -45,7 +45,8 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     setCurrentWebsite,
     logoImage,
     setLogoImage,
-    isLogoLoading
+    isLogoLoading,
+    refreshLogo
   } = useProfileLogo();
   
   const form = useForm<UserProfileFormValues>({
@@ -164,13 +165,30 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="flex flex-col items-center mb-4">
+        <div className="flex flex-col items-center mb-4 relative">
           <CompanyLogo 
             website={websiteValue} 
             companyName={companyNameValue}
             logoImage={logoImage}
             className="h-16 w-16"
           />
+          
+          {websiteValue && (
+            <Button 
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="mt-2 text-xs h-6"
+              onClick={(e) => {
+                e.preventDefault();
+                refreshLogo();
+              }}
+              disabled={isLoading || isLogoLoading}
+            >
+              <RefreshCcw className="h-3 w-3 mr-1" />
+              Refresh logo
+            </Button>
+          )}
         </div>
 
         <ProfileFormFields form={form} />

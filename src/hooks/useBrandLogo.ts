@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { fetchCompanyBranding, getBestLogo, extractDomain } from "@/utils/brandfetch";
+import { fetchCompanyBranding, getBestLogo, extractDomain, fetchImageAsBase64 } from "@/utils/brandfetch";
 
 export const useBrandLogo = (website: string) => {
   const [logoImage, setLogoImage] = useState<string | null>(null);
@@ -15,15 +14,14 @@ export const useBrandLogo = (website: string) => {
       return;
     }
 
+    const domain = extractDomain(website);
+    
+    // Skip if domain is invalid or unchanged
+    if (!domain || domain === lastFetchedDomain) {
+      return;
+    }
+    
     const fetchLogo = async () => {
-      // Extract domain for comparison
-      const domain = extractDomain(website);
-      
-      // Skip fetch if we've already fetched for this domain
-      if (domain === lastFetchedDomain) {
-        return;
-      }
-      
       console.log("Fetching logo for domain:", domain);
       setIsLoading(true);
       setError(null);
@@ -33,28 +31,18 @@ export const useBrandLogo = (website: string) => {
         const brandingData = await fetchCompanyBranding(website);
         const logoUrl = getBestLogo(brandingData);
         
-        // If we found a logo URL, fetch the actual image data
         if (logoUrl) {
-          try {
-            const response = await fetch(logoUrl);
-            const blob = await response.blob();
-            
-            // Convert blob to base64
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = () => {
-              const base64data = reader.result as string;
-              setLogoImage(base64data);
-            };
-          } catch (imgError) {
-            console.error("Error fetching logo image:", imgError);
-            setLogoImage(null);
-          }
+          // Convert logo to base64 directly
+          const base64Logo = await fetchImageAsBase64(logoUrl);
+          setLogoImage(base64Logo);
+        } else {
+          setLogoImage(null);
         }
         
+        // Store the domain we just fetched to avoid duplicate requests
         setLastFetchedDomain(domain);
       } catch (err) {
-        console.error("Error fetching logo:", err);
+        console.error("Error in logo fetch process:", err);
         setError("Failed to fetch company logo");
         setLogoImage(null);
       } finally {
@@ -65,9 +53,15 @@ export const useBrandLogo = (website: string) => {
     fetchLogo();
   }, [website, lastFetchedDomain]);
 
+  // Add a manual refresh function
+  const refreshLogo = () => {
+    setLastFetchedDomain(null); // Reset to trigger a new fetch
+  };
+
   return {
     logoImage,
     isLoading,
-    error
+    error,
+    refreshLogo
   };
 };

@@ -106,3 +106,26 @@ export const getBestLogo = (data: BrandfetchResponse | null): string | null => {
 
   return data.icon?.src || null;
 };
+
+/**
+ * Convert image URL to base64 data
+ */
+export const fetchImageAsBase64 = async (imageUrl: string): Promise<string | null> => {
+  try {
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error('Error converting image to base64:', error);
+    return null;
+  }
+};
