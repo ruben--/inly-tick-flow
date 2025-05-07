@@ -64,7 +64,10 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   useEffect(() => {
     if (initialLogoImage) {
       setLogoImage(initialLogoImage);
-      setLogoUrl(initialLogoUrl); // Keep URL in sync
+      // Don't override if we already have an initialLogoUrl
+      if (!logoUrl) {
+        setLogoUrl(initialLogoUrl);
+      }
       setFetchAttempted(true); // No need to fetch
       return;
     }
