@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from "@/components/ui/button";
-import { Upload, RefreshCw } from "lucide-react";
-import { fetchCompanyBranding, getBestLogo, extractDomain } from "@/utils/brandfetch";
+import { LogoPlaceholder } from "./LogoPlaceholder";
+import { LogoUploader } from "./LogoUploader";
+import { useCompanyLogo } from "@/hooks/useCompanyLogo";
 
 interface CompanyLogoProps {
   website: string;
@@ -28,13 +28,20 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   onLogoUpload,
   showUploadButton = false
 }) => {
-  const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl || null);
-  const [logoImage, setLogoImage] = useState<string | null>(initialLogoImage || null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastFetchedDomain, setLastFetchedDomain] = useState<string | null>(null);
-  const [fetchAttempted, setFetchAttempted] = useState(initialFetchAttempted);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    logoUrl,
+    logoImage,
+    isLoading,
+    error,
+    fetchAttempted,
+    handleRetryFetch
+  } = useCompanyLogo({
+    website,
+    initialLogoUrl,
+    initialLogoImage,
+    initialFetchAttempted,
+    onLogoFound
+  });
 
   console.log("CompanyLogo rendering with:", { 
     hasLogoImage: !!logoImage, 
@@ -51,27 +58,6 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         .toUpperCase()
     : 'CO';
 
-  // Fetch and store the image as base64 data when we have a logo URL
-  const fetchAndStoreImage = async (url: string) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      
-      // Convert blob to base64
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result as string);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (err) {
-      console.error("Error fetching image:", err);
-      return null;
-    }
-  };
-
   // Handle logo file upload
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -80,7 +66,6 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      setLogoImage(base64String);
       
       // Call the callback with the new image data
       if (onLogoUpload) {
@@ -93,134 +78,11 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       }
       
       // Clear the file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      if (event.target) {
+        event.target.value = '';
       }
     };
     reader.readAsDataURL(file);
-  };
-
-  // First priority: Use the provided logo image if available
-  useEffect(() => {
-    console.log("Logo image effect triggered", { 
-      initialLogoImage: !!initialLogoImage, 
-      logoImage: !!logoImage 
-    });
-    
-    if (initialLogoImage) {
-      console.log("Using provided logo image from props");
-      setLogoImage(initialLogoImage);
-      
-      // Only set the URL if provided and we don't have one already
-      if (initialLogoUrl && !logoUrl) {
-        setLogoUrl(initialLogoUrl);
-      }
-      
-      setFetchAttempted(true); // No need to fetch
-      return;
-    }
-
-    // If we have a logoUrl but no logoImage, fetch the image data
-    if (logoUrl && !logoImage && !fetchAttempted) {
-      console.log("Fetching image data from logo URL");
-      const fetchImage = async () => {
-        setIsLoading(true);
-        const imageData = await fetchAndStoreImage(logoUrl);
-        setLogoImage(imageData);
-        setIsLoading(false);
-        setFetchAttempted(true);
-        
-        // Call the callback when we get image data
-        if (onLogoFound && imageData) {
-          onLogoFound(logoUrl, imageData);
-        }
-      };
-      
-      fetchImage();
-    }
-  }, [logoUrl, logoImage, initialLogoImage, initialLogoUrl, onLogoFound, fetchAttempted]);
-
-  // Only fetch a new logo if we don't have any image data yet and haven't tried fetching
-  useEffect(() => {
-    console.log("Logo fetch effect triggered", { 
-      logoImage: !!logoImage, 
-      fetchAttempted, 
-      website 
-    });
-    
-    // Skip fetch if we already have a logo image or have attempted to fetch
-    if (logoImage || fetchAttempted) {
-      console.log("Skipping fetch - already have image or attempted fetch");
-      return;
-    }
-
-    // If we already have a logo URL from props, use it 
-    if (initialLogoUrl) {
-      console.log("Using provided logo URL");
-      setLogoUrl(initialLogoUrl);
-      setFetchAttempted(true);
-      return;
-    }
-
-    // Skip if no website
-    if (!website) {
-      console.log("No website provided - skipping fetch");
-      setLogoUrl(null);
-      setFetchAttempted(true);
-      if (onLogoFound) onLogoFound(null, null);
-      return;
-    }
-
-    const fetchLogo = async () => {
-      // Extract domain for comparison
-      const domain = extractDomain(website);
-      
-      // Skip fetch if we've already fetched for this domain
-      if (domain === lastFetchedDomain) {
-        console.log("Already fetched this domain - skipping");
-        setFetchAttempted(true);
-        return;
-      }
-      
-      console.log("Fetching logo for domain:", domain);
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const brandingData = await fetchCompanyBranding(website);
-        const logo = getBestLogo(brandingData);
-        setLogoUrl(logo);
-        setLastFetchedDomain(domain);
-        
-        // If we found a logo, immediately fetch and store the image data
-        if (logo) {
-          console.log("Logo URL found:", logo);
-          const imageData = await fetchAndStoreImage(logo);
-          setLogoImage(imageData);
-          if (onLogoFound) onLogoFound(logo, imageData);
-        } else {
-          console.log("No logo found for domain");
-          if (onLogoFound) onLogoFound(null, null);
-        }
-      } catch (err) {
-        console.error("Error fetching logo:", err);
-        setError("Failed to fetch company logo");
-        setLogoUrl(null);
-        if (onLogoFound) onLogoFound(null, null);
-      } finally {
-        setIsLoading(false);
-        setFetchAttempted(true);
-      }
-    };
-
-    fetchLogo();
-  }, [website, onLogoFound, initialLogoUrl, logoImage, lastFetchedDomain, fetchAttempted]);
-
-  const handleRetryFetch = async () => {
-    setFetchAttempted(false);
-    setLogoImage(null);
-    setLogoUrl(null);
-    setError(null);
   };
 
   return (
@@ -240,66 +102,42 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
               className="object-contain p-1 w-full h-full"
               onLoad={async () => {
                 // After successful load, convert to base64 for storage if we haven't done so already
-                if (!logoImage) {
+                if (!logoImage && onLogoFound) {
                   console.log("Image loaded successfully, converting to base64");
-                  const imageData = await fetchAndStoreImage(logoUrl);
-                  if (imageData) {
-                    setLogoImage(imageData);
-                    if (onLogoFound) onLogoFound(logoUrl, imageData);
-                  }
+                  const response = await fetch(logoUrl);
+                  const blob = await response.blob();
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const imageData = reader.result as string;
+                    if (imageData) {
+                      if (onLogoFound) onLogoFound(logoUrl, imageData);
+                    }
+                  };
+                  reader.readAsDataURL(blob);
                 }
               }}
               onError={() => {
-                setError("Failed to load image");
-                setLogoUrl(null);
+                console.error("Failed to load image from URL:", logoUrl);
+                if (handleRetryFetch) handleRetryFetch();
               }}
             />
           ) : (
-            <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-500">
-              {isLoading ? (
-                <div className="animate-pulse rounded-none bg-gray-300 h-full w-full" />
-              ) : (
-                <span className="text-lg font-medium">{initials}</span>
-              )}
-            </div>
+            <LogoPlaceholder 
+              initials={initials} 
+              isLoading={isLoading} 
+            />
           )}
         </AspectRatio>
       </div>
       
-      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
-      
-      <div className="flex gap-2">
-        {showUploadButton && (
-          <>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="sm" 
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="mr-1 h-4 w-4" /> Upload
-            </Button>
-          </>
-        )}
-        
-        {website && fetchAttempted && error && (
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRetryFetch}
-          >
-            <RefreshCw className="mr-1 h-4 w-4" /> Retry
-          </Button>
-        )}
-      </div>
+      <LogoUploader
+        onFileChange={handleFileChange}
+        onRetry={handleRetryFetch}
+        error={error}
+        showUploadButton={showUploadButton}
+        showRetryButton={!!website && fetchAttempted && !!error}
+        website={website}
+      />
     </div>
   );
 };
