@@ -71,11 +71,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				energy: {
-          blue: '#585858',
-          green: '#6e6e6e',
-          teal: '#4a4a4a',
-          light: '#f5f5f5',
-          dark: '#1a1a1a'
+          blue: '#585858', // Changed from blue to gray
+          green: '#6e6e6e', // Keeping as gray
+          teal: '#4a4a4a', // Changed from teal to dark gray
+          light: '#f5f5f5', // Light gray
+          dark: '#1a1a1a' // Dark gray
 				}
 			},
 			borderRadius: {
