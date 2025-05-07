@@ -76,7 +76,7 @@ const Checklist = () => {
           </div>
         </div>
         
-        <div className="flex-1 p-6 pt-4 overflow-auto h-full">
+        <div className="flex-1 p-6 pt-2 overflow-auto">
           <MainContent 
             selectedCustomer={selectedCustomer}
             selectedAssetTypes={selectedAssetTypes}
