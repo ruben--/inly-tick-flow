@@ -3,13 +3,17 @@ import React from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-import { UserProfileFormValues } from "./ProfileRequiredForm"; // Import the type from the shared location
+import { UserProfileFormValues } from "./ProfileRequiredForm"; 
 
 interface ProfileFormFieldsProps {
   form: UseFormReturn<UserProfileFormValues>;
+  onWebsiteBlur?: () => void;
 }
 
-export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({ form }) => {
+export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({ 
+  form,
+  onWebsiteBlur
+}) => {
   return (
     <div className="space-y-4">
       <FormField
@@ -75,10 +79,18 @@ export const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({ form }) =>
           <FormItem>
             <FormLabel>Website <span className="text-red-500">*</span></FormLabel>
             <FormControl>
-              <Input placeholder="https://example.com" {...field} required />
+              <Input 
+                placeholder="example.com" 
+                {...field} 
+                onBlur={(e) => {
+                  field.onBlur(); // Call the original onBlur
+                  if (onWebsiteBlur) onWebsiteBlur(); // Call our custom handler
+                }}
+                required 
+              />
             </FormControl>
             <FormDescription>
-              Your company's website URL
+              Your company's website URL (e.g. example.com or https://example.com)
             </FormDescription>
             <FormMessage />
           </FormItem>

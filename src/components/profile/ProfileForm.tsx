@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { useProfileLogo } from "@/hooks/useProfileLogo";
 import { ProfileFormSubmit } from "./ProfileFormSubmit";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { isValidUrl } from "@/utils/brandfetch";
 
 export const ProfileForm: React.FC = () => {
   const { user } = useAuth();
@@ -20,19 +21,13 @@ export const ProfileForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   
-  // Define profile schema
+  // Define profile schema with better validation
   const profileSchema = z.object({
     companyName: z.string().min(1, "Company name is required"),
     website: z.string()
       .min(1, "Website is required")
-      .refine(val => {
-        try {
-          const url = new URL(!/^https?:\/\//i.test(val) ? `https://${val}` : val);
-          return true;
-        } catch {
-          return false;
-        }
-      }, "Must be a valid URL"),
+      .refine(val => isValidUrl(val), 
+        "Must be a valid URL (e.g. example.com or https://example.com)"),
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     role: z.string().min(1, "Role is required")
@@ -65,12 +60,12 @@ export const ProfileForm: React.FC = () => {
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
   
-  // Set website value once on initial load, but not during typing
-  useEffect(() => {
-    if (websiteValue && !currentWebsite) {
+  // Set website value on initial load and when website field is blurred
+  const handleWebsiteBlur = useCallback(() => {
+    if (websiteValue) {
       setCurrentWebsite(websiteValue);
     }
-  }, [websiteValue, currentWebsite, setCurrentWebsite]);
+  }, [websiteValue, setCurrentWebsite]);
 
   // Fetch existing profile data if available
   useEffect(() => {
@@ -126,21 +121,16 @@ export const ProfileForm: React.FC = () => {
     
     setIsLoading(true);
     
-    // Normalize URL by adding https:// if not present
-    const normalizedWebsite = !/^https?:\/\//i.test(data.website) 
-      ? `https://${data.website}` 
-      : data.website;
-    
     try {
-      // Set the current website before saving
-      setCurrentWebsite(normalizedWebsite);
+      // Set the website value before saving
+      handleWebsiteBlur();
       
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
           company_name: data.companyName,
-          website: normalizedWebsite,
+          website: data.website,
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
@@ -187,14 +177,17 @@ export const ProfileForm: React.FC = () => {
         )}
         
         <ProfileFormSubmit 
-          isLoading={isLoading || isLogoLoading}
+          isLoading={isLoading}
           websiteValue={websiteValue}
           companyNameValue={companyNameValue}
           logoImage={logoImage}
           isLogoLoading={isLogoLoading}
           onRefreshLogo={refreshLogo}
         >
-          <ProfileFormFields form={form} />
+          <ProfileFormFields 
+            form={form} 
+            onWebsiteBlur={handleWebsiteBlur}
+          />
         </ProfileFormSubmit>
       </form>
     </Form>

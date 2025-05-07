@@ -1,31 +1,25 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormFields } from "./ProfileFormFields";
-import { CompanyLogo } from "./CompanyLogo";
 import { useProfileLogo } from "@/hooks/useProfileLogo";
-import { RefreshCcw, AlertCircle } from "lucide-react";
+import { ProfileFormSubmit } from "./ProfileFormSubmit";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { isValidUrl } from "@/utils/brandfetch";
 
 // Create validation schema
 const profileSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   website: z.string()
     .min(1, "Website is required")
-    .refine(val => {
-      try {
-        const url = new URL(!/^https?:\/\//i.test(val) ? `https://${val}` : val);
-        return true;
-      } catch {
-        return false;
-      }
-    }, "Must be a valid URL"),
+    .refine(val => isValidUrl(val), 
+      "Must be a valid URL (e.g. example.com or https://example.com)"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   role: z.string().min(1, "Role is required")
@@ -110,40 +104,34 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
     fetchProfile();
   }, [userId, form, toast, setCurrentWebsite, setLogoImage]);
 
-  // Watch for website changes - but don't set currentWebsite immediately 
-  // to avoid unnecessary logo fetches
+  // Watch for website changes in the form
   const websiteValue = form.watch("website");
   const companyNameValue = form.watch("companyName");
   
-  // Update the website in the logo hook but only on form submission
-  // This avoids constant logo fetching while the user is typing
-  useEffect(() => {
-    if (websiteValue && !currentWebsite) {
-      // If we have a website value but no currentWebsite, set it once
+  // Handle website blur to update currentWebsite
+  const handleWebsiteBlur = useCallback(() => {
+    if (websiteValue) {
       setCurrentWebsite(websiteValue);
     }
-  }, [websiteValue, currentWebsite, setCurrentWebsite]);
+  }, [websiteValue, setCurrentWebsite]);
 
   const onSubmit = async (data: UserProfileFormValues) => {
     if (!userId) return;
     
     setIsLoading(true);
     
-    // Normalize URL by adding https:// if not present
-    const normalizedWebsite = !/^https?:\/\//i.test(data.website) 
-      ? `https://${data.website}` 
-      : data.website;
-    
     try {
-      // Update the current website
-      setCurrentWebsite(normalizedWebsite);
+      // Update the current website before saving
+      if (data.website) {
+        setCurrentWebsite(data.website);
+      }
       
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: userId,
           company_name: data.companyName,
-          website: normalizedWebsite,
+          website: data.website,
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
@@ -171,8 +159,6 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
       setIsLoading(false);
     }
   };
-  
-  const isSubmitDisabled = isLoading || isLogoLoading;
 
   if (profileLoading) {
     return (
@@ -187,44 +173,26 @@ export const ProfileRequiredForm: React.FC<ProfileRequiredFormProps> = ({ userId
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="flex flex-col items-center mb-4 relative">
-          <CompanyLogo 
-            website={websiteValue} 
-            companyName={companyNameValue}
-            logoImage={logoImage}
-            className="h-16 w-16"
-          />
-          
-          {logoError && (
-            <Alert variant="destructive" className="mt-3 py-2">
-              <AlertCircle className="h-4 w-4 mr-2" />
-              <AlertDescription className="text-sm">{logoError}</AlertDescription>
-            </Alert>
-          )}
-          
-          {websiteValue && (
-            <Button 
-              type="button"
-              size="sm"
-              variant="ghost"
-              className="mt-2 text-xs h-6"
-              onClick={(e) => {
-                e.preventDefault();
-                refreshLogo();
-              }}
-              disabled={isSubmitDisabled}
-            >
-              <RefreshCcw className={`h-3 w-3 mr-1 ${isLogoLoading ? 'animate-spin' : ''}`} />
-              {isLogoLoading ? 'Loading...' : 'Refresh logo'}
-            </Button>
-          )}
-        </div>
-
-        <ProfileFormFields form={form} />
+        {logoError && (
+          <Alert variant="destructive" className="py-2">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            <AlertDescription className="text-sm">{logoError}</AlertDescription>
+          </Alert>
+        )}
         
-        <Button type="submit" disabled={isSubmitDisabled} className="w-full">
-          {isLoading ? "Saving..." : "Save Profile"}
-        </Button>
+        <ProfileFormSubmit 
+          isLoading={isLoading}
+          websiteValue={websiteValue}
+          companyNameValue={companyNameValue}
+          logoImage={logoImage}
+          isLogoLoading={isLogoLoading}
+          onRefreshLogo={refreshLogo}
+        >
+          <ProfileFormFields 
+            form={form}
+            onWebsiteBlur={handleWebsiteBlur}
+          />
+        </ProfileFormSubmit>
       </form>
     </Form>
   );
