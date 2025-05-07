@@ -48,7 +48,7 @@ const Checklist = () => {
   return (
     <div className="flex h-svh bg-te-gray-50">
       {/* Sidebar fixed on the left side - TE style */}
-      <div className="w-80 border-r-2 border-black flex-shrink-0 overflow-y-auto bg-te-gray-100 h-full relative">
+      <div className="w-80 flex-shrink-0 overflow-y-auto bg-te-gray-100 h-full relative">
         <ConfigurationSidebar 
           customerTypes={customerTypes}
           assetTypes={assetTypes}
