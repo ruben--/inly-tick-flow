@@ -4,13 +4,7 @@ import { LoadingState } from '@/components/configurator/LoadingState';
 import { SaveIndicator } from '@/components/configurator/SaveIndicator';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { useChecklistConfig } from '@/hooks/useChecklistConfig';
-import { useState, useEffect } from 'react';
-import { 
-  SidebarProvider, 
-  Sidebar, 
-  SidebarTrigger, 
-  SidebarContent 
-} from '@/components/ui/sidebar';
+import { useState } from 'react';
 import { ConfigurationSidebar } from '@/components/configurator/ConfigurationSidebar';
 import { MainContent } from '@/components/configurator/MainContent';
 
@@ -52,55 +46,50 @@ const Checklist = () => {
   const progress = Math.round((completedCount / totalSteps) * 100);
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex h-svh w-full">
-        {/* Main Sidebar using shadcn/ui components */}
-        <Sidebar>
-          <SidebarContent>
-            <ConfigurationSidebar 
+    <div className="flex h-svh">
+      {/* Sidebar fixed on the left side */}
+      <div className="w-80 border-r border-gray-200 flex-shrink-0 overflow-y-auto bg-white">
+        <ConfigurationSidebar 
+          customerTypes={customerTypes}
+          assetTypes={assetTypes}
+          meterTypes={meterTypes}
+          toggleCustomerType={toggleCustomerType}
+          toggleAssetType={toggleAssetType}
+          toggleMeterType={toggleMeterType}
+          completedSteps={completedSteps}
+        />
+      </div>
+      
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="p-6 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <ProgressBar 
+              progress={progress}
+              completedTasks={completedCount}
+              totalTasks={totalSteps}
               customerTypes={customerTypes}
               assetTypes={assetTypes}
               meterTypes={meterTypes}
-              toggleCustomerType={toggleCustomerType}
-              toggleAssetType={toggleAssetType}
-              toggleMeterType={toggleMeterType}
-              completedSteps={completedSteps}
+              onProfileStatusChange={setIsProfileComplete}
             />
-          </SidebarContent>
-        </Sidebar>
-        
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="p-6 pb-0">
-            <div className="flex items-center justify-between mb-4">
-              <ProgressBar 
-                progress={progress}
-                completedTasks={completedCount}
-                totalTasks={totalSteps}
-                customerTypes={customerTypes}
-                assetTypes={assetTypes}
-                meterTypes={meterTypes}
-                onProfileStatusChange={setIsProfileComplete}
-              />
-              <SidebarTrigger className="md:hidden" />
-            </div>
-          </div>
-          
-          <div className="flex-1 p-6 pt-4 overflow-auto">
-            <MainContent 
-              selectedCustomer={selectedCustomer}
-              selectedAssetTypes={selectedAssetTypes}
-              isAllCustomersSelected={isAllCustomersSelected}
-              meterTypes={meterTypes}
-            />
-          </div>
-          
-          <div className="p-6 pt-0">
-            <SaveIndicator saving={saving} lastSaved={lastSaved} />
           </div>
         </div>
+        
+        <div className="flex-1 p-6 pt-4 overflow-auto">
+          <MainContent 
+            selectedCustomer={selectedCustomer}
+            selectedAssetTypes={selectedAssetTypes}
+            isAllCustomersSelected={isAllCustomersSelected}
+            meterTypes={meterTypes}
+          />
+        </div>
+        
+        <div className="p-6 pt-0">
+          <SaveIndicator saving={saving} lastSaved={lastSaved} />
+        </div>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
