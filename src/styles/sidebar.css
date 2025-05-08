@@ -35,4 +35,14 @@
 .page-content {
   width: 100%;
   min-height: 50vh;
+  overflow: visible;
+}
+
+/* Ensure content areas don't scroll independently */
+[data-sidebar="content"] {
+  overflow: visible !important;
+}
+
+.sidebar-content-area {
+  overflow: visible !important;
 }

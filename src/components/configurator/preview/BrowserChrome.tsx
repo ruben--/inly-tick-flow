@@ -21,8 +21,8 @@ export const BrowserChrome = ({ companyDomain, children }: BrowserChromeProps) =
         </div>
       </div>
       
-      {/* Browser Content */}
-      <div className="p-4 overflow-y-auto flex-1">
+      {/* Browser Content - Now with auto overflow to enable parent scrolling instead */}
+      <div className="p-4 overflow-visible flex-1">
         {children}
       </div>
     </div>

@@ -29,19 +29,21 @@ export const MainContent = ({
   return (
     <div className="w-full h-full flex flex-col">
       <BrowserChrome companyDomain={companyDomain}>
-        <PreviewHeader 
-          companyName={profileData?.company_name}
-          website={profileData?.website || selectedCustomer?.website}
-        />
-        
-        <HeroSection 
-          selectedCustomer={selectedCustomer}
-          isAllCustomersSelected={isAllCustomersSelected}
-        />
-        
-        <AssetSection selectedAssetTypes={selectedAssetTypes} />
-        
-        <OptimizationSection meterTypes={meterTypes} />
+        <div className="flex flex-col space-y-6">
+          <PreviewHeader 
+            companyName={profileData?.company_name}
+            website={profileData?.website || selectedCustomer?.website}
+          />
+          
+          <HeroSection 
+            selectedCustomer={selectedCustomer}
+            isAllCustomersSelected={isAllCustomersSelected}
+          />
+          
+          <AssetSection selectedAssetTypes={selectedAssetTypes} />
+          
+          <OptimizationSection meterTypes={meterTypes} />
+        </div>
       </BrowserChrome>
     </div>
   );

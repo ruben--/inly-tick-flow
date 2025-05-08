@@ -44,7 +44,8 @@ export const ConfigurationSidebar = ({
       
       <SidebarHeader title="Configuration" />
       
-      <div className="flex-1 overflow-y-auto p-4">
+      {/* Changed from overflow-y-auto to overflow-visible to prevent internal scrolling */}
+      <div className="flex-1 overflow-visible p-4">
         <div className="mb-6">
           <div className="text-black text-xs uppercase tracking-wider font-bold mb-3">Configure Your Offering</div>
           <div className="space-y-4">
