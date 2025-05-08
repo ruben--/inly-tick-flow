@@ -42,12 +42,13 @@ export const OemLogoCard: React.FC<OemLogoCardProps> = ({
         <CompanyLogo 
           website={domain}
           companyName={name}
+          logoImage={logo}
           className="h-full w-full"
         />
       </div>
       
       <div className="text-center mt-2">
-        <p className="text-sm font-medium truncate">{name}</p>
+        <p className="text-sm font-medium truncate max-w-full">{name}</p>
       </div>
     </Card>
   );

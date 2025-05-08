@@ -18,12 +18,14 @@ export const useBrandLogo = (website: string) => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const fetchTimeoutRef = useRef<number | null>(null);
   const previousWebsiteRef = useRef<string | null>(null);
+  const [fetchAttempted, setFetchAttempted] = useState(false);
 
   // Clear logo when website changes completely
   useEffect(() => {
     if (previousWebsiteRef.current !== website) {
       setLogoImage(null);
       setError(null);
+      setFetchAttempted(false);
       previousWebsiteRef.current = website;
     }
   }, [website]);
@@ -50,6 +52,7 @@ export const useBrandLogo = (website: string) => {
     if (cached && Date.now() - cached.timestamp < CACHE_EXPIRY_TIME) {
       console.log("Using logo from memory cache for", domain);
       setLogoImage(cached.logo);
+      setFetchAttempted(true);
       return;
     }
     
@@ -70,6 +73,7 @@ export const useBrandLogo = (website: string) => {
           setLogoImage(cachedLogo);
           // Update in-memory cache
           logoCache.set(domain, { logo: cachedLogo, timestamp });
+          setFetchAttempted(true);
           return;
         }
       }
@@ -100,6 +104,7 @@ export const useBrandLogo = (website: string) => {
   const fetchLogo = useCallback(async (domain: string) => {
     if (!domain) {
       setError("No domain provided");
+      setFetchAttempted(true);
       return;
     }
     
@@ -133,6 +138,7 @@ export const useBrandLogo = (website: string) => {
         console.error("API error:", response.error);
         setError("Failed to fetch company logo");
         setIsLoading(false);
+        setFetchAttempted(true);
       } else if (response.data?.logoImage) {
         const logo = response.data.logoImage;
         console.log("Logo fetched successfully for", domain);
@@ -140,6 +146,7 @@ export const useBrandLogo = (website: string) => {
         // Update state
         setLogoImage(logo);
         setIsLoading(false);
+        setFetchAttempted(true);
         
         // Cache the logo in localStorage
         try {
@@ -158,20 +165,23 @@ export const useBrandLogo = (website: string) => {
         console.error("No logo found in API response");
         setError("No logo found");
         setIsLoading(false);
+        setFetchAttempted(true);
       }
     } catch (err: any) {
       if (controller.signal.aborted) return;
       console.error("Error fetching logo:", err);
       setError(err.message || "Failed to fetch logo");
       setIsLoading(false);
+      setFetchAttempted(true);
     }
   }, []);
 
   // Manual refresh function
-  const refreshLogo = useCallback(() => {
-    if (!website) return;
+  const refreshLogo = useCallback((websiteUrl?: string) => {
+    const targetWebsite = websiteUrl || website;
+    if (!targetWebsite) return;
     
-    const domain = extractDomain(website);
+    const domain = extractDomain(targetWebsite);
     if (domain) {
       console.log("Manually refreshing logo for", domain);
       // Clear the cache for this domain when manually refreshing
@@ -189,6 +199,7 @@ export const useBrandLogo = (website: string) => {
       
       // Reset state before fetching
       setLogoImage(null);
+      setFetchAttempted(false);
       fetchLogo(domain);
     }
   }, [website, fetchLogo]);
@@ -197,6 +208,7 @@ export const useBrandLogo = (website: string) => {
     logoImage,
     isLoading,
     error,
-    refreshLogo
+    refreshLogo,
+    fetchAttempted
   };
 };

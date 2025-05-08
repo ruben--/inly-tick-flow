@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { RefreshCcw } from 'lucide-react';
+import { RefreshCcw, Image } from 'lucide-react';
 import { OemLogosGrid } from '@/components/configurator/OemLogosGrid';
 import { OemType } from '@/hooks/oem/types';
+import { Button } from '@/components/ui/button';
 
 interface OemsTabProps {
   oemLogos: OemType[];
@@ -18,6 +19,9 @@ export const OemsTab: React.FC<OemsTabProps> = ({
   loading,
   saving
 }) => {
+  // Check if any OEM is missing a logo
+  const hasMissingLogos = oemLogos.some(oem => !oem.logo);
+  
   return (
     <Card>
       <CardHeader>
@@ -40,6 +44,12 @@ export const OemsTab: React.FC<OemsTabProps> = ({
                 <div className="flex items-center text-sm text-muted-foreground">
                   <RefreshCcw className="h-3 w-3 mr-1 animate-spin" />
                   <span>Saving...</span>
+                </div>
+              )}
+              {loading && (
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <RefreshCcw className="h-3 w-3 mr-1 animate-spin" />
+                  <span>Loading logos...</span>
                 </div>
               )}
             </div>

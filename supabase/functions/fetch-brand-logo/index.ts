@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -35,6 +36,7 @@ serve(async (req: Request) => {
     const brandData = await fetchCompanyBranding(domain);
     
     if (!brandData) {
+      console.log(`No brand data found for domain: ${domain}`);
       return new Response(
         JSON.stringify({ error: "Could not fetch brand data" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
@@ -45,21 +47,27 @@ serve(async (req: Request) => {
     const logoUrl = getBestLogo(brandData);
     
     if (!logoUrl) {
+      console.log(`No logo found for domain: ${domain}`);
       return new Response(
         JSON.stringify({ error: "No logo found for this domain" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
       );
     }
     
+    console.log(`Found logo URL for ${domain}: ${logoUrl.substring(0, 50)}...`);
+    
     // Fetch and convert the logo to base64
     const base64Logo = await fetchImageAsBase64(logoUrl);
     
     if (!base64Logo) {
+      console.log(`Failed to convert logo to base64 for domain: ${domain}`);
       return new Response(
         JSON.stringify({ error: "Failed to process logo image" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
       );
     }
+    
+    console.log(`Successfully processed logo for domain: ${domain}`);
     
     return new Response(
       JSON.stringify({ 
@@ -123,6 +131,8 @@ async function fetchCompanyBranding(domain: string): Promise<BrandfetchResponse 
   try {
     if (!domain) return null;
     
+    console.log(`Making API request to Brandfetch for domain: ${domain}`);
+    
     const response = await fetch(`https://api.brandfetch.io/v2/brands/${domain}`, {
       method: 'GET',
       headers: {
@@ -131,10 +141,13 @@ async function fetchCompanyBranding(domain: string): Promise<BrandfetchResponse 
     });
 
     if (!response.ok) {
+      console.log(`Brandfetch API error: ${response.status} - ${response.statusText}`);
       throw new Error(`Error fetching brand data: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`Received brand data for ${domain}: ${JSON.stringify(data).substring(0, 100)}...`);
+    return data;
   } catch (error) {
     console.error('Error fetching brand data:', error);
     return null;
@@ -143,15 +156,24 @@ async function fetchCompanyBranding(domain: string): Promise<BrandfetchResponse 
 
 // Get the best logo from the Brandfetch response
 function getBestLogo(data: BrandfetchResponse | null): string | null {
-  if (!data || !data.logos || data.logos.length === 0) {
-    return data?.icon?.src || null;
+  if (!data) {
+    console.log("No data provided to getBestLogo");
+    return null;
   }
+  
+  if (!data.logos || data.logos.length === 0) {
+    console.log("No logos found in data, checking for icon");
+    return data.icon?.src || null;
+  }
+  
+  console.log(`Found ${data.logos.length} logos in brand data`);
 
   // First try to find a light theme logo with PNG format
   for (const logo of data.logos) {
     if (logo.theme === 'light' && logo.formats) {
       const pngFormat = logo.formats.find(format => format.format === 'png');
       if (pngFormat && pngFormat.src) {
+        console.log("Found light theme PNG logo");
         return pngFormat.src;
       }
     }
@@ -162,6 +184,7 @@ function getBestLogo(data: BrandfetchResponse | null): string | null {
     if (logo.formats) {
       const pngFormat = logo.formats.find(format => format.format === 'png');
       if (pngFormat && pngFormat.src) {
+        console.log("Found PNG logo");
         return pngFormat.src;
       }
     }
@@ -170,16 +193,19 @@ function getBestLogo(data: BrandfetchResponse | null): string | null {
   // If no PNG found, return the first available logo or icon
   for (const logo of data.logos) {
     if (logo.formats && logo.formats.length > 0 && logo.formats[0].src) {
+      console.log("Using first available logo format");
       return logo.formats[0].src;
     }
   }
 
+  console.log("No suitable logo found, using icon if available");
   return data.icon?.src || null;
 }
 
 // Convert image URL to base64 data
 async function fetchImageAsBase64(imageUrl: string): Promise<string | null> {
   try {
+    console.log(`Fetching image from URL: ${imageUrl.substring(0, 50)}...`);
     const response = await fetch(imageUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.status}`);
@@ -190,6 +216,7 @@ async function fetchImageAsBase64(imageUrl: string): Promise<string | null> {
     const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
     const mimeType = response.headers.get('content-type') || 'image/png';
     
+    console.log(`Successfully converted image to base64 (${Math.round(base64.length / 1024)}KB)`);
     return `data:${mimeType};base64,${base64}`;
   } catch (error) {
     console.error('Error converting image to base64:', error);

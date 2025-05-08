@@ -8,10 +8,18 @@ import { useConfigState } from '@/components/configure/useConfigState';
 import { Card, CardContent } from '@/components/ui/card';
 import { CompanyLogo } from '@/components/profile/CompanyLogo';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useEffect } from 'react';
 
 const Configure = () => {
   const { user } = useAuth();
-  const { oemLogos, loading: oemsLoading, toggleOem, saving: oemsSaving, prefetchAllLogos } = useOemLogos(user?.id);
+  const { 
+    oemLogos, 
+    loading: oemsLoading, 
+    toggleOem, 
+    saving: oemsSaving, 
+    prefetchAllLogos 
+  } = useOemLogos(user?.id);
+  
   const { 
     config, 
     saving, 
@@ -25,6 +33,13 @@ const Configure = () => {
   } = useConfigState();
   
   const { data: profileData } = useProfileData({ userId: user?.id });
+  
+  // Trigger logo prefetch on initial load
+  useEffect(() => {
+    if (oemLogos.length > 0 && !oemsLoading) {
+      prefetchAllLogos();
+    }
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -35,6 +50,8 @@ const Configure = () => {
         <Card className="p-2 flex items-center space-x-3">
           <CompanyLogo 
             companyName={profileData?.companyName || 'Company'} 
+            website={profileData?.website || ''}
+            logoImage={profileData?.logoImage || null}
             className="h-12 w-12" 
           />
           <div className="text-sm">
