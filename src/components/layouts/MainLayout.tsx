@@ -60,14 +60,15 @@ export function MainLayout() {
   };
 
   return <div className="min-h-screen flex flex-col">
-      {user && !isIndexPage && showProfileModal && (
+      {user && !isIndexPage && (
         <Dialog 
           open={showProfileModal && !isProfileComplete} 
           onOpenChange={(open) => {
             // Only allow closing if profile is complete
-            if (isProfileComplete) {
-              setShowProfileModal(open);
+            if (!open && !isProfileComplete) {
+              return; // Prevent dialog from closing
             }
+            setShowProfileModal(open);
           }}
         >
           <ProfileRequiredModal 
