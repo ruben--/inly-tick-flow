@@ -35,7 +35,7 @@ export function ProfileRequiredModal({ userId, onSuccess }: ProfileRequiredModal
 
   if (step === 'loading') {
     return (
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>Setting Up Your Profile</DialogTitle>
         </DialogHeader>
@@ -45,7 +45,7 @@ export function ProfileRequiredModal({ userId, onSuccess }: ProfileRequiredModal
   }
 
   return (
-    <DialogContent className="sm:max-w-[500px]">
+    <DialogContent className="sm:max-w-[500px]" showCloseButton={false}>
       <DialogHeader>
         <DialogTitle>Complete Your Profile</DialogTitle>
       </DialogHeader>

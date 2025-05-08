@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,8 @@ import { Check, Cog, User } from 'lucide-react';
 import { ProfileRequiredModal } from '@/components/ProfileRequiredModal';
 import { PageTransition } from '@/components/transitions/PageTransition';
 import { Dialog } from '@/components/ui/dialog';
+import { useLogo } from '@/contexts/LogoContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export function MainLayout() {
   const {
@@ -13,28 +16,60 @@ export function MainLayout() {
     logout
   } = useAuth();
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isProfileComplete, setIsProfileComplete] = useState(true); // Default to true to prevent initial flicker
   const location = useLocation();
+  
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   // Hide header and footer on index page
   const isIndexPage = location.pathname === '/';
-  React.useEffect(() => {
+  
+  useEffect(() => {
     if (user && !isIndexPage) {
       // Check if profile is complete
-      // This would typically be a check against user metadata or a profile table
-      setShowProfileModal(true);
+      const checkProfileCompletion = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('company_name, website')
+            .eq('id', user.id)
+            .maybeSingle();
+            
+          if (error) throw error;
+          
+          // Profile is incomplete if company name or website is missing
+          const profileIncomplete = !data || !data.company_name || !data.website;
+          setIsProfileComplete(!profileIncomplete);
+          setShowProfileModal(profileIncomplete);
+        } catch (error) {
+          console.error('Error checking profile:', error);
+          setIsProfileComplete(false);
+          setShowProfileModal(true);
+        }
+      };
+      
+      checkProfileCompletion();
     }
   }, [user, isIndexPage]);
 
   const handleProfileComplete = () => {
+    setIsProfileComplete(true);
     setShowProfileModal(false);
   };
 
   return <div className="min-h-screen flex flex-col">
       {user && !isIndexPage && showProfileModal && (
-        <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+        <Dialog 
+          open={showProfileModal && !isProfileComplete} 
+          onOpenChange={(open) => {
+            // Only allow closing if profile is complete
+            if (isProfileComplete) {
+              setShowProfileModal(open);
+            }
+          }}
+        >
           <ProfileRequiredModal 
             userId={user.id} 
             onSuccess={handleProfileComplete} 
