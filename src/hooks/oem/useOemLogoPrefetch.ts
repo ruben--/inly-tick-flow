@@ -26,7 +26,10 @@ export function useOemLogoPrefetch() {
   }, []);
 
   // Prefetch all logos
-  const prefetchAllLogos = useCallback(async (oemLogos: OemType[], updateLogos: (updatedOem: OemType, index: number) => void) => {
+  const prefetchAllLogos = useCallback(async (
+    oemLogos: OemType[], 
+    updateLogo: (updatedOem: OemType, index: number) => void
+  ) => {
     if (prefetchLoading) return;
     
     setPrefetchLoading(true);
@@ -43,7 +46,7 @@ export function useOemLogoPrefetch() {
       try {
         for (let i = 0; i < batch.length; i++) {
           const updatedOem = await prefetchLogo(batch[i]);
-          updateLogos(updatedOem, startIndex + i);
+          updateLogo(updatedOem, startIndex + i);
         }
       } catch (error) {
         console.error('Error processing logo batch:', error);
