@@ -16,7 +16,7 @@ export function MainLayout() {
     logout
   } = useAuth();
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isProfileComplete, setIsProfileComplete] = useState(true); // Default to true to prevent initial flicker
+  const [isProfileComplete, setIsProfileComplete] = useState(false); // Default to false so modal shows immediately if needed
   const location = useLocation();
   
   const isActive = (path: string) => {
@@ -42,7 +42,7 @@ export function MainLayout() {
           // Profile is incomplete if company name or website is missing
           const profileIncomplete = !data || !data.company_name || !data.website;
           setIsProfileComplete(!profileIncomplete);
-          setShowProfileModal(profileIncomplete);
+          setShowProfileModal(true); // Always set to true initially, the Dialog will only show if profile is incomplete
         } catch (error) {
           console.error('Error checking profile:', error);
           setIsProfileComplete(false);
