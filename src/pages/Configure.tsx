@@ -32,7 +32,10 @@ const Configure = () => {
     handleResetToDefaults
   } = useConfigState();
   
-  const { data: profileData } = useProfileData({ userId: user?.id });
+  const { 
+    data: profileData,
+    logoImage // Get logoImage from the hook return value 
+  } = useProfileData({ userId: user?.id });
   
   // Trigger logo prefetch on initial load
   useEffect(() => {
@@ -51,7 +54,7 @@ const Configure = () => {
           <CompanyLogo 
             companyName={profileData?.companyName || 'Company'} 
             website={profileData?.website || ''}
-            logoImage={profileData?.logoImage || null}
+            logoImage={logoImage} // Use logoImage from the hook
             className="h-12 w-12" 
           />
           <div className="text-sm">

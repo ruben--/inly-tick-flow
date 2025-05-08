@@ -33,4 +33,5 @@ export interface ProfileData {
   firstName: string;
   lastName: string;
   role: string;
+  logoImage?: string | null;
 }
