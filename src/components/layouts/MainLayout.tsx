@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,10 +12,11 @@ import { supabase } from '@/integrations/supabase/client';
 export function MainLayout() {
   const {
     user,
-    logout
+    logout,
+    showProfileModal,
+    setShowProfileModal
   } = useAuth();
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [isProfileComplete, setIsProfileComplete] = useState(false); // Default to false so modal shows immediately if needed
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const location = useLocation();
   
   const isActive = (path: string) => {
@@ -54,11 +54,6 @@ export function MainLayout() {
     }
   }, [user, isIndexPage]);
 
-  const handleProfileComplete = () => {
-    setIsProfileComplete(true);
-    setShowProfileModal(false);
-  };
-
   return <div className="min-h-screen flex flex-col">
       {user && !isIndexPage && (
         <Dialog 
@@ -73,7 +68,10 @@ export function MainLayout() {
         >
           <ProfileRequiredModal 
             userId={user.id} 
-            onSuccess={handleProfileComplete} 
+            onSuccess={() => {
+              setIsProfileComplete(true);
+              setShowProfileModal(false);
+            }} 
           />
         </Dialog>
       )}

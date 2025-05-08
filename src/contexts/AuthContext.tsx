@@ -1,4 +1,3 @@
-
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -16,6 +15,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  showProfileModal: boolean;
+  setShowProfileModal: (show: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,6 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -93,6 +95,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (error) {
         throw error;
       }
+
+      // Check if profile data is complete
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .maybeSingle();
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (!profileData || !profileData.company_name || !profileData.first_name || !profileData.last_name || !profileData.role || !profileData.website) {
+        setShowProfileModal(true);
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       throw error;
@@ -138,7 +155,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         loading, 
         login, 
         signup, 
-        logout 
+        logout,
+        showProfileModal,
+        setShowProfileModal
       }}
     >
       {children}

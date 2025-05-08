@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -64,6 +63,16 @@ export const useProfileData = ({ userId }: UseProfileDataProps) => {
           lastName: data.last_name || "",
           role: data.role || ""
         });
+        
+        // Check if required profile data is missing
+        if (!data.company_name || !data.first_name || !data.last_name || !data.role || !data.website) {
+          setIsError(true);
+          toast({
+            title: "Profile Incomplete",
+            description: "Please complete your profile data.",
+            variant: "destructive"
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
