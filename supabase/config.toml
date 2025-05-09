@@ -1,5 +1,0 @@
-
-project_id = "xdgjvjvcgtcnwjkvbcgu"
-
-[functions.fetch-brand-logo]
-verify_jwt = false
